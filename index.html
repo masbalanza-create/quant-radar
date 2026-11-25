@@ -21,6 +21,39 @@ tr.buy{background:#e5f5eb}tr.sell{background:#fce8e8}tr.hold{background:#fff7dc}
 <div class="strategy-wide"><button class="primary" type="submit">Guardar y aplicar</button>
 <p id="strategyStatus" class="muted strategy-status" role="status">El perfil se guarda en este navegador. El protocolo sigue comprobando si hay evidencia para operar.</p></div>
 </form>
+</details>
+<details id="generalSettings">
+<summary>Ajustes generales de inversión</summary>
+<form id="generalForm" class="strategy-form">
+<p class="strategy-wide">Consulta las tarifas de tu bróker. Escribe 0 cuando sepas que un coste no se cobra. Si lo desconoces, déjalo en blanco.</p>
+<label>Comisión al comprar (%) <input type="number" min="0" max="100" step="any" name="buy"></label>
+<label>Comisión al vender (%) <input type="number" min="0" max="100" step="any" name="sell"></label>
+<label>Gasto fijo por compra (EUR) <input type="number" min="0" step="any" name="buyFee"></label>
+<label>Gasto fijo por venta (EUR) <input type="number" min="0" step="any" name="sellFee"></label>
+<label>Otros gastos conocidos de compra y venta (%) <input type="number" min="0" max="100" step="any" name="other"></label>
+<label>Importe habitual por compra (EUR) <input type="number" min="0" step="any" name="order"></label>
+<label>Efectivo disponible (EUR) <input type="number" min="0" step="any" name="cash"></label>
+<label>Perfil de riesgo por operación
+<select name="riskProfile">
+<option value="">Presupuesto manual</option>
+<option value="0.25">Prudente · 0,25% del capital</option>
+<option value="0.5">Intermedio · 0,50% del capital</option>
+<option value="1">Alto · 1% del capital</option>
+</select></label>
+<label>Pérdida máxima en modo manual (EUR) <input type="number" min="0" step="any" name="lossBudget"></label>
+<p class="strategy-wide">El importe habitual sirve para expresar los gastos fijos como porcentaje. El capital total y el límite por activo se ajustan en el perfil de estrategia.</p>
+<div class="strategy-wide"><button class="primary" type="submit">Guardar ajustes</button>
+<p class="muted" id="generalStatus" role="status"></p></div>
+</form>
+</details>
+<details id="personalPortfolio">
+<summary>Cartera personal</summary>
+<form id="personalPortfolioForm" class="strategy-form">
+<p class="strategy-wide">Introduce el valor actual en euros de lo que ya tienes en cada activo, según tu bróker. Usa 0 si no tienes ese activo y deja en blanco los importes que desconozcas.</p>
+<div id="personalHoldings" class="strategy-form strategy-wide"></div>
+<div class="strategy-wide"><button class="primary" type="submit">Guardar cartera</button>
+<p id="personalPortfolioStatus" class="muted" role="status">Los importes se guardan en este navegador.</p></div>
+</form>
 </details><p id="fxnote" class="muted" style="font-size:12px"></p><div class="cards"><div class="card"><small>Activos disponibles</small><div class="metric" id="count">—</div><small>Universo seleccionado</small></div><div class="card"><small>Sesgo alcista</small><div class="metric" id="bull">—</div><small>Puntuación conjunta ≥ 65</small></div><div class="card"><small>Mayor puntuación</small><div class="metric" id="top">—</div><small>Puntuación técnica + ajuste informativo, no probabilidad</small></div></div><div class="layout"><div class="card"><div class="split"><h2>Clasificación de activos</h2><small>Orden por puntuación conjunta</small></div><div class="legend"><span style="background:#e5f5eb">Compra virtual validada</span><span style="background:#fce8e8">Venta virtual validada</span><span style="background:#fff7dc">No operar</span><span style="background:#e4e8ee">Cerrado</span><span style="background:#f1f3f5">Horario sin verificar</span></div><div class="scroll"><table><thead><tr><th>Activo</th><th>Precio</th><th>Variación / vela</th><th>Fuente y última operación</th><th>Score</th><th>Riesgo</th><th>Decisión / sesión</th></tr></thead><tbody id="rows"></tbody></table></div><p class="muted" id="errors"></p></div><div><div class="card"><div class="split"><h2 id="name">Selecciona un activo</h2><span id="signal" class="pill"></span></div><div class="metric" id="price">—</div><canvas id="chart"></canvas><div id="indicators" class="muted"></div><p class="muted" id="source"></p></div><div class="card" style="margin-top:16px"><div class="split"><h2>¿Qué haría ante esta situación?</h2><span class="pill" id="aiMode">Motor cuantitativo</span></div><div id="allocationPanel" style="padding:14px;margin:0 0 14px;border:1px solid #dce2e8;border-radius:10px;font-size:17px;font-weight:700" hidden>Porcentaje virtual: —</div><div id="analysis"></div><button id="openProtocol" type="button" aria-haspopup="dialog" disabled>Ver proceso cuantitativo</button><button id="ask" class="primary" style="margin-top:15px">Análisis avanzado con IA</button><p id="aihelp" class="muted"></p><button id="copy">Copiar contexto para ChatGPT</button><div id="deep" style="margin-top:14px"></div><p class="muted">Hipótesis educativa; no ejecuta operaciones ni garantiza resultados.</p></div><div class="card" style="margin-top:16px"><div class="split"><h2>Noticias y acontecimientos</h2><button id="reloadnews">Actualizar noticias</button></div><p id="newsstatus" class="muted"></p><div id="newslist"></div></div></div></div><div class="card" style="margin-top:16px"><h2>Metodología y control de riesgo</h2><p>Puntuación conjunta = técnica + ajuste de noticias (máximo ±12 puntos). Filtro de titulares de hasta 72 horas; impacto limitado a medios prioritarios y señales explícitas. No verifica artículos completos. Score técnico heurístico: momentum de 10 velas, relación con media de 20 velas y RSI de 14 periodos. Riesgo según volatilidad por vela y clase de activo; no equivale a una calificación regulatoria. Los horizontes cambian la frecuencia de las velas, no predicen el futuro. El universo es una lista inicial, no un escáner exhaustivo.</p></div><footer>QUANT RADAR · Datos: Alpaca (opcional), Kraken y Yahoo Finance (acceso no oficial). Sin conexión a bróker.</footer></main>
 <dialog id="protocolDialog" aria-labelledby="protocolTitle">
 <div class="protocol-head"><div class="split"><h2 id="protocolTitle">Proceso cuantitativo</h2>
@@ -45,9 +78,8 @@ const intra=()=>['1min','5min','15min','30min','1h'].includes($('horizon').value
 function session(d){if(d.u[2]==='Crypto')return 'open';if(['EE. UU.','ETF'].includes(d.u[2])&&clock.state&&Date.now()/1000-clock.asof<120)return clock.state;let s=d.meta.session,z=d.meta.exchange_timezone;if(s&&s.start&&s.end&&z){let now=Date.now()/1000;try{let f=new Intl.DateTimeFormat('en-CA',{timeZone:z,year:'numeric',month:'2-digit',day:'2-digit'});if(f.format(new Date(s.start*1000))===f.format(new Date()))return now>=s.start&&now<s.end?'open':'closed'}catch{}}return 'unknown'}
 function newsFilter(d){let n=newsData[d.u[0]];return n&&Date.now()/1000-n.asof<900?n.filter:null}
 function joint(d){return clamp(d.score+(newsFilter(d)?.adjustment||0),0,100)}
-function posture(d){let f=newsFilter(d),score=joint(d);if(!f||newsData[d.u[0]]?.errors?.length)return ['hold','No actuar · contexto incompleto'];if(score>=75&&d.mom>0&&d.p>d.ma&&d.rsi<75&&f.adjustment>=-4)return ['buy','Comprar virtual'];if(score<=35)return ['sell','Reducir / vender virtual'];return ['hold','No actuar']}
-function preliminaryDecision(d){let state=session(d);if(state==='closed')return ['closed','Cerrado · '+posture(d)[1]];if(state==='unknown')return ['unknown','Horario sin verificar'];if(d.stale||(intra()&&!fresh(d)))return ['hold','No actuar · dato no verificado'];return posture(d)}
-function preliminaryAllocation(d){let action=preliminaryDecision(d)[0],score=joint(d);if(action==='buy'){let base=score>=90?5:score>=85?4:score>=80?3:2;let factor=d.risk==='Alto'?.5:d.risk==='Medio'?.75:1;return {action,percent:Math.min(Math.round(base*factor*10)/10,strategyProfile?.limit??100),basis:'valor total de la cartera virtual'}}if(action==='sell')return {action,percent:score<=15?100:score<=25?75:50,basis:'posición virtual existente en este activo'};return {action,percent:0,basis:'sin operación'}}
+function posture(d){let f=newsFilter(d),score=joint(d);if(!f||newsData[d.u[0]]?.errors?.length)return ['hold','Contexto de noticias incompleto'];if(score>=75&&d.mom>0&&d.p>d.ma&&d.rsi<75&&f.adjustment>=-4)return ['buy','Sesgo alcista'];if(score<=35)return ['sell','Sesgo bajista'];return ['hold','Sin sesgo claro']}
+function preliminaryDecision(d){let state=session(d);if(state==='closed')return ['closed','Cerrado · '+posture(d)[1]];if(state==='unknown')return ['unknown','Horario sin verificar'];if(d.stale||(intra()&&!fresh(d)))return ['hold','Cotización sin verificar'];return posture(d)}
 const strategyKey = 'qr_strategy_v1';
 let strategyProfile = null;
 try { strategyProfile = normalizeStrategy(JSON.parse(localStorage.getItem(strategyKey))); } catch {}
@@ -94,6 +126,86 @@ $('strategyForm').onsubmit = event => {
   load();
 };
 
+const generalSettingsKey = 'qr_general_settings_v1';
+let generalSettings = {};
+try { generalSettings = JSON.parse(localStorage.getItem(generalSettingsKey)) ?? {}; } catch {}
+const generalForm = $('generalForm');
+const generalFields = [...generalForm.querySelectorAll('input, select')];
+for (const field of generalFields) field.value = generalSettings[field.name] ?? '';
+generalForm.onsubmit = event => {
+  event.preventDefault();
+  generalSettings = Object.fromEntries(generalFields.map(field => [field.name, field.value]));
+  try {
+    localStorage.setItem(generalSettingsKey, JSON.stringify(generalSettings));
+    $('generalStatus').textContent = 'Ajustes guardados para todos los activos en este navegador.';
+  } catch {
+    $('generalStatus').textContent = 'Ajustes aplicados durante esta visita.';
+  }
+  $('protocolDialog').report = null;
+  render();
+};
+
+function generalCost() {
+  const known = name => generalSettings[name] !== undefined && generalSettings[name] !== '';
+  const tariff = ['buy', 'sell', 'buyFee', 'sellFee', 'other'];
+  if (!tariff.every(known)) return null;
+  const fixed = Number(generalSettings.buyFee) + Number(generalSettings.sellFee);
+  const order = Number(generalSettings.order);
+  if (fixed > 0 && !(order > 0)) return null;
+  const percent = Number(generalSettings.buy) + Number(generalSettings.sell) + Number(generalSettings.other);
+  return percent + (fixed > 0 ? fixed / order * 100 : 0);
+}
+
+function totalScenarioCost(entries) {
+  const base = generalCost();
+  if (base === null) return null;
+  const costs = (entries ?? []).map(Number);
+  if (costs.some(value => !Number.isFinite(value) || value < 0)) return null;
+  const total = base + costs.reduce((sum, value) => sum + value, 0);
+  return Number.isFinite(total) && total <= 100 ? total : null;
+}
+
+const personalPortfolioKey = 'qr_personal_portfolio_v1';
+let personalHoldings = {};
+try { personalHoldings = JSON.parse(localStorage.getItem(personalPortfolioKey)) ?? {}; } catch {}
+const holdingFields = universe.map(([symbol, name]) => {
+  const label = document.createElement('label');
+  label.textContent = name + ' (' + symbol + ') · EUR';
+  const input = document.createElement('input');
+  input.type = 'number';
+  input.min = '0';
+  input.step = '0.01';
+  input.value = personalHoldings[symbol] ?? '';
+  label.append(input);
+  $('personalHoldings').append(label);
+  return [symbol, input];
+});
+$('personalPortfolioForm').onsubmit = event => {
+  event.preventDefault();
+  personalHoldings = Object.fromEntries(holdingFields
+    .filter(([, input]) => input.value !== '')
+    .map(([symbol, input]) => [symbol, input.valueAsNumber]));
+  try {
+    localStorage.setItem(personalPortfolioKey, JSON.stringify(personalHoldings));
+    $('personalPortfolioStatus').textContent = 'Cartera guardada en este navegador.';
+  } catch {
+    $('personalPortfolioStatus').textContent = 'Cartera aplicada durante esta visita.';
+  }
+  $('protocolDialog').report = null;
+  render();
+};
+
+function positionSettings(d) {
+  const key = d.u[0] + '|' + d.interval;
+  const profileRate = Number(generalSettings.riskProfile);
+  const lossBudget = profileRate > 0 && strategyProfile
+    ? Math.round(strategyProfile.capital * profileRate) / 100 : generalSettings.lossBudget;
+  const atrStop = d.atr > 0 && d.p > 0 ? Math.round(20000 * d.atr / d.p) / 100 : null;
+  const overrides = positionSizeInputs.get(key);
+  return {cash:generalSettings.cash, lossBudget, stop:atrStop, ...overrides,
+    limit:overrides?.limit || strategyProfile?.limit, exposure:personalHoldings[d.u[0]]};
+}
+
 function protocolReport(d){
   const usable = d.interval === $('horizon').value && session(d) === 'open' && !d.stale && (!intra() || fresh(d))
     && !!newsFilter(d) && !newsData[d.u[0]]?.errors?.length;
@@ -125,6 +237,7 @@ function protocolReport(d){
         const series = [d.u[0], d.interval, d.meta.source, preparation.corporate].join('|');
         const ledger = recordForecast(saved, series, audit.bars, report.forecast, now);
         localStorage.setItem(ledgerKey, JSON.stringify(ledger));
+        report.forecast.evaluation = forecastEvaluation(ledger, series, bars, d.interval);
         const lastClosed = ledger.slice().reverse().find(entry=>entry.key===series && entry.result);
         report.forecast.lastClosed = lastClosed
           ? {issuedAt:lastClosed.issuedAt, direction:lastClosed.direction, reference:lastClosed.reference, close:lastClosed.result.close}
@@ -138,13 +251,23 @@ function protocolReport(d){
   }
   return d.protocolCache.get(key);
 }
-function decision(d){
+function protocolVerdictFor(d) {
   const report = protocolReport(d);
+  if (!Object.hasOwn(report, 'uncertainty')) report.uncertainty = backtestUncertainty(report.historicalTest);
+  const key = d.u[0] + '|' + d.interval;
+  const cost = totalScenarioCost(protocolCostInputs.get(key));
+  const sizing = Object.fromEntries(Object.entries(positionSettings(d))
+    .map(([field, value]) => [field, value == null || value === '' ? NaN : Number(value)]));
+  return integratedVerdict(report, preliminaryDecision(d)[0], cost, strategyProfile, sizing);
+}
+function decision(d){
+  const verdict = protocolVerdictFor(d);
   const market = session(d);
-  return [market === 'open' ? report.action : market, report.label];
+  return [market === 'open' ? verdict.action : market, verdict.stance];
 }
 function allocation(d){
-  return {action: protocolReport(d).action, percent: 0, basis: 'sin operación virtual autorizada'};
+  const verdict = protocolVerdictFor(d);
+  return {action:verdict.action, percent:verdict.percent, basis:verdict.reason};
 }
 const protocolSource = JSON.parse($('protocolSource').textContent);
 const protocolCoverage = [
@@ -161,23 +284,23 @@ const protocolCoverage = [
   ['Sin datos suficientes', 'Rentabilidad y riesgo históricos a partir de cierres del intervalo seleccionado.'],
   ['Sin titulares revisados', 'El filtro clasifica acontecimientos recientes y estima su efecto orientativo sobre la puntuación del radar.'],
   ['Sin datos suficientes', 'Modelo ridge exploratorio que estima el rendimiento entre el último cierre y el siguiente.'],
-  ['Experimental', 'Previsión común para la próxima vela. Entrenamiento y calibración pendientes.'],
-  ['Histórico', 'Distribución empírica de la regla. Falta calibrar una distribución predictiva.', 3],
-  ['Requiere datos y modelo', 'Trayectorias calibradas y barreras de entrada y salida.'],
-  ['Según la estrategia', 'Cadena histórica de opciones, vencimientos y tipos de interés.'],
-  ['Exploratorio', 'Prueba cronológica con referencia del mismo activo. Faltan validación repetida y costes verificados.', 4],
-  ['Por implementar', 'Cuantificar incertidumbre, dependencia temporal y pruebas múltiples con una muestra suficiente.'],
-  ['Por implementar', 'Predicciones fechadas y resultados posteriores para medir calibración.'],
-  ['Simulación disponible', 'Puedes introducir un coste agregado de ida y vuelta.', 5],
-  ['Parcial', 'Media de la muestra y escenario neto del paso 21. Falta una esperanza predictiva validada.'],
-  ['Parcial', 'Volatilidad y caída máxima de las velas cerradas. Faltan pruebas de estrés de cartera.'],
-  ['Parcial', 'Tope del perfil. Faltan exposición vigente, efectivo y presupuesto de pérdida.', 6],
-  ['Requiere datos y modelo', 'Posiciones y series sincronizadas de todos los activos de la cartera.'],
-  ['Opinión virtual', 'El informe compara la señal actual con la evidencia histórica. La asignación del protocolo requiere validación.'],
-  ['Exploratorio', 'La prueba usa entrada en el cierre siguiente y salida una vela más tarde. Faltan barreras verificadas.'],
-  ['Según la estrategia', 'Para evaluar ejecución se necesitan precios negociables, liquidez y condiciones de órdenes.'],
-  ['Registro local', 'Las previsiones se cotejan al recibir la siguiente vela cerrada. Quedan pendientes las posiciones y los controles de deterioro.'],
-  ['Parcial', 'Se ven los retornos de las operaciones históricas. Falta atribuir resultados de posiciones registradas.']
+  ['Sin datos suficientes', 'Comparación exploratoria de modelos para estimar el rendimiento de la próxima vela.'],
+  ['Sin datos suficientes', 'Distribución observada entre cierres del activo y resultados históricos de la regla técnica.'],
+  ['Sin datos suficientes', 'Simulación de trayectorias de un activo mediante remuestreo de rendimientos históricos.'],
+  ['Opciones sin consultar', 'Consulta puntual de opciones call y put cercanas al precio del subyacente.'],
+  ['Sin fechas evaluables', 'Backtest cronológico bruto de una regla fija con una referencia del mismo activo.', 4],
+  ['Muestra insuficiente', 'Intervalo exploratorio para la diferencia de rendimiento bruto entre la regla y su referencia.'],
+  ['Esperando cierres observados', 'Compara las previsiones de deriva guardadas en este navegador con los cierres posteriores.'],
+  ['Simulación disponible', 'Introduce los costes estimados de abrir y cerrar una operación.', 5],
+  ['Sin operaciones históricas', 'Resultado medio por operación de la regla del paso 18, antes y después de costes simulados.'],
+  ['Sin datos suficientes', 'Riesgo histórico del activo y de las operaciones simuladas en el paso 18.'],
+  ['Escenario de tamaño disponible', 'Calcula cuánto añadir a una posición virtual larga con los límites y el efectivo que indiques.', 6],
+  ['Escenario de cartera disponible', 'Estima el riesgo histórico de una cartera virtual con los pesos que introduzcas.'],
+  ['Comprobaciones disponibles', 'Contrasta la señal actual con el backtest, su incertidumbre y los costes simulados.'],
+  ['Simulación de salidas disponible', 'Simula la entrada al cierre siguiente a la señal y la salida por objetivo, stop o plazo.'],
+  ['Simulación histórica', 'Compara tres formas de repartir una compra virtual entre velas históricas.'],
+  ['Seguimiento virtual', 'Registra una posición larga y sigue su resultado al último cierre de la fuente seleccionada.'],
+  ['Evaluación de cierres virtuales', 'Resume las operaciones cerradas que guardaste en el paso 29.']
 ];
 
 function protocolDetails(d, report){
@@ -201,11 +324,11 @@ function protocolDetails(d, report){
      'Ventana evaluada: tramo final del histórico, desde el índice ' + history.cutoff + ' (numeración desde cero). Casos: ' + history.observations + '.',
      history.meanGrossReturn === null ? 'Sin casos elegibles para calcular una media.' : 'Media bruta = suma de los rendimientos ÷ número de casos ≈ ' + f(history.sumGrossReturn*100) + '% ÷ ' + history.observations + ' = ' + f(history.meanGrossReturn*100,3) + '%. Describe esa muestra histórica.',
      history.benchmarkMean === null ? 'Sin histórico para la referencia.' : 'Referencia: entrar en las ' + history.benchmarkCount + ' fechas elegibles, con media bruta del ' + f(history.benchmarkMean*100,3) + '%.' + (history.meanGrossReturn === null ? '' : ' Diferencia regla − referencia = ' + f((history.meanGrossReturn-history.benchmarkMean)*100,3) + ' puntos porcentuales.'),
-     'Implementación pendiente: estabilidad por periodos e incertidumbre estadística.'],
+     'Los resultados son brutos. La significación estadística y los costes se tratan en los pasos posteriores.'],
     ['Indica el coste total de abrir y cerrar como porcentaje del importe de la operación. Incluye comisión, diferencial, deslizamiento y los demás costes aplicables.'],
     [profile ? 'Tope declarado = ' + f(profile.capital,2) + ' € × ' + f(profile.limit,2) + '% ≈ ' + f(profile.capital * profile.limit / 100,2) + ' €. Es el máximo por activo declarado en el formulario.' : 'Completa Mi estrategia virtual para calcular el tope por activo.',
-     'Datos necesarios: efectivo, posiciones y límites de pérdida. Implementación pendiente: escenarios de estrés, exposición total y tamaño de posición.'],
-    ['Implementación pendiente: reglas de entrada, salida e invalidación, seguimiento de posiciones simuladas y evaluación tras el cierre.']
+     'La liquidez de mercado y la exposición conjunta de la cartera quedan pendientes de incorporar al cálculo.'],
+    ['El paso 29 registra y valora posiciones simuladas. La evaluación tras el cierre se desarrolla en el paso 30.']
   ];
 }
 
@@ -296,62 +419,574 @@ function protocolTrades(trades){
 
 const protocolCostInputs = new Map();
 
-function protocolCostScenario(key, gross){
+function brokerComparison(d) {
+  const panel = document.createElement('details');
+  panel.className = 'protocol-math';
+  const title = document.createElement('summary');
+  title.textContent = 'Comparar costes de brókeres · ' + d.u[1];
+  const note = document.createElement('p');
+  note.textContent = 'Para comparar, usa el mismo instrumento, mercado, moneda, tamaño y hora. Copia los precios de compra y venta de cada bróker e indica sus comisiones y cambio de divisa como porcentaje total de ida y vuelta.';
+  panel.append(title, note);
+  const order = Number(generalSettings.order);
+  const result = document.createElement('p');
+  result.setAttribute('role','status');
+  const brokers = [
+    ['DEGIRO', 'https://www.degiro.es/tarifas'],
+    ['Interactive Brokers', 'https://www.interactivebrokers.com/en/pricing/commissions-stocks.php'],
+    ['XTB', 'https://www.xtb.com/es/cuenta-y-tarifas']
+  ];
+  const rows = brokers.map(([name, url]) => {
+    const row = document.createElement('fieldset');
+    const legend = document.createElement('legend');
+    const link = document.createElement('a');
+    link.href = url;
+    link.target = '_blank';
+    link.rel = 'noopener';
+    link.textContent = name + ' · tarifas oficiales';
+    legend.append(link);
+    row.append(legend);
+    const fields = ['Precio al que puedes vender (bid)', 'Precio al que puedes comprar (ask)',
+      'Comisiones y divisa de ida y vuelta (%)'].map(text => {
+      const label = document.createElement('label');
+      label.style.display = 'block';
+      label.textContent = text + ' ';
+      const input = document.createElement('input');
+      input.type = 'number';
+      input.min = '0';
+      input.step = 'any';
+      label.append(input);
+      row.append(label);
+      return input;
+    });
+    const cost = document.createElement('p');
+    row.append(cost);
+    panel.append(row);
+    return {name, fields, cost};
+  });
+  function update() {
+    const comparable = rows.flatMap(({name, fields, cost}) => {
+      const [bid, ask, fees] = fields.map(field => field.valueAsNumber);
+      if (!(bid > 0 && ask >= bid && fees >= 0)) {
+        cost.textContent = 'Faltan precios comparables o comisiones.';
+        return [];
+      }
+      const spread = 200 * (ask - bid) / (ask + bid);
+      const total = spread + fees;
+      cost.textContent = 'Diferencial ' + fmt(spread) + '% · coste estimado ' + fmt(total) + '%'
+        + (order > 0 ? ' (≈ ' + fmt(order * total / 100) + ' EUR para el importe habitual).' : '.');
+      return [{name,total}];
+    }).sort((a,b) => a.total - b.total);
+    const best = comparable[0];
+    result.textContent = comparable.length < 2 ? 'Completa al menos dos brókeres para comparar.'
+      : 'Menor coste estimado en esta comparación · '
+        + comparable.filter(row => row.total === best.total).map(row => row.name).join(', ')
+        + ' (' + fmt(best.total) + '%). La ejecución y el deslizamiento pueden cambiar el resultado.';
+  }
+  for (const {fields} of rows) for (const field of fields) field.addEventListener('input', update);
+  panel.append(result);
+  update();
+  return panel;
+}
+
+function protocolCostScenario(key, {meanGrossReturn:gross, trades}, onCostChange){
   const section = document.createElement('div');
   section.className = 'protocol-math protocol-cost';
-  const label = document.createElement('label');
-  label.textContent = 'Coste total simulado de ida y vuelta (%)';
-  const input = document.createElement('input');
-  input.type = 'number';
-  input.min = '0';
-  input.max = '100';
-  input.step = 'any';
-  input.value = protocolCostInputs.get(key) ?? '';
+  const base = document.createElement('p');
+  const configuredCost = generalCost();
+  base.textContent = configuredCost === null
+    ? 'Completa las tarifas en Ajustes generales de inversión. Si hay cargos fijos, indica el importe habitual de una compra.'
+    : 'Costes generales de compra y venta · ' + fmt(configuredCost) + '%. Los extras del activo son opcionales en esta simulación.';
+  section.append(base);
+  const fields = ['Diferencial entre compra y venta', 'Deslizamiento estimado',
+    'Financiación', 'Cambio de moneda y otros extras del activo'];
+  const inputs = fields.map((name, index) => {
+    const label = document.createElement('label');
+    label.style.display = 'block';
+    label.textContent = name + ' (%)';
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.min = '0';
+    input.max = '100';
+    input.step = 'any';
+    input.value = protocolCostInputs.get(key)?.[index] ?? '';
+    label.append(input);
+    section.append(label);
+    return input;
+  });
   const output = document.createElement('p');
   output.setAttribute('role', 'status');
   const format = value => value.toLocaleString('es-ES', {maximumFractionDigits: 5});
   function update(){
+    if (inputs.some(input => input.validity.badInput || !input.checkValidity())) {
+      onCostChange(null);
+      output.textContent = 'Cada coste debe estar entre 0% y 100%.';
+      return;
+    }
+    const cost = totalScenarioCost(inputs.map(input => input.value));
+    if (cost === null) {
+      onCostChange(null);
+      output.textContent = configuredCost === null ? 'Coste general pendiente.' : 'El coste total debe ser como máximo del 100%.';
+      return;
+    }
+    onCostChange(cost);
+    const total = 'Coste total de ida y vuelta ' + format(cost) + '%.';
     if (gross === null) {
-      output.textContent = 'Sin casos históricos para estimar la media neta.';
+      output.textContent = total + ' Sin operaciones históricas para calcular el resultado neto.';
       return;
     }
-    if (input.validity.badInput || !input.checkValidity()) {
-      output.textContent = 'Introduce un coste entre 0% y 100%.';
-      return;
-    }
-    if (input.value === '') {
-      output.textContent = gross > 0
-        ? 'Coste de equilibrio histórico: ' + format(gross*100) + '%. A ese coste, la media neta sería cero.'
-        : 'La media bruta histórica es ' + format(gross*100) + '%. Ya es cero o negativa con coste cero.';
-      return;
-    }
-    const cost = input.valueAsNumber;
-    const net = gross*100 - cost;
-    output.textContent = 'Media neta simulada = ' + format(gross*100) + '% − ' + format(cost)
-      + '% ≈ ' + format(net) + '%. Frente a abstenerse (0% en esta comparación), la media es '
-      + (net > 0 ? 'superior' : net < 0 ? 'inferior' : 'igual') + '.';
+    const positive = trades.filter(trade => trade.gross * 100 > cost).length;
+    output.textContent = total + ' Media neta simulada ' + format(gross * 100 - cost)
+      + '% · ' + positive + ' de ' + trades.length + ' operaciones en positivo tras costes.'
+      + (gross * 100 > cost ? ' El escenario admite ' + format(gross * 100 - cost)
+        + ' puntos porcentuales de coste adicional antes de llegar a cero.' : '');
   }
-  input.addEventListener('input', () => {
-    protocolCostInputs.set(key, input.value);
+  for (const input of inputs) input.addEventListener('input', () => {
+    protocolCostInputs.set(key, inputs.map(field => field.validity.badInput ? 'NaN' : field.value));
     update();
+    refreshProtocolVerdict();
   });
-  label.append(input);
-  section.append(label, output);
+  section.append(output);
+  if (gross !== null) {
+    const breakeven = document.createElement('p');
+    breakeven.textContent = gross > 0
+      ? 'Coste de equilibrio histórico ' + format(gross * 100) + '%. A ese coste, la media neta sería cero.'
+      : 'La media bruta histórica es ' + format(gross * 100) + '%. Ya es cero o negativa con coste cero.';
+    section.append(breakeven);
+  }
   update();
   return section;
 }
 
+const positionSizeInputs = new Map();
+
+function protocolPositionSize(d, profile, getCost) {
+  const key = d.u[0] + '|' + d.interval;
+  const panel = document.createElement('div');
+  panel.className = 'protocol-math protocol-cost';
+  const fields = [
+    ['lossBudget', 'Presupuesto de pérdida de esta operación (EUR)'],
+    ['stop', 'Distancia de la entrada al stop (%)'],
+    ['exposure', 'Importe en Cartera personal (EUR)'],
+    ['cash', 'Efectivo disponible para invertir (EUR)'],
+    ['limit', 'Tope para este escenario (% del capital)']
+  ];
+  const saved = positionSettings(d);
+  const inputs = fields.map(([name, title]) => {
+    const label = document.createElement('label');
+    label.style.display = 'block';
+    label.textContent = title;
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.min = '0';
+    input.step = 'any';
+    if (name === 'stop' || name === 'limit') input.max = '100';
+    if (name === 'limit') input.placeholder = String(profile.limit);
+    if (name === 'exposure') input.readOnly = true;
+    input.value = saved[name] ?? '';
+    label.append(input);
+    panel.append(label);
+    return input;
+  });
+  const output = document.createElement('p');
+  output.setAttribute('role', 'status');
+  const euro = new Intl.NumberFormat('es-ES', {style:'currency', currency:'EUR'});
+  const update = () => {
+    const cost = getCost();
+    const values = Object.fromEntries(fields.map(([name], i) => [name, inputs[i].valueAsNumber]));
+    if (inputs.at(-1).value === '' && !inputs.at(-1).validity.badInput) values.limit = profile.limit;
+    const size = virtualPositionSize({...profile, ...values, cost:cost ?? 0});
+    if (!size) {
+      output.textContent = 'Completa el efectivo, el presupuesto de pérdida y la distancia al stop, entre más de 0% y 100%. En Cartera personal, indica el importe de este activo o escribe 0 EUR si no tienes posición.';
+      return;
+    }
+    output.textContent = 'Importe máximo adicional ' + euro.format(size.amount)
+      + ' (' + fmt(size.portfolioWeight * 100) + '% del capital). Por riesgo ' + euro.format(size.riskLimit)
+      + ' · margen hasta el tope por activo ' + euro.format(size.concentrationLimit)
+      + ' · efectivo ' + euro.format(values.cash)
+      + '. Pérdida simulada al stop ' + euro.format(size.lossAtStop)
+      + (cost == null ? '. Escenario sin costes del paso 21.' : ' con un coste de ' + fmt(cost) + '%.');
+  };
+  for (const input of inputs) input.addEventListener('input', () => {
+    const changes = positionSizeInputs.get(key) ?? {};
+    const field = fields[inputs.indexOf(input)][0];
+    positionSizeInputs.set(key, {...changes, [field]:input.validity.badInput ? 'NaN' : input.value});
+    update();
+    refreshProtocolVerdict();
+  });
+  const note = document.createElement('p');
+  note.textContent = 'El tope habitual es ' + fmt(profile.limit) + '% del capital. Puedes cambiarlo para este activo y plazo. La distancia al stop propuesta equivale a dos rangos medios de 14 velas (ATR) y puedes editarla. El cálculo supone una salida al precio del stop.';
+  panel.append(output, note);
+  update();
+  return {panel, update};
+}
+
+const portfolioWeightInputs = new Map();
+
+function protocolPortfolio(d) {
+  const panel = document.createElement('div');
+  panel.className = 'protocol-math protocol-cost';
+  const currency = d.meta.currency;
+  const candidates = currency && d.u[2] !== 'Forex'
+    ? data.filter(asset => asset.interval === d.interval && asset.meta.currency === currency && asset.u[2] !== 'Forex' && !asset.stale)
+      .sort((a, b) => a.u[1].localeCompare(b.u[1], 'es'))
+    : [];
+  const note = document.createElement('p');
+  if (!candidates.length) {
+    note.textContent = 'Selecciona un activo distinto de un par de divisas con histórico disponible para abrir un escenario en su moneda de cotización.';
+    panel.append(note);
+    return panel;
+  }
+  note.textContent = 'Pesos en activos cotizados en ' + currency + '. Los campos vacíos valen cero y el peso restante queda en efectivo.';
+  panel.append(note);
+  const key = currency + '|' + d.interval;
+  const saved = portfolioWeightInputs.get(key) ?? {};
+  const availableSymbols = new Set(candidates.map(asset => asset.u[0]));
+  const inputs = candidates.map(asset => {
+    const label = document.createElement('label');
+    label.style.display = 'block';
+    label.textContent = asset.u[1] + ' (%)';
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.min = '0';
+    input.max = '100';
+    input.step = 'any';
+    input.value = saved[asset.u[0]] ?? '';
+    label.append(input);
+    panel.append(label);
+    return input;
+  });
+  const output = document.createElement('div');
+  output.setAttribute('aria-live', 'polite');
+  const prepared = new Map();
+  const update = () => {
+    const weights = inputs.map(input => input.value === '' ? 0 : input.valueAsNumber / 100);
+    if (inputs.some(input => input.validity.badInput || !input.checkValidity())
+        || weights.reduce((sum, weight) => sum + weight, 0) > 1 + 1e-12) {
+      output.textContent = 'Introduce pesos entre 0% y 100% que sumen como máximo el 100%.';
+      return;
+    }
+    const positions = candidates.flatMap((asset, i) => {
+      const weight = weights[i];
+      if (weight === 0) return [];
+      if (!prepared.has(asset)) {
+        const audit = auditForecastInputs(asset.values, {interval:asset.interval, now:Date.now(),
+          source:asset.meta.source, stale:asset.stale, continuous:asset.u[2] === 'Crypto'});
+        prepared.set(asset, prepareForecastSeries(audit.bars, asset.u[2]).bars);
+      }
+      return [{weight, bars:prepared.get(asset), name:asset.u[1]}];
+    });
+    const result = portfolioRisk(positions, d.interval);
+    if (!result || result.count < 20) {
+      output.textContent = result ? 'Hay ' + result.count + ' rendimientos alineados. Se necesitan al menos 20.'
+        : 'Introduce un peso positivo para simular la cartera.';
+      return;
+    }
+    const pct = value => fmt(value * 100) + '%';
+    const contribution = result.volatility > 0
+      ? ' Aportación a la varianza: ' + positions.map(({name}, i) => name + ' ' + pct(result.contributions[i])).join(' · ') + '.'
+      : ' La varianza observada es cero.';
+    const omitted = Object.keys(saved).filter(symbol => Number(saved[symbol]) > 0 && !availableSymbols.has(symbol));
+    output.replaceChildren(protocolCalculation(['Rentabilidad y riesgo de la cartera',
+      'Cada rendimiento de cartera es la suma de los rendimientos de los activos multiplicados por sus pesos. La volatilidad es la desviación estándar muestral.',
+      result.count + ' periodos alineados · media por vela ' + pct(result.mean) + ' · volatilidad por vela '
+        + pct(result.volatility) + ' · efectivo ' + pct(result.cash),
+      'Se supone rebalanceo a pesos constantes, efectivo al 0% y ausencia de costes.' + contribution
+        + (omitted.length ? ' Los pesos de ' + omitted.join(', ') + ' se tratan como efectivo mientras falte su serie.' : '')]));
+  };
+  for (const input of inputs) input.addEventListener('input', () => {
+    portfolioWeightInputs.set(key, {...saved, ...Object.fromEntries(candidates.map((asset, i) => [asset.u[0], inputs[i].value]))});
+    update();
+  });
+  const coverage = document.createElement('p');
+  coverage.textContent = 'Pendientes: carteras en varias monedas, posiciones reales y optimización de pesos.';
+  panel.append(output, coverage);
+  update();
+  return panel;
+}
+
+function virtualPositionKey(d) {
+  return 'qr_virtual_position_v1:' + JSON.stringify([d.u[0], d.interval, d.meta.source, d.meta.currency]);
+}
+
+function protocolPositionMonitor(d, bar, signal, onChange) {
+  const panel = document.createElement('div');
+  panel.className = 'protocol-math protocol-cost';
+  const currency = d.meta.currency;
+  if (!bar || !currency || !d.meta.source) {
+    panel.textContent = 'El seguimiento necesita un cierre, una moneda y una fuente identificada.';
+    return panel;
+  }
+  const key = virtualPositionKey(d);
+  const price = value => fmt(value) + ' ' + currency;
+  const date = time => new Date(time).toLocaleString('es-ES');
+  const form = document.createElement('form');
+  const label = document.createElement('label');
+  label.textContent = 'Unidades de la posición virtual ';
+  const units = document.createElement('input');
+  units.type = 'number';
+  units.min = '0';
+  units.step = 'any';
+  units.required = true;
+  label.append(units);
+  const button = document.createElement('button');
+  button.type = 'submit';
+  form.append(label, button);
+  const status = document.createElement('p');
+  status.setAttribute('role', 'status');
+  const history = document.createElement('p');
+  const note = document.createElement('p');
+  note.textContent = 'Registro de este navegador por activo, intervalo y fuente. Resultado bruto en moneda original. '
+    + 'La atribución factorial y los indicadores de deterioro quedan como fórmulas de referencia.';
+  panel.append(form, status, history, note);
+
+  const read = () => JSON.parse(localStorage.getItem(key)) ?? {open:null, closed:[]};
+  const describe = (position, exit) => {
+    const move = exit - position.entry;
+    return price(move * position.units) + ' (' + fmt(move / position.entry * 100) + '%)';
+  };
+  const update = () => {
+    try {
+      const {open, closed} = read();
+      label.hidden = !!open;
+      units.disabled = !!open;
+      button.textContent = open ? 'Cerrar posición virtual' : 'Registrar compra virtual';
+      const usable = !d.stale && (!open || bar.time > open.entryTime);
+      button.disabled = !usable;
+      const mark = 'Último cierre disponible · ' + price(bar.close) + ' · ' + date(bar.time) + '.';
+      status.textContent = mark + (open
+        ? ' Posición de ' + fmt(open.units) + ' unidades · entrada ' + price(open.entry) + ' · ' + date(open.entryTime) + '.'
+          + (bar.time >= open.entryTime ? ' Resultado bruto abierto ' + describe(open, bar.close) + '.' : '')
+        : ' Sin posición abierta.');
+      if (d.stale) status.textContent += ' La fuente muestra datos guardados.';
+      else if (!usable) status.textContent += ' El siguiente cierre permitirá cerrar la posición.';
+      const last = closed.at(-1);
+      history.textContent = last
+        ? closed.length + (closed.length === 1 ? ' cierre guardado' : ' cierres guardados') + ' · último cierre virtual ' + price(last.exit) + ' · '
+          + date(last.exitTime) + ' · resultado bruto ' + describe(last, last.exit) + '.'
+        : '';
+    } catch {
+      button.disabled = true;
+      status.textContent = 'El navegador no pudo leer el registro virtual.';
+    }
+  };
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    try {
+      const ledger = read();
+      if (d.stale) return update();
+      if (ledger.open) {
+        if (!units.disabled || bar.time <= ledger.open.entryTime) return update();
+        ledger.closed.push({...ledger.open, exit:bar.close, exitTime:bar.time});
+        ledger.open = null;
+      } else {
+        if (units.disabled) return update();
+        const quantity = units.valueAsNumber;
+        if (!Number.isFinite(quantity) || quantity <= 0 || !Number.isFinite(quantity * bar.close)) {
+          status.textContent = 'Introduce una cantidad positiva de unidades dentro del rango admitido.';
+          return;
+        }
+        ledger.open = {units:quantity, entry:bar.close, entryTime:bar.time};
+      }
+      localStorage.setItem(key, JSON.stringify(ledger));
+      units.value = '';
+      update();
+      onChange();
+    } catch {
+      status.textContent = 'El navegador no pudo guardar el cambio.';
+    }
+  });
+  window.addEventListener('storage', event => {
+    if (event.key === key && panel.isConnected) {
+      update();
+      onChange();
+    }
+  }, {signal});
+  update();
+  return panel;
+}
+
+function protocolClosedPositionReview(d, bars) {
+  const panel = document.createElement('div');
+  panel.className = 'protocol-math';
+  panel.setAttribute('aria-live', 'polite');
+  const pct = value => fmt(100 * value) + '%';
+  const amount = value => fmt(value) + ' ' + d.meta.currency;
+  const update = () => {
+    let review;
+    try {
+      const ledger = JSON.parse(localStorage.getItem(virtualPositionKey(d)));
+      review = closedPositionReview(ledger?.closed ?? [], bars);
+    } catch {
+      panel.textContent = 'El navegador no pudo leer el registro virtual.';
+      return;
+    }
+    if (!review) {
+      panel.textContent = 'Los resultados aparecerán al cerrar una posición virtual en el paso 29 para este activo, intervalo y fuente.';
+      return;
+    }
+    const rows = [
+      review.count + ' operaciones · ' + review.wins + ' con ganancia · ' + review.losses
+        + ' con pérdida · ' + (review.count - review.wins - review.losses) + ' sin cambio.',
+      'Resultado bruto acumulado ' + amount(review.total) + ' · esperanza observada por operación '
+        + amount(review.expectancy) + ' · Profit Factor '
+        + (review.profitFactor === null ? 'sin pérdidas para calcularlo.' : fmt(review.profitFactor) + '.'),
+      'Rentabilidad del último cierre virtual ' + pct(review.lastReturn) + '.',
+      review.excursions
+        ? 'Última operación, medido al cierre de cada vela · avance máximo ' + pct(review.excursions.favorable)
+          + ' · caída máxima desde la entrada ' + pct(review.excursions.adverse) + '.'
+        : 'El histórico disponible ya no cubre ambos extremos de la última operación para medir su recorrido.'
+    ];
+    panel.replaceChildren(...rows.map(row => {
+      const line = document.createElement('p');
+      line.textContent = row;
+      return line;
+    }));
+  };
+  update();
+  return {panel, update};
+}
+
+const executionScheduleInputs = new Map();
+
+function protocolExecutionSchedule(d, bars) {
+  const panel = document.createElement('div');
+  panel.className = 'protocol-math protocol-cost';
+  const key = d.u[0] + '|' + d.interval;
+  const fields = [['Cantidad (unidades)', 100, 'any'], ['Número de velas', 5, '1'],
+    ['Participación POV (%)', 1, 'any']];
+  const saved = executionScheduleInputs.get(key);
+  const inputs = fields.map(([name, initial, step], index) => {
+    const label = document.createElement('label');
+    label.style.display = 'block';
+    label.textContent = name;
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.min = index === 1 ? '1' : '0';
+    if (index > 0) input.max = index === 1 ? '30' : '100';
+    input.step = step;
+    input.value = saved?.[index] ?? initial;
+    label.append(input);
+    panel.append(label);
+    return input;
+  });
+  const output = document.createElement('ul');
+  output.setAttribute('aria-live', 'polite');
+  const update = () => {
+    const result = executionSchedule(bars, ...inputs.map(input => input.valueAsNumber), d.u[2]);
+    const rows = result ? [
+      ['TWAP · mismo reparto por vela', result.twap],
+      ['VWAP · reparto según el volumen de la ventana anterior', result.vwap],
+      ['POV · porcentaje del volumen observado', result.pov]
+    ].map(([name, scenario]) => {
+      if (!scenario) return name + ' · volumen histórico utilizable insuficiente.';
+      return name + ' · ' + fmt(scenario.filled) + ' unidades simuladas · '
+        + fmt(scenario.pending) + ' pendientes'
+        + (scenario.mean === null ? '.' : ' · precio medio ' + money(scenario.mean, d) + '.');
+    }) : ['Usa una cantidad positiva, de 1 a 30 velas disponibles y una participación mayor que 0% y de hasta 100%.'];
+    output.replaceChildren(...rows.map(row => {
+      const item = document.createElement('li');
+      item.textContent = row;
+      return item;
+    }));
+  };
+  for (const input of inputs) input.addEventListener('input', () => {
+    executionScheduleInputs.set(key, inputs.map(field => field.value));
+    update();
+  });
+  const note = document.createElement('p');
+  note.textContent = 'Usa cierres históricos como precios simulados. No incluye comisiones, spread ni impacto de mercado. '
+    + 'Almgren-Chriss, creación de mercado y probabilidad de ejecución se muestran como referencias.';
+  panel.append(output, note);
+  update();
+  return panel;
+}
+
+const executionInputs = new Map();
+
+function protocolExecution(key, bars, trades, getCost) {
+  const panel = document.createElement('div');
+  panel.className = 'protocol-math protocol-cost';
+  if (!trades.length) {
+    panel.textContent = 'La regla del paso 18 no produjo señales para simular.';
+    return {panel, update:() => {}};
+  }
+  const fields = [['Objetivo de ganancia (%)', 5, 100], ['Distancia al stop (%)', 5, 100],
+    ['Plazo máximo (velas)', 5, 30]];
+  const saved = executionInputs.get(key);
+  const inputs = fields.map(([name, initial, max], index) => {
+    const label = document.createElement('label');
+    label.style.display = 'block';
+    label.textContent = name;
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.min = index === 2 ? '1' : '0';
+    input.max = String(max);
+    input.step = index === 2 ? '1' : 'any';
+    input.value = saved?.[index] ?? initial;
+    label.append(input);
+    panel.append(label);
+    return input;
+  });
+  const output = document.createElement('p');
+  output.setAttribute('role', 'status');
+  const update = () => {
+    const [target, stop, horizon] = inputs.map(input => input.valueAsNumber);
+    const result = executionScenario(bars, trades, {target, stop, horizon});
+    if (!result) {
+      output.textContent = 'Indica un objetivo y un stop mayores que 0% y de hasta 100%, y un plazo entero de 1 a 30 velas.';
+      return;
+    }
+    const cost = getCost();
+    output.textContent = result.count + ' operaciones simuladas · ' + result.exits.target + ' por objetivo · '
+      + result.exits.stop + ' por stop · ' + result.exits.time + ' por plazo.'
+      + (result.count ? ' Media bruta ' + fmt(result.mean * 100) + '%'
+        + (cost === null ? '.' : ' · media neta con costes del paso 21 ' + fmt(result.mean * 100 - cost) + '%.') : '')
+      + ' Señales omitidas por posición abierta ' + result.overlapping + ' · por falta de horizonte completo ' + result.incomplete + '.';
+  };
+  for (const input of inputs) input.addEventListener('input', () => {
+    executionInputs.set(key, inputs.map(field => field.value));
+    update();
+  });
+  const note = document.createElement('p');
+  note.textContent = 'Las barreras se comprueban únicamente al cierre y la salida usa ese cierre. El modelo permite una posición a la vez y omite señales sin suficientes velas posteriores.';
+  panel.append(output, note);
+  update();
+  return {panel, update};
+}
+
+function protocolExpectancy(trades, cost) {
+  const percent = value => fmt(value) + '%';
+  const count = trades.length;
+  function describe(title, deduction) {
+    let wins = 0, losses = 0, gains = 0, declines = 0;
+    for (const trade of trades) {
+      const result = trade.gross * 100 - deduction;
+      if (result > 0) {
+        wins++;
+        gains += result;
+      } else if (result < 0) {
+        losses++;
+        declines -= result;
+      }
+    }
+    const winMean = wins ? gains / wins : 0;
+    const lossMean = losses ? declines / losses : 0;
+    return protocolCalculation([title,
+      'Esperanza = frecuencia de ganancias × ganancia media − frecuencia de pérdidas × pérdida media. Los empates aportan cero.',
+      '(' + wins + ' ÷ ' + count + ') × ' + percent(winMean) + ' − (' + losses + ' ÷ ' + count + ') × '
+        + percent(lossMean) + ' = ' + percent((gains - declines) / count),
+      wins + ' ganancias · ' + losses + ' pérdidas · ' + (count - wins - losses) + ' empates. '
+        + (deduction ? 'Se restó un coste de ' + percent(deduction) + ' a cada operación.' : 'Coste aplicado: 0%.')]);
+  }
+  const gross = describe('Esperanza histórica bruta', 0);
+  if (cost !== null) return [gross, describe('Esperanza histórica neta', cost)];
+  const note = document.createElement('p');
+  note.textContent = 'Introduce un coste válido en el paso 21 para ver la esperanza neta.';
+  return [gross, note];
+}
+
 $('protocolStart').onclick = () => { $('protocolBody').scrollTop = 0; };
 $('protocolEnd').onclick = () => { $('protocolBody').scrollTop = $('protocolBody').scrollHeight; };
-
-function opinionForAsset(d){
-  const signal = preliminaryDecision(d);
-  if (!['buy','sell','hold'].includes(signal[0]) || d.stale || (intra() && !fresh(d))
-      || !newsFilter(d) || newsData[d.u[0]]?.errors?.length) {
-    return {stance: 'Esperaría antes de cambiar la posición virtual', reason: signal[1] + '.'};
-  }
-  return virtualOpinion(protocolReport(d), signal[0]);
-}
 
 const macroBySymbol = new Map();
 
@@ -493,6 +1128,24 @@ function loadMicroQuote(d, force = false) {
 }
 
 const fundamentalReports = new Map();
+const optionSnapshots = new Map();
+
+async function loadOptions(d) {
+  const symbol = d.u[0];
+  if (optionSnapshots.get(symbol)?.loading) return;
+  optionSnapshots.set(symbol, {loading:true});
+  showProtocol(d);
+  try {
+    const response = await fetch('/api/options?symbol=' + encodeURIComponent(symbol),
+      {signal:AbortSignal.timeout(26000)});
+    if (!response.ok) throw Error();
+    optionSnapshots.set(symbol, {...await response.json(), queriedAt:Date.now()});
+  } catch {
+    optionSnapshots.set(symbol, {reason:'No se pudo consultar la cadena de opciones.', queriedAt:Date.now()});
+  }
+  const dialog = $('protocolDialog');
+  if (dialog.open && dialog.asset?.u[0] === symbol) showProtocol(dialog.asset);
+}
 
 async function loadFundamentals(d) {
   const symbol = d.u[0];
@@ -524,6 +1177,8 @@ function showProtocol(d){
   const macro = macroBySymbol.get(d.u[0]);
   const snapshot = quoteSnapshots.get(d.u[0]);
   const fundamentals = fundamentalReports.get(d.u[0]);
+  const options = optionSnapshots.get(d.u[0]);
+  const supportsOptions = ['EE. UU.', 'ETF'].includes(d.u[2]);
   const news = newsData[d.u[0]];
   const filter = newsFilter(d);
   const loadingNews = Boolean(newsPending[d.u[0]]);
@@ -537,15 +1192,23 @@ function showProtocol(d){
   const matched = report.forecast && comparison?.bars
     ? relativeMomentum(report.preparedBars, comparison.bars, d.interval, invert) : null;
   // Keep the report intact while the user reads or edits the scenario.
-  if (dialog.report === report && dialog.asset === d && dialog.macro === macro && dialog.comparison === comparison && dialog.snapshot === snapshot && dialog.fundamentals === fundamentals && dialog.news === news && dialog.newsFilter === filter && dialog.loadingNews === loadingNews) return;
+  if (dialog.report === report && dialog.asset === d && dialog.macro === macro && dialog.comparison === comparison && dialog.snapshot === snapshot && dialog.fundamentals === fundamentals && dialog.options === options && dialog.news === news && dialog.newsFilter === filter && dialog.loadingNews === loadingNews) return;
   const risk = historicalRisk(report.preparedBars, comparison?.bars, d.interval, invert);
   const alpha = technicalAlpha(report.preparedBars);
+  const quadratic = alpha && technicalAlpha(report.preparedBars, {quadratic:true});
+  const distribution = returnDistribution(report.preparedBars);
+  const simulation = distribution && monteCarloScenarios(report.preparedBars);
+  const uncertainty = report.uncertainty ??= backtestUncertainty(report.historicalTest);
+  dialog.positionMonitorController?.abort();
+  dialog.positionMonitorController = new AbortController();
+  const closedReview = protocolClosedPositionReview(d, report.rawBars);
   dialog.report = report;
   dialog.asset = d;
   dialog.macro = macro;
   dialog.comparison = comparison;
   dialog.snapshot = snapshot;
   dialog.fundamentals = fundamentals;
+  dialog.options = options;
   dialog.news = news;
   dialog.newsFilter = filter;
   dialog.loadingNews = loadingNews;
@@ -555,9 +1218,16 @@ function showProtocol(d){
     step: item.firstElementChild.open,
     trades: item.querySelector('.protocol-trades')?.parentElement.open,
     reference: item.querySelector('.protocol-reference')?.open,
-    discardedNews: item.querySelector('.protocol-discarded-news')?.open
+    discardedNews: item.querySelector('.protocol-discarded-news')?.open,
+    histogram: item.querySelector('.protocol-histogram')?.open
   }));
   $('protocolAsset').textContent = d.u[1] + ' · ' + $('horizon').selectedOptions[0].textContent;
+  let scenarioCost = null;
+  let refreshExpectancy = () => {};
+  let refreshRisk = () => {};
+  let refreshPositionSize = () => {};
+  let refreshDecisionEvidence = () => {};
+  let refreshExecution = () => {};
   $('protocolChecks').replaceChildren(...protocolSource.map(([name, groups], index) => {
     const [defaultStatus, description, panel] = protocolCoverage[index];
     const inputs = report.inputs;
@@ -594,7 +1264,27 @@ function showProtocol(d){
       : news ? 'Titulares sin datos recientes' : defaultStatus;
     const alphaStatus = alpha ? (alpha.error < alpha.baselineError
       ? 'Mejora la referencia en la prueba' : 'Sin mejora en la prueba') : 'Sin datos suficientes';
-    const status = index === 12 ? alphaStatus : index === 11 ? newsStatus : index === 10 ? riskStatus : index === 9 ? fundamentalStatus : index === 8 ? microStatus : index === 7 ? pairStatus : index === 6 ? reversionStatus : index === 5 ? trendStatus : index === 4 ? macroStatus : index === 3 && regime ? (regime.complete ? 'Régimen calculado' : 'Régimen provisional')
+    const modelStatus = quadratic ? (quadratic.error < Math.min(alpha.error, alpha.baselineError)
+      ? 'Modelo cuadrático con menor error' : 'El modelo cuadrático no supera ambas referencias') : 'Sin datos suficientes';
+    const optionsStatus = !supportsOptions ? 'Sin fuente conectada para este activo'
+      : options?.loading ? 'Consultando opciones'
+      : options?.pair ? 'Volatilidad implícita disponible'
+      : options ? 'Sin datos utilizables' : 'Opciones sin consultar';
+    const uncertaintyStatus = uncertainty?.interval ? 'Intervalo exploratorio calculado'
+      : uncertainty ? 'Remuestreo insuficiente' : 'Muestra insuficiente';
+    const evaluation = report.forecast?.evaluation;
+    const evaluationStatus = evaluation?.count ? 'Previsiones evaluadas'
+      : evaluation ? 'Esperando cierres observados' : 'Registro no disponible';
+    const status = index === 26 && !report.historicalTest.trades.length ? 'Sin señales históricas'
+      : index === 24 && (d.u[2] === 'Forex' || !d.meta.currency) ? 'Escenario no disponible para este activo'
+      : index === 23 && !strategyProfile ? 'Falta el perfil virtual'
+      : index === 22 && (risk || report.historicalTest.trades.length) ? 'Riesgo histórico calculado'
+      : index === 21 && report.historicalTest.trades.length ? 'Esperanza histórica calculada'
+      : index === 19 ? evaluationStatus : index === 18 ? uncertaintyStatus
+      : index === 17 && report.historicalTest.benchmarkCount ? 'Backtest cronológico calculado'
+      : index === 16 ? optionsStatus : index === 15 && simulation ? 'Escenarios simulados'
+      : index === 14 && distribution ? 'Distribución histórica calculada'
+      : index === 13 ? modelStatus : index === 12 ? alphaStatus : index === 11 ? newsStatus : index === 10 ? riskStatus : index === 9 ? fundamentalStatus : index === 8 ? microStatus : index === 7 ? pairStatus : index === 6 ? reversionStatus : index === 5 ? trendStatus : index === 4 ? macroStatus : index === 3 && regime ? (regime.complete ? 'Régimen calculado' : 'Régimen provisional')
       : index === 2 ? preparationStatus
       : index === 1 ? (inputs.ready ? 'Completo para la previsión técnica' : 'Entradas insuficientes')
       : defaultStatus;
@@ -753,15 +1443,12 @@ function showProtocol(d){
         }
       }
     }
-    if (forecast && index === 13) section.append(protocolCalculation(['Dirección experimental',
+    if (forecast && index === 13) section.append(protocolCalculation(['Dirección del modelo de deriva',
       'Deriva = (momentum logarítmico medio + pendiente ÷ precio medio) ÷ 2',
       '(' + format(forecast.momentum*100,5) + '% + ' + format(forecast.slope/forecast.mean*100,5)
       + '%) ÷ 2 ≈ ' + format(forecast.drift*100,5) + '%. Umbral lateral ±'
       + format(forecast.threshold*100,5) + '%. Resultado: ' + forecast.direction,
       'El rango indicativo usa una volatilidad EWMA alrededor de la deriva. Su cobertura todavía no está calibrada.']));
-    if (forecast && index === 22) section.append(protocolCalculation(['Caída máxima histórica',
-      'máximo(1 − cierre ÷ máximo previo acumulado)', format(forecast.drawdown*100,3) + '%',
-      'Mayor retroceso respecto de un máximo del histórico disponible. No representa el riesgo de toda la cartera.']));
 
     if (index === 6 && reversion) {
       const {latest, z, phi, alpha, next, covariance, variance, equilibrium, halfLife,
@@ -1069,13 +1756,296 @@ function showProtocol(d){
       coverage.textContent = 'Pendientes: validación en más ventanas y horizontes, IC transversal y neutralización de factores.';
       section.append(coverage);
     }
-    if (index === 17 && report.historicalTest.trades.length) {
-      const trades = protocolTrades(report.historicalTest.trades);
-      trades.open = expanded[index]?.trades ?? false;
-      section.append(trades);
+    if (index === 13) {
+      if (quadratic) {
+        const pct = value => fmt(value * 100) + '%';
+        const pp = value => fmt(value * 100) + ' pp';
+        section.append(protocolCalculation(['Ridge cuadrático',
+          'Se amplía el ridge del paso 13 con los cuadrados de sus tres indicadores y los tres productos entre pares. La escala de cada variable se estima con el tramo de ajuste.',
+          'Estimación para el próximo cierre: ' + pct(quadratic.estimate) + ' · ridge lineal: ' + pct(alpha.estimate)
+            + ' · media del tramo de ajuste: ' + pct(alpha.baseline),
+          'Las tres cifras corresponden al intervalo seleccionado. La penalización ridge es fija (λ = ' + quadratic.penalty + ').']),
+          protocolCalculation(['Comparación en el tramo de prueba',
+            'Se ajusta con el primer 70% y se compara el error absoluto medio de las tres previsiones en las mismas observaciones posteriores.',
+            quadratic.trainCount + ' observaciones de ajuste · ' + quadratic.testCount + ' de prueba. Ridge cuadrático '
+              + pp(quadratic.error) + ' · ridge lineal ' + pp(alpha.error) + ' · media histórica ' + pp(alpha.baselineError),
+            'Un error menor indica mayor precisión en este tramo. Hace falta repetir la prueba en otras ventanas para evaluar la estabilidad.']));
+      } else {
+        const detail = document.createElement('p');
+        detail.textContent = 'Se necesitan al menos 53 cierres utilizables para ajustar y probar ambos modelos.';
+        section.append(detail);
+      }
+    }
+    if (index === 14) {
+      if (distribution) {
+        const pct = value => format(value * 100, 4) + '%';
+        const {count, positive, negative, mean, variance, quantiles, tailMean, min, max, bins} = distribution;
+        section.append(protocolCalculation(['Frecuencias y dispersión del activo',
+          'Rendimiento por vela = cierre ÷ cierre anterior − 1. Frecuencia = casos ÷ rendimientos observados.',
+          count + ' rendimientos · subidas ' + pct(positive / count) + ' · bajadas ' + pct(negative / count)
+            + ' · sin cambio ' + pct((count - positive - negative) / count),
+          'Media ' + pct(mean) + ' · desviación empírica ' + pct(Math.sqrt(variance)) + '.']),
+          protocolCalculation(['Percentiles y cola inferior',
+            'Se ordenan los rendimientos. P5 es el valor en el primer rango que alcanza el 5%. La media de cola usa el peor 5%, con peso fraccional si hace falta.',
+            quantiles.map((value, i) => 'P' + [5, 10, 50, 90, 95][i] + ' ' + pct(value)).join(' · ')
+              + ' · media del 5% inferior ' + pct(tailMean),
+            'Mínimo ' + pct(min) + ' · máximo ' + pct(max) + '. Frecuencias históricas del intervalo seleccionado.']));
+        const histogram = document.createElement('details');
+        histogram.className = 'protocol-histogram';
+        histogram.open = expanded[index]?.histogram ?? false;
+        const heading = document.createElement('summary');
+        heading.textContent = 'Ver distribución por intervalos';
+        histogram.append(heading);
+        const list = document.createElement('ul');
+        bins.forEach(({low, high, count: observations}, i) => {
+          const row = document.createElement('li');
+          const range = low === high ? pct(low)
+            : '[' + pct(low) + ', ' + pct(high) + (i === bins.length - 1 ? ']' : ')');
+          const meter = document.createElement('meter');
+          meter.max = count;
+          meter.value = observations;
+          meter.setAttribute('aria-label', range);
+          row.append(meter, ' ' + range + ' · ' + observations + ' de ' + count);
+          list.append(row);
+        });
+        histogram.append(list);
+        section.append(histogram);
+      } else {
+        const detail = document.createElement('p');
+        detail.textContent = 'Se necesitan al menos 21 cierres utilizables para calcular la distribución del activo.';
+        section.append(detail);
+      }
+      const rule = document.createElement('h4');
+      rule.textContent = 'Resultados históricos de la regla técnica';
+      section.append(rule);
+      for (const calculation of calculations[3]) section.append(protocolCalculation(calculation));
+    }
+    if (index === 15) {
+      if (simulation) {
+        const {paths, observations, steps, barrier, firstHits, summaries} = simulation;
+        const pct = value => format(value * 100, 2) + '%';
+        section.append(protocolCalculation(['Rendimiento acumulado por horizonte',
+          'Cada trayectoria extrae rendimientos históricos de forma independiente y con reemplazo. El rendimiento acumulado multiplica los factores (1 + rendimiento por vela) y resta 1.',
+          fmt(paths) + ' trayectorias a partir de ' + observations + ' rendimientos históricos.',
+          'Cada horizonte se expresa en velas de la frecuencia seleccionada. El remuestreo supone que la distribución histórica se mantiene.']));
+        const table = document.createElement('table');
+        const headers = table.createTHead().insertRow();
+        for (const name of ['Horizonte', 'P5', 'Mediana', 'P95', 'Termina en positivo']) {
+          const cell = document.createElement('th');
+          cell.scope = 'col';
+          cell.textContent = name;
+          headers.append(cell);
+        }
+        const rows = table.createTBody();
+        for (const {horizon, quantiles, positive} of summaries) {
+          const row = rows.insertRow();
+          for (const value of [horizon + (horizon === 1 ? ' vela' : ' velas'),
+            ...quantiles.map(pct), pct(positive / paths)]) row.insertCell().textContent = value;
+        }
+        const tableWrap = document.createElement('div');
+        tableWrap.style.overflowX = 'auto';
+        tableWrap.append(table);
+        section.append(tableWrap, protocolCalculation(['Qué barrera se alcanza primero',
+          'Desde el último cierre, se comprueba en cada cierre simulado si se alcanza primero +' + pct(barrier)
+            + ' o −' + pct(barrier) + ' dentro de ' + steps + ' velas.',
+          'Barrera superior primero ' + pct(firstHits.upper / paths) + ' · inferior primero '
+            + pct(firstHits.lower / paths) + ' · ninguna ' + pct(firstHits.neither / paths),
+          'Las barreras son ilustrativas y se evalúan al cierre. La simulación conjunta y la validación fuera de muestra quedan pendientes.']));
+      } else {
+        const detail = document.createElement('p');
+        detail.textContent = 'Se necesitan al menos 21 cierres utilizables para simular trayectorias.';
+        section.append(detail);
+      }
+    }
+    if (index === 16) {
+      if (supportsOptions) {
+        section.addEventListener('toggle', () => {
+          const cached = optionSnapshots.get(d.u[0]);
+          if (section.open && section.isConnected && dialog.open && dialog.asset?.u[0] === d.u[0]
+              && !cached?.loading && (!cached || Date.now() - cached.queriedAt >= 60000)) {
+            loadOptions(dialog.asset);
+          }
+        });
+      }
+      const note = document.createElement('p');
+      note.textContent = !supportsOptions ? 'La fuente conectada cubre las acciones y ETF estadounidenses del radar.'
+        : options?.loading ? 'Consultando la última operación del subyacente y la cadena indicativa…'
+        : options?.reason || (options?.pair ? 'Alpaca Indicative ofrece operaciones con retraso y cotizaciones modificadas.'
+          : options ? 'La muestra consultada no contiene una pareja call/put con volatilidad y precios utilizables.'
+          : 'Se busca automáticamente en Alpaca un vencimiento entre 7 y 45 días y un precio de ejercicio dentro del ±5 % del subyacente.');
+      section.append(note);
+      if (options?.pair) {
+        const {expiration, strike, call, put} = options.pair;
+        const timestamp = value => value ? new Date(value).toLocaleString('es-ES') : 'sin hora';
+        section.append(protocolCalculation(['Volatilidad implícita cerca del precio del subyacente',
+          'Se elige el vencimiento más próximo con una call y una put al mismo precio de ejercicio. Dentro de ese vencimiento se elige el precio de ejercicio más cercano al subyacente.',
+          'Subyacente ' + fmt(options.spot) + ' USD (' + timestamp(options.spotTime) + ') · vencimiento ' + expiration + ' · ejercicio ' + fmt(strike) + ' USD',
+          'Volatilidad implícita anualizada publicada por Alpaca para cada contrato.'
+            + (options.sampled ? ' Se consultó la primera página de la cadena filtrada.' : '')]));
+        for (const [label, contract] of [['Call', call], ['Put', put]]) {
+          const line = document.createElement('p');
+          line.textContent = label + ' · ' + contract.symbol + ' · IV ' + fmt(contract.iv * 100)
+            + '% · bid ' + fmt(contract.bid) + ' USD · ask ' + fmt(contract.ask) + ' USD · ' + timestamp(contract.time);
+          section.append(line);
+        }
+      }
+      if (supportsOptions && options && !options.loading) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.textContent = 'Volver a consultar opciones';
+        button.onclick = () => loadOptions(d);
+        section.append(button);
+      }
+      const coverage = document.createElement('p');
+      coverage.textContent = 'Pendientes: paridad put–call, prima de riesgo de volatilidad y distribución implícita.';
+      section.append(coverage);
+    }
+    if (index === 17) {
+      const {windows, trades} = report.historicalTest;
+      if (windows.length) {
+        const note = document.createElement('p');
+        note.textContent = 'El tramo final se divide en hasta tres bloques cronológicos. Para cada señal se simula la entrada en el cierre siguiente y la salida un cierre más tarde. Las operaciones no se solapan en el tiempo.';
+        const table = document.createElement('table');
+        const headers = table.createTHead().insertRow();
+        for (const title of ['Tramo (UTC)', 'Operaciones / fechas', 'Media regla', 'Media referencia', 'Diferencia']) {
+          const cell = document.createElement('th');
+          cell.scope = 'col';
+          cell.textContent = title;
+          headers.append(cell);
+        }
+        const body = table.createTBody();
+        const time = idx => new Date(report.preparedBars[idx].time).toISOString()
+          .slice(0, d.interval === '1week' || d.interval === '1day' ? 10 : 16).replace('T', ' ');
+        for (const window of windows) {
+          const row = body.insertRow();
+          for (const value of [time(window.first) + ' a ' + time(window.lastExit),
+            window.trades + ' / ' + window.eligible,
+            window.ruleMean == null ? 'Sin operaciones' : fmt(window.ruleMean * 100) + '%',
+            fmt(window.referenceMean * 100) + '%',
+            window.ruleMean == null ? '—' : fmt((window.ruleMean - window.referenceMean) * 100) + ' pp']) {
+            row.insertCell().textContent = value;
+          }
+        }
+        const wrapper = document.createElement('div');
+        wrapper.style.overflowX = 'auto';
+        wrapper.append(table);
+        section.append(note, wrapper);
+      }
+      if (trades.length) {
+        const detail = protocolTrades(trades);
+        detail.open = expanded[index]?.trades ?? false;
+        section.append(detail);
+      }
+    }
+    if (index === 18) {
+      const history = report.historicalTest;
+      const sample = document.createElement('p');
+      sample.textContent = history.benchmarkCount + ' fechas evaluables · ' + history.observations + ' operaciones de la regla.';
+      section.append(sample);
+      if (uncertainty?.interval) {
+        const pp = value => fmt(value * 100) + ' pp';
+        const [lower, upper] = uncertainty.interval;
+        const interpretation = lower > 0 ? 'El intervalo queda por encima de cero en esta prueba.'
+          : upper < 0 ? 'El intervalo queda por debajo de cero en esta prueba.'
+          : 'El intervalo incluye cero. La diferencia observada es compatible con una ventaja nula bajo este método.';
+        section.append(protocolCalculation(['Intervalo bootstrap del 95 %',
+          'Se remuestrean bloques circulares de ' + uncertainty.blockSize + ' fechas consecutivas del backtest. En cada réplica se resta la media de todas las fechas de la media de las operaciones de la regla.',
+          'Diferencia observada ' + pp(uncertainty.difference) + ' · intervalo [' + pp(lower) + ', ' + pp(upper) + '] · '
+            + fmt(uncertainty.valid) + ' de ' + fmt(uncertainty.repetitions) + ' réplicas utilizables.',
+          interpretation]));
+      } else {
+        const note = document.createElement('p');
+        note.textContent = uncertainty
+          ? 'Menos del 95 % de las réplicas contienen operaciones de la regla. El intervalo queda sin estimar.'
+          : 'Se requieren al menos 20 fechas evaluables y 5 operaciones de la regla para estimar el intervalo.';
+        section.append(note);
+      }
+      const coverage = document.createElement('p');
+      coverage.textContent = 'Resultados brutos para una regla y un activo. Quedan pendientes la corrección por pruebas múltiples y las métricas de sobreajuste.';
+      section.append(coverage);
+    }
+    if (index === 19) {
+      if (evaluation?.count) {
+        const {count, covered, directionHits, error, referenceError} = evaluation;
+        const rate = value => value + ' de ' + count + ' (' + fmt(100 * value / count) + '%)';
+        section.append(protocolCalculation(['Cobertura y acierto observados',
+          'Se comprueba si el cierre posterior cae dentro del rango previsto y si su dirección coincide usando el umbral lateral guardado.',
+          'Dentro del rango ' + rate(covered) + ' · dirección acertada ' + rate(directionHits),
+          'La cobertura es una frecuencia observada en el registro de este navegador.']),
+          protocolCalculation(['Error frente al cierre sin cambios',
+            'Se compara el error absoluto medio del rendimiento previsto con el de estimar un rendimiento de 0%.',
+            'Modelo ' + fmt(error * 100) + ' pp · cierre sin cambios ' + fmt(referenceError * 100) + ' pp',
+            'Se usa el cierre siguiente del histórico preparado. La emisión se comprueba con el horario nominal de las velas.']));
+      } else {
+        const note = document.createElement('p');
+        note.textContent = evaluation
+          ? 'Todavía no hay previsiones de este activo, intervalo y fuente con un cierre posterior evaluable en el registro. Se incorporan conforme llegan nuevas velas.'
+          : 'La evaluación estará disponible cuando se pueda registrar una previsión con datos válidos.';
+        section.append(note);
+      }
+      const coverage = document.createElement('p');
+      coverage.textContent = 'Quedan pendientes la calibración de probabilidades (Platt, isotónica y ECE) y la explicación mediante SHAP.';
+      section.append(coverage);
     }
     if (index === 20) section.append(protocolCostScenario(
-      d.u[0] + '|' + d.interval, report.historicalTest.meanGrossReturn));
+      d.u[0] + '|' + d.interval, report.historicalTest, cost => {
+        scenarioCost = cost;
+        refreshExpectancy();
+        refreshRisk();
+        refreshPositionSize();
+        refreshDecisionEvidence();
+        refreshExecution();
+      }), brokerComparison(d));
+    if (index === 21) {
+      const {trades} = report.historicalTest;
+      const results = document.createElement('div');
+      if (trades.length) {
+        refreshExpectancy = () => results.replaceChildren(...protocolExpectancy(trades, scenarioCost));
+        refreshExpectancy();
+      } else {
+        results.textContent = 'La regla del paso 18 no produjo operaciones en este tramo.';
+      }
+      const coverage = document.createElement('p');
+      coverage.textContent = 'La esperanza describe las operaciones del backtest. Su capacidad predictiva queda pendiente de validación.';
+      section.append(results, coverage);
+    }
+    if (index === 22) {
+      const percent = value => fmt(value * 100) + '%';
+      if (risk) section.append(protocolCalculation(['Riesgo del activo entre cierres',
+        'Caída máxima = mayor descenso desde un máximo previo. Volatilidad = desviación estándar muestral de los rendimientos.',
+        'Caída máxima ' + percent(-risk.drawdown) + ' · volatilidad por vela ' + percent(risk.volatility),
+        risk.count + ' rendimientos del intervalo seleccionado.']));
+      const {trades} = report.historicalTest;
+      const results = document.createElement('div');
+      if (trades.length) {
+        const describe = (title, metrics) => protocolCalculation([title,
+          'Se reinvierte el capital después de cada operación. La desviación a la baja usa el 0% como objetivo. Sortino = media por operación ÷ desviación a la baja.',
+          'Caída máxima ' + percent(metrics.drawdown) + ' · desviación a la baja ' + percent(metrics.downside)
+            + ' · Sortino por operación ' + (metrics.sortino == null ? 'sin estimar' : fmt(metrics.sortino))
+            + (metrics.p5 == null ? '' : ' · P5 ' + percent(metrics.p5) + ' · media del 5% inferior ' + percent(metrics.tailMean)),
+          metrics.count + ' operaciones. ' + (metrics.p5 == null ? 'La cola requiere al menos 20 operaciones.'
+            : 'La cola se estima con pocos casos cuando la muestra es pequeña.')
+            + ' La curva de capital tiene un suelo de cero.']);
+        const gross = describe('Riesgo bruto de la regla', strategyRisk(trades));
+        refreshRisk = () => {
+          results.replaceChildren(gross);
+          if (scenarioCost !== null) results.append(describe('Riesgo neto con los costes del paso 21',
+            strategyRisk(trades, scenarioCost / 100)));
+        };
+        refreshRisk();
+      } else {
+        results.textContent = 'La regla del paso 18 no produjo operaciones en este tramo.';
+      }
+      const coverage = document.createElement('p');
+      coverage.textContent = 'Pendientes las pruebas de estrés de cartera y la validación de la cola fuera de muestra.';
+      section.append(results, coverage);
+    }
+    if (index === 23 && strategyProfile) {
+      const scenario = protocolPositionSize(d, strategyProfile, () => scenarioCost);
+      refreshPositionSize = scenario.update;
+      section.append(scenario.panel);
+    }
+    if (index === 24) section.append(protocolPortfolio(d));
     if (index === 28) {
       const line = document.createElement('p');
       const last = forecast?.lastClosed;
@@ -1084,13 +2054,51 @@ function showProtocol(d){
           + new Date(last.issuedAt).toLocaleString('es-ES') + ' · referencia '
           + money(last.reference,d) + ' · cierre observado ' + money(last.close,d) + '.'
         : 'Todavía no hay una previsión anterior resuelta para esta serie en el navegador.';
-      section.append(line);
+      section.append(protocolPositionMonitor(d, report.rawBars.at(-1), dialog.positionMonitorController.signal, closedReview.update), line);
     }
     if (index === 25) {
-      const opinion = opinionForAsset(d);
-      const line = document.createElement('p');
-      line.textContent = opinion.stance + '. ' + opinion.reason + ' ' + report.label + '.';
-      section.append(line);
+      const [, signalLabel] = preliminaryDecision(d);
+      const history = report.historicalTest;
+      const evidence = document.createElement('ul');
+      const conclusion = document.createElement('p');
+      const pct = value => fmt(value * 100) + '%';
+      refreshDecisionEvidence = () => {
+        const lower = uncertainty?.interval?.[0];
+        const advantage = lower != null && lower > 0;
+        const net = scenarioCost !== null && history.meanGrossReturn !== null
+          ? history.meanGrossReturn - scenarioCost / 100 : null;
+        const checks = [
+          'Señal preliminar · ' + signalLabel + ' · puntuación conjunta ' + joint(d) + '/100.',
+          'Prueba de entradas largas · ' + history.observations + ' operaciones'
+            + (history.meanGrossReturn === null ? '.' : ' · media bruta ' + pct(history.meanGrossReturn) + '.'),
+          'Evidencia frente a la referencia · ' + (lower == null ? 'intervalo sin estimar.'
+            : advantage ? 'intervalo bruto por encima de cero.' : 'el intervalo bruto no queda por encima de cero.'),
+          'Resultado neto frente a abstenerse · ' + (net === null
+            ? 'falta un escenario de costes válido o una media histórica.' : pct(net) + ' por operación con los costes del paso 21.')
+        ];
+        evidence.replaceChildren(...checks.map(text => {
+          const item = document.createElement('li');
+          item.textContent = text;
+          return item;
+        }));
+        const verdict = protocolVerdictFor(d);
+        conclusion.textContent = verdict.stance + '. ' + verdict.reason;
+      };
+      dialog.refreshDecisionEvidence = refreshDecisionEvidence;
+      refreshDecisionEvidence();
+      section.append(evidence, conclusion);
+    }
+    if (index === 26) {
+      const scenario = protocolExecution(d.u[0] + '|' + d.interval, report.preparedBars,
+        report.historicalTest.trades, () => scenarioCost);
+      refreshExecution = scenario.update;
+      section.append(scenario.panel);
+    }
+    if (index === 27) section.append(protocolExecutionSchedule(d, report.rawBars));
+    if (index === 29) {
+      const note = document.createElement('p');
+      note.textContent = 'Resultados brutos en moneda original. Information Ratio, tracking error y atribución del error figuran como referencias.';
+      section.append(closedReview.panel, note);
     }
     if (groups.length) {
       const reference = document.createElement('details');
@@ -1114,10 +2122,7 @@ function showProtocol(d){
     item.append(section);
     return item;
   }));
-  const opinion = opinionForAsset(d);
-  $('protocolOutcome').textContent = 'Mi opinión: ' + opinion.stance + '.';
-  $('protocolVerdict').textContent = opinion.stance + '. ' + opinion.reason
-    + ' Decisión del protocolo: ' + report.label + ' · Asignación autorizada: ' + allocation(d).percent + '%.';
+  updateProtocolConclusion(d);
   const forecast = report.forecast;
   $('protocolForecast').textContent = forecast
     ? 'Previsión experimental · ' + forecast.direction + ' al cierre de la próxima vela del plazo elegido. '
@@ -1149,7 +2154,7 @@ function showProtocol(d){
     evidence.push('La regla quedó ' + (difference > 0 ? 'por encima' : difference < 0 ? 'por debajo' : 'al nivel')
       + ' de la referencia bruta (' + difference.toLocaleString('es-ES',{maximumFractionDigits:3}) + ' puntos porcentuales).');
   }
-  evidence.push('Los indicadores técnicos se solapan y los resultados históricos son exploratorios. La decisión tiene en cuenta la señal, la referencia y los controles pendientes.');
+  evidence.push('Los indicadores técnicos se solapan y los resultados históricos son exploratorios. Los datos y la señal alimentan la prueba histórica. Los costes del paso 21 y el tamaño del paso 24 completan el veredicto del paso 26. Los pasos 27 a 30 sirven para simular la ejecución, seguir la posición virtual y evaluar su cierre.');
   $('protocolIndicatorSummary').replaceChildren(...evidence.map(text => {
     const item = document.createElement('li');
     item.textContent = text;
@@ -1171,24 +2176,51 @@ $('openProtocol').onclick = () => {
 
 function showNews(d){let id=d.u[0];selectedNews=id;let n=newsData[id];$('newslist').replaceChildren();if(!n){$('newsstatus').textContent='Buscando noticias…';if(!newsPending[id])getNews(id);return}if(Date.now()/1000-n.asof>300&&!newsPending[id])getNews(id);$('newsstatus').textContent=(n.sources||[]).join(' · ')+' · '+(n.asof?new Date(n.asof*1000).toLocaleString('es-ES'):'')+' · '+(n.errors||[]).join(' · ')+' · Titulares, no artículos verificados.';for(let a of n.filter?.relevant||[]){let el=document.createElement('div');el.className='newsitem';let link=document.createElement('a');link.textContent=a.title;try{let url=new URL(a.url);if(['https:','http:'].includes(url.protocol)){link.href=url.href;link.target='_blank';link.rel='noopener noreferrer'}}catch{}let meta=document.createElement('p');meta.className='muted';meta.textContent=[a.category,a.source,a.date,a.reason,'Ajuste '+(a.impact>0?'+':'')+a.impact].filter(Boolean).join(' · ');el.append(link,meta);$('newslist').append(el)}let f=n.filter;if(f){$('newsstatus').textContent+=' · '+f.total+' revisadas / '+f.relevant.length+' relevantes / '+f.discarded.length+' descartadas · ajuste '+f.adjustment;let details=document.createElement('details');let title=document.createElement('summary');title.textContent='Ver noticias descartadas y motivos';details.append(title);for(let x of f.discarded){let p=document.createElement('p');p.textContent=x.title+' — '+x.reason;details.append(p)}$('newslist').append(details)}if(!f?.relevant.length){let p=document.createElement('p');p.textContent='Sin acontecimientos relevantes detectados. No significa que no existan.';$('newslist').append(p)}}
 async function getNews(id,force=false){if(newsPending[id])return newsPending[id];let promise=(async()=>{try{let r=await fetch('/api/news?symbol='+encodeURIComponent(id)+(force?'&force=1':''));let n=await r.json();if(n.error)throw Error(n.error);newsData[id]=n}catch(e){newsData[id]={items:[],errors:[e.message],asof:Date.now()/1000}}})();newsPending[id]=promise;await promise;delete newsPending[id];let d=data.find(x=>x.u[0]===id);if(d)render()}
-function context(d){return {asset:d.u[1],symbol:d.u[0],horizon:$('horizon').value,session:session(d),fresh: fresh(d),stale:!!d.stale,source:d.meta.source,quoteTime:d.meta.quote_time,score:d.score,risk:d.risk,rsi:d.rsi,momentum:d.mom,volatility:d.vol,displayCurrency:conversion(d),displayPrices:{current:money(d.p,d),average:money(d.ma,d),recentHigh:money(d.high,d),recentLow:money(d.low,d)},technicalDecision:preliminaryDecision(d)[1],protocol:protocolReport(d),strategyProfile,virtualAllocation:allocation(d),combinedScore:joint(d),newsFilter:newsFilter(d),news:newsData[d.u[0]]||{items:[],errors:['Noticias no consultadas']}}}
-function allocationTextFromSnapshot(s){let a=s.virtualAllocation,n=a.percent.toLocaleString('es-ES');return a.action==='buy'?'Compraría '+n+'% del valor total de la cartera virtual, como peso objetivo.':a.action==='sell'?'Vendería '+n+'% de la posición virtual existente, si la tuviera.':'0%: no realizaría ninguna operación.'}
+function context(d){return {asset:d.u[1],symbol:d.u[0],horizon:$('horizon').value,session:session(d),fresh: fresh(d),stale:!!d.stale,source:d.meta.source,quoteTime:d.meta.quote_time,score:d.score,risk:d.risk,rsi:d.rsi,momentum:d.mom,volatility:d.vol,displayCurrency:conversion(d),displayPrices:{current:money(d.p,d),average:money(d.ma,d),recentHigh:money(d.high,d),recentLow:money(d.low,d)},technicalSignal:preliminaryDecision(d)[1],protocolVerdict:protocolVerdictFor(d),protocol:protocolReport(d),strategyProfile,virtualAllocation:allocation(d),combinedScore:joint(d),newsFilter:newsFilter(d),news:newsData[d.u[0]]||{items:[],errors:['Noticias no consultadas']}}}
+function allocationTextFromSnapshot(s){let a=s.virtualAllocation,n=a.percent.toLocaleString('es-ES');return a.action==='pending'?'Asignación pendiente de evaluación.':a.action==='buy'?'Compraría '+n+'% adicional del capital virtual.':a.action==='sell'?'Salida técnica si hay una posición larga virtual.':'0%: no realizaría ninguna operación.'}
 function deepKey(d){return d.u[0]+'|'+$('horizon').value+'|'+$('currency').value}
 function render(){let ds=filtered();$('count').textContent=ds.length;$('bull').textContent=ds.length?Math.round(ds.filter(x=>joint(x)>=65&&(!intra()||fresh(x))).length/ds.length*100)+'%':'—';$('top').textContent=ds.find(x=>!intra()||fresh(x))?.u[0].split(':')[0]||'—';$('rows').replaceChildren();for(let d of ds){let tr=document.createElement('tr');tr.dataset.id=d.u[0];let dec=decision(d);tr.className=dec[0]+(selected===d.u[0]?' selected':'');for(let [i,t] of [d.u[1]+' · '+d.u[2],money(d.meta.quote_price??d.p,d)+(d.stale?' (caché)':''), (d.change>=0?'+':'')+d.change.toFixed(2)+'%',(d.meta.source||'Proveedor')+' · '+quality(d)+' · '+quoteAge(d),intra()&&!fresh(d)?'—':joint(d)+'/100',d.risk,dec[1]].entries()){let td=document.createElement('td');td.textContent=t;if(i===2)td.className=d.change>=0?'up':'down';if(i===4&&(!intra()||fresh(d))){let bar=document.createElement('div');bar.className='bar';let k=document.createElement('i');k.style.width=joint(d)+'%';bar.append(k);td.append(bar)}tr.append(td)}tr.onclick=()=>{selected=d.u[0];render();if(innerWidth<=850)document.getElementById("allocationPane")?.scrollIntoView({behavior:"smooth",block:"center"})};$('rows').append(tr)}let d=ds.find(x=>x.u[0]===selected)||ds[0];if(d){selected=d.u[0];detail(d)}else{showProtocol(null);$('allocationPanel').hidden=true;$('allocationPanel').textContent='Porcentaje virtual: —';$('name').textContent='Sin activos';$('price').textContent='—';$('signal').textContent='';$('analysis').textContent='No hay datos para estos filtros.';$('indicators').textContent='';$('source').textContent='';let c=$('chart');c.getContext('2d').clearRect(0,0,c.width,c.height)}}
-function detail(d){let a=allocation(d);$('allocationPanel').textContent='Porcentaje virtual: '+a.percent.toLocaleString('es-ES')+'% · '+(a.action==='buy'?'del total de la cartera':a.action==='sell'?'de la posición existente':decision(d)[1]);$('allocationPanel').style.background=a.action==='buy'?'#e5f5eb':a.action==='sell'?'#fce8e8':'#f1f3f5';$('name').textContent=d.u[1];$('price').textContent=money(d.p,d);if(d.meta.quote_price!=null&&d.meta.quote_time)$('price').textContent+=' · Última operación '+money(d.meta.quote_price,d);$('signal').textContent=intra()&&!fresh(d)?'Señal bloqueada':d.score>=65?'Tendencia a subir':d.score<=35?'Tendencia a bajar':'Sin dirección clara';$('indicators').textContent=`RSI ${d.rsi.toFixed(1)} · MA20 ${money(d.ma,d)} · Momentum ${d.mom.toFixed(2)}% · Vol. ${d.vol.toFixed(2)}% · MACD ${money(d.macd,d)} · ATR ${d.atr==null?"—":money(d.atr,d)} · Bollinger ${money(d.ma-2*d.sd,d)} / ${money(d.ma+2*d.sd,d)} · Volumen relativo ${d.volumeRatio==null?"—":d.volumeRatio.toFixed(2)+"×"}`;$('source').textContent='Última operación: '+quoteAge(d)+' · '+(d.meta.source||'Proveedor')+' · '+(d.stale?'CACHÉ ANTIGUA · ':'')+'última vela '+d.date+(d.meta.quote_time?' · última operación '+d.meta.quote_time:'')+' · '+(d.meta.exchange_timezone||d.meta.timezone||'zona no indicada');const f = newsFilter(d);
-const preliminary = preliminaryAllocation(d);
-const opinion = opinionForAsset(d);
+function updateProtocolConclusion(d) {
+  const verdict = protocolVerdictFor(d);
+  $('protocolOutcome').textContent = verdict.stance;
+  $('protocolVerdict').textContent = verdict.stance + '. ' + verdict.reason + (verdict.action === 'buy'
+    ? ' · Asignación virtual adicional ' + fmt(verdict.percent) + '% del capital.' : '');
+}
+function refreshProtocolVerdict() {
+  const dialog = $('protocolDialog');
+  if (!dialog.asset) return;
+  dialog.refreshDecisionEvidence?.();
+  updateProtocolConclusion(dialog.asset);
+  render();
+}
+function detail(d){let a=allocation(d);$('allocationPanel').textContent=a.action==='pending'?'Datos insuficientes':a.action==='sell'?'Salida de la posición larga virtual':'Porcentaje virtual: '+a.percent.toLocaleString('es-ES')+'% · '+(a.action==='buy'?'adicional del capital virtual':decision(d)[1]);$('allocationPanel').style.background=a.action==='buy'?'#e5f5eb':a.action==='sell'?'#fce8e8':'#f1f3f5';$('name').textContent=d.u[1];$('price').textContent=money(d.p,d);if(d.meta.quote_price!=null&&d.meta.quote_time)$('price').textContent+=' · Última operación '+money(d.meta.quote_price,d);$('signal').textContent=intra()&&!fresh(d)?'Señal bloqueada':d.score>=65?'Tendencia a subir':d.score<=35?'Tendencia a bajar':'Sin dirección clara';$('indicators').textContent=`RSI ${d.rsi.toFixed(1)} · MA20 ${money(d.ma,d)} · Momentum ${d.mom.toFixed(2)}% · Vol. ${d.vol.toFixed(2)}% · MACD ${money(d.macd,d)} · ATR ${d.atr==null?"—":money(d.atr,d)} · Bollinger ${money(d.ma-2*d.sd,d)} / ${money(d.ma+2*d.sd,d)} · Volumen relativo ${d.volumeRatio==null?"—":d.volumeRatio.toFixed(2)+"×"}`;$('source').textContent='Última operación: '+quoteAge(d)+' · '+(d.meta.source||'Proveedor')+' · '+(d.stale?'CACHÉ ANTIGUA · ':'')+'última vela '+d.date+(d.meta.quote_time?' · última operación '+d.meta.quote_time:'')+' · '+(d.meta.exchange_timezone||d.meta.timezone||'zona no indicada');const f = newsFilter(d);
+const opinion = protocolVerdictFor(d);
 $('allocationPanel').hidden = false;
-$('analysis').textContent = 'MI OPINIÓN VIRTUAL\n' + opinion.stance + '. ' + opinion.reason + '\n\nDECISIÓN DEL PROTOCOLO\n' + decision(d)[1]
-  + '\n\nDIAGNÓSTICO PRELIMINAR\n'
-  + preliminaryDecision(d)[1] + ' · ' + preliminary.percent + '% (' + preliminary.basis + ').'
+$('analysis').textContent = 'DECISIÓN DEL PROTOCOLO\n' + opinion.stance + '. ' + opinion.reason
+  + '\n\nEVIDENCIA TÉCNICA\n'
+  + preliminaryDecision(d)[1] + '.'
   + '\nTécnica ' + d.score + '/100 · ajuste de titulares ' + (f?.adjustment ?? 'pendiente')
   + ' · puntuación conjunta ' + joint(d) + '/100.'
   + '\nReferencias históricas: ' + money(d.low,d) + ' a ' + money(d.high,d) + '.';
 showProtocol(d);draw(d.a);showNews(d);$('deep').textContent=deepResults[deepKey(d)]||'';$('aihelp').textContent=ai?'IA por API: consulta bajo demanda, puede generar coste.':'Sin clave de OpenAI: puedes copiar el contexto y pegarlo en ChatGPT para un análisis completo.'}
 function draw(a){let c=$('chart'),w=c.clientWidth||400,h=220;c.width=w*devicePixelRatio;c.height=h*devicePixelRatio;let ctx=c.getContext('2d');ctx.scale(devicePixelRatio,devicePixelRatio);let lo=Math.min(...a),hi=Math.max(...a),pad=12;let x=i=>pad+i*(w-pad*2)/(a.length-1),y=v=>h-pad-(v-lo)/(hi-lo||1)*(h-pad*2);ctx.strokeStyle='#e7edf2';for(let i=0;i<5;i++){ctx.beginPath();ctx.moveTo(0,i*h/5);ctx.lineTo(w,i*h/5);ctx.stroke()}ctx.beginPath();a.forEach((v,i)=>i?ctx.lineTo(x(i),y(v)):ctx.moveTo(x(i),y(v)));ctx.strokeStyle='#355e7d';ctx.lineWidth=2;ctx.stroke()}
 let newsBatch=false;async function queueNews(){if(newsBatch)return;newsBatch=true;try{let ids=filtered().map(d=>d.u[0]);for(let i=0;i<ids.length;i+=3){await Promise.all(ids.slice(i,i+3).filter(id=>!newsData[id]||Date.now()/1000-newsData[id].asof>=300).map(id=>getNews(id)))}}finally{newsBatch=false}}
-let reloadQueued=false;async function load(){if(busy){reloadQueued=true;return}busy=true;$('refresh').disabled=true;$('refresh').textContent='Actualizando…';let errors=[];let alpacaConfigured=false;await loadFX();try{clock=await (await fetch('/api/clock')).json()}catch{clock={}}try{let r=await fetch('/api/status');let s=await r.json();connected=s.market;ai=s.ai;alpacaConfigured=s.alpaca}catch{connected=false;ai=false}let u=universe.filter(x=>($('view').value!=='live'||['Crypto','EE. UU.','ETF'].includes(x[2]))&&($('market').value==='all'||x[2]===$('market').value));let horizon=$('horizon').value;let results=await Promise.all(u.map(async a=>{try{if(!connected)throw Error('Abre la web desde el servidor local');let r=await fetch('/api/series?symbol='+encodeURIComponent(a[0])+'&interval='+horizon);let d=await r.json();if(d.error)throw Error(d.error);return {...compute(a,d), interval:horizon}}catch(e){errors.push(a[0]+': '+e.message);return null}}));data=results.filter(Boolean);$('mode').textContent='DATOS REALES';$('notice').textContent='Alpaca: '+(data.some(d=>String(d.meta.quality).startsWith('alpaca_')&&!d.stale)?'conexión confirmada en esta consulta':alpacaConfigured?'claves detectadas; sin respuesta válida de Alpaca en esta selección':'claves no detectadas')+'. Kraken: API pública. Yahoo: latencia no garantizada. Actualizar no equivale a recibir una operación nueva.';$('stamp').textContent='Consulta: '+new Date().toLocaleString('es-ES');$('errors').textContent=errors.join(' · ');$('aiMode').textContent=ai?'IA disponible':'Motor cuantitativo';$('ask').disabled=false;render();queueNews();busy=false;$('refresh').disabled=false;$('refresh').textContent='Actualizar datos';if(reloadQueued){reloadQueued=false;load()}}
+let reloadQueued=false;async function load(){if(busy){reloadQueued=true;return}busy=true;$('refresh').disabled=true;$('refresh').textContent='Actualizando…';
+  try {
+    let errors=[];let alpacaConfigured=false;await loadFX();try{clock=await (await fetch('/api/clock')).json()}catch{clock={}}try{let r=await fetch('/api/status');let s=await r.json();connected=s.market;ai=s.ai;alpacaConfigured=s.alpaca}catch{connected=false;ai=false}let u=universe.filter(x=>($('view').value!=='live'||['Crypto','EE. UU.','ETF'].includes(x[2]))&&($('market').value==='all'||x[2]===$('market').value));let horizon=$('horizon').value;let results=await Promise.all(u.map(async a=>{try{if(!connected)throw Error('Abre la web desde el servidor local');let r=await fetch('/api/series?symbol='+encodeURIComponent(a[0])+'&interval='+horizon);let d=await r.json();if(d.error)throw Error(d.error);return {...compute(a,d), interval:horizon}}catch(e){errors.push(a[0]+': '+e.message);return null}}));data=results.filter(Boolean);$('mode').textContent='DATOS REALES';$('notice').textContent='Alpaca: '+(data.some(d=>String(d.meta.quality).startsWith('alpaca_')&&!d.stale)?'conexión confirmada en esta consulta':alpacaConfigured?'claves detectadas; sin respuesta válida de Alpaca en esta selección':'claves no detectadas')+'. Kraken: API pública. Yahoo: latencia no garantizada. Actualizar no equivale a recibir una operación nueva.';$('stamp').textContent='Consulta: '+new Date().toLocaleString('es-ES');$('errors').textContent=errors.join(' · ');$('aiMode').textContent=ai?'IA disponible':'Motor cuantitativo';$('ask').disabled=false;render();queueNews();
+  } catch (error) {
+    console.error('Error al actualizar Quant Radar', error);
+    $('errors').textContent = 'No se pudo completar la actualización. Pulsa Actualizar datos para reintentar.';
+  } finally {
+    busy = false;
+    $('refresh').disabled = false;
+    $('refresh').textContent = 'Actualizar datos';
+    if (reloadQueued) {
+      reloadQueued = false;
+      load();
+    }
+  }
+}
 $('currency').onchange=()=>{try{localStorage.setItem('qr_currency',$('currency').value)}catch{}fxNote();render()};$('refresh').onclick=load;$('view').onchange=()=>{if($('view').value==='live'){$('horizon').value='1min';$('market').value='all'}load()};for(let k of ['market','horizon'])$(k).onchange=load;for(let k of ['risk','search'])$(k).oninput=()=>{render();queueNews()};$('auto').onchange=()=>{clearInterval(timer);if(+$('auto').value)timer=setInterval(load,+$('auto').value)};$('reloadnews').onclick=()=>{if(selected)getNews(selected,true)};
 $('copy').onclick=async()=>{let d=data.find(x=>x.u[0]===selected);if(!d)return;await getNews(d.u[0]);let snapshot=context(d);let prompt='Analiza estos datos de Quant Radar en español sencillo. Explica la decisión y la asignación virtual del protocolo. Trata el diagnóstico técnico como preliminar y señala qué comprobaciones faltan. Contrasta fuentes y fechas; no inventes hechos. Distingue hipótesis de ejecución real. Contexto: '+JSON.stringify(snapshot);try{await navigator.clipboard.writeText(prompt);$('aihelp').textContent='Contexto copiado. Pégalo en ChatGPT.'}catch{$('deep').textContent=prompt}};
 $('ask').onclick=async()=>{let d=data.find(x=>x.u[0]===selected);if(!d)return;let key=deepKey(d);if(!ai){$('deep').textContent='Para activar IA dentro de Quant Radar, añade OPENAI_API_KEY al archivo .env y reinicia. Alternativa: pulsa Copiar contexto para ChatGPT. El motor técnico y las noticias funcionan sin esa clave.';deepResults[key]=$('deep').textContent;return}if(!confirm('Esta consulta usa la API de OpenAI y puede generar coste. ¿Continuar?'))return;$('ask').disabled=true;deepResults[key]='Consultando noticias e IA…';$('deep').textContent=deepResults[key];try{await getNews(d.u[0]);let snapshot=context(d);let r=await fetch('/api/analysis',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(snapshot)});let j=await r.json();deepResults[key]=new Date().toLocaleString('es-ES')+' · Análisis bajo demanda\n\n'+(j.text?'MI ASIGNACIÓN VIRTUAL (motor cuantitativo, al solicitar el análisis)\n'+allocationTextFromSnapshot(snapshot)+'\n\n'+j.text:j.error)}catch(e){deepResults[key]=e.message}finally{$('ask').disabled=false;let current=data.find(x=>x.u[0]===selected);if(current)$('deep').textContent=deepResults[deepKey(current)]||''}};load();timer=setInterval(load,60000);setInterval(()=>{if(!busy&&intra())render()},10000);

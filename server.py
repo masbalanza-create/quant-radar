@@ -1,7 +1,7 @@
 from relevance import classify
 from macro import macro_report
 import xml.etree.ElementTree as ET
-import base64,hmac
+import base64,hmac,math,re
 import os,json,urllib.request,urllib.parse, concurrent.futures,time
 from http.server import ThreadingHTTPServer,SimpleHTTPRequestHandler
 from pathlib import Path
@@ -13,7 +13,8 @@ cache={}
 def get_json(url,headers=None):
  req=urllib.request.Request(url,headers={'User-Agent':'QuantRadar/6.0',**(headers or {})})
  with urllib.request.urlopen(req,timeout=12) as r:return json.load(r)
-from datetime import date,datetime,timezone
+from datetime import date,datetime,timedelta,timezone
+from zoneinfo import ZoneInfo
 SYMBOLS={'ASML:Euronext Amsterdam':'ASML.AS','SAP:XETR':'SAP.DE','SAN:BME':'SAN.MC','7203:JPX':'7203.T','9984:JPX':'9984.T','EUR/USD':'EURUSD=X','USD/JPY':'JPY=X','XAU/USD':'GC=F','XAG/USD':'SI=F'}
 INTERVALS={'1min':('1m','1d',1),'5min':('5m','5d',5),'15min':('15m','5d',15),'30min':('30m','1mo',30),'1h':('60m','1mo',60),'1day':('1d','6mo',1440),'1week':('1wk','2y',10080)}
 def iso(t):return datetime.fromtimestamp(t,timezone.utc).isoformat()
@@ -120,6 +121,61 @@ def market_quote(symbol):
   except (OSError, KeyError, ValueError, TypeError):
    return {'source':source,'reason':'Alpaca no entregó una cotización bid/ask para este activo.'}
  return {'reason':'El proveedor de velas de este activo no aporta aquí una cotización bid/ask fechada.'}
+
+def option_pair(snapshots, symbol, spot, start, end):
+ grouped = {}
+ for contract, snapshot in snapshots.items():
+  match = re.fullmatch(re.escape(symbol) + r'(\d{6})([CP])(\d{8})', contract)
+  if not match:
+   continue
+  expiry, side, strike = match.groups()
+  expiry = '20' + expiry[:2] + '-' + expiry[2:4] + '-' + expiry[4:]
+  strike = int(strike) / 1000
+  quote = snapshot.get('latestQuote') or {}
+  bid, ask, iv = quote.get('bp'), quote.get('ap'), snapshot.get('impliedVolatility')
+  if not (start <= expiry <= end and spot * .95 <= strike <= spot * 1.05
+          and all(isinstance(v, (int, float)) and math.isfinite(v) for v in (bid, ask, iv))
+          and 0 < bid <= ask and iv > 0 and quote.get('t')):
+   continue
+  grouped.setdefault((expiry, strike), {})[side] = {
+   'symbol': contract, 'bid': bid, 'ask': ask, 'iv': iv, 'time': quote['t']}
+ pairs = [(expiry, strike, sides) for (expiry, strike), sides in grouped.items() if len(sides) == 2]
+ if not pairs:
+  return None
+ expiry, strike, sides = min(pairs, key=lambda pair: (pair[0], abs(pair[1] - spot), pair[1]))
+ return {'expiration': expiry, 'strike': strike, 'call': sides['C'], 'put': sides['P']}
+
+def option_snapshot(symbol):
+ if symbol not in US_SYMBOLS:
+  return {'reason': 'La fuente conectada cubre las acciones y ETF estadounidenses del radar.'}
+ if not alpaca_ready():
+  return {'reason': 'Se necesita la conexión de Alpaca para obtener opciones.'}
+ now = time.time()
+ key = ('options', symbol)
+ if key in cache and now - cache[key][0] < 60:
+  return cache[key][1]
+ headers = alpaca_headers()
+ today = datetime.now(ZoneInfo('America/New_York')).date()
+ start = (today + timedelta(days=7)).isoformat()
+ end = (today + timedelta(days=45)).isoformat()
+ try:
+  underlying = get_json('https://data.alpaca.markets/v2/stocks/' + symbol + '/trades/latest?'
+                        + urllib.parse.urlencode({'feed': os.getenv('ALPACA_FEED', 'iex').lower()}), headers)['trade']
+  spot = float(underlying['p'])
+  if not math.isfinite(spot) or spot <= 0:
+   raise ValueError('Invalid underlying price')
+  params = {'feed': 'indicative', 'limit': 1000, 'root_symbol': symbol,
+            'expiration_date_gte': start, 'expiration_date_lte': end,
+            'strike_price_gte': spot * .95, 'strike_price_lte': spot * 1.05}
+  payload = get_json('https://data.alpaca.markets/v1beta1/options/snapshots/' + symbol + '?'
+                     + urllib.parse.urlencode(params), headers)
+  pair = option_pair(payload.get('snapshots') or {}, symbol, spot, start, end)
+  result = {'source': 'Alpaca Indicative', 'spot': spot, 'spotTime': underlying.get('t'),
+            'sampled': bool(payload.get('next_page_token')), 'pair': pair}
+  cache[key] = (now, result)
+  return result
+ except (OSError, KeyError, ValueError, TypeError):
+  return {'reason': 'Alpaca no pudo entregar la cotización del subyacente o la cadena indicativa.'}
 
 SEC_COMPANIES = {'AAPL': 320193, 'NVDA': 1045810, 'MSFT': 789019, 'TSLA': 1318605, 'AMZN': 1018724,
                  'SAP:XETR': 1000184}
@@ -244,6 +300,7 @@ class Handler(SimpleHTTPRequestHandler):
   if not self.authorized():return
   u=urllib.parse.urlsplit(self.path);q=urllib.parse.parse_qs(u.query)
   if u.path=='/api/market-quote':return self.reply(market_quote(q.get('symbol',[''])[0]))
+  if u.path=='/api/options':return self.reply(option_snapshot(q.get('symbol',[''])[0]))
   if u.path=='/api/fundamentals':return self.reply(fundamentals(q.get('symbol',[''])[0]))
   if u.path=='/api/macro':return self.reply(macro_report(q.get('symbol',[''])[0]))
   if u.path=='/api/clock':return self.reply(market_clock())
