@@ -1,48 +1,42 @@
 # Quant Radar
 
-## Manual de colaboración
+Panel de análisis de activos, simulación de cartera y evaluación de señales. El motor aplica reglas cuantitativas. La integración opcional con OpenAI explica el informe y el entrenamiento de modelos es una línea de trabajo independiente.
 
-### Responsabilidades
+## Arranque desde cero
 
-| Área | Rama | Archivos y tarea |
-| --- | --- | --- |
-| Interfaz web y móvil | `ui/interfaz-v11` | Pantallas, filtros y estados en `index.html`. Instalación y caché en `manifest.webmanifest`, `sw.js` e iconos. [Tarea #1](https://github.com/masbalanza-create/quant-radar/issues/1) |
-| Datos y motor de decisión | `motor/datos-y-decision-v11` | API en `server.py`, datos macro en `macro.py`, noticias en `relevance.py` y lógica de decisión en `decision.js`. [Tarea #2](https://github.com/masbalanza-create/quant-radar/issues/2) |
+Instala Python 3.10 o posterior. Para ejecutar las comprobaciones del motor necesitas Node.js 22.
 
-`index.html` también contiene llamadas a la API y al motor. Si las dos personas necesitan cambiar la misma función, acordad quién hace ese cambio e indicadlo en el PR.
+```sh
+git clone https://github.com/masbalanza-create/quant-radar.git
+cd quant-radar
+python3 server.py
+```
 
-### Acordar qué datos se intercambian
+Abre [Quant Radar local](http://127.0.0.1:8767). En macOS también puedes abrir `INICIAR.command`. El servidor usa la biblioteca estándar de Python. Puede iniciarse sin claves. Las cotizaciones y noticias requieren conexión a las fuentes externas.
 
-1. Antes de editar un campo que use la otra persona, anotad en la tarea o el PR el nombre del campo, su tipo, cuándo puede faltar y qué debe hacer la interfaz en ese caso. Incluid ejemplos de respuesta normal, datos incompletos o desactualizados y error.
-2. Usad esos mismos ejemplos para desarrollar y probar ambas partes. Si cambia el formato, conservad temporalmente la compatibilidad o integrad los cambios dependientes en un mismo PR revisado por ambos.
-3. Pedid revisión mutua cuando cambie una ruta de la API, un campo usado por la interfaz o la forma de llamar al motor.
+Copia `.env.example` a `.env` si necesitas habilitar Alpaca u OpenAI. Cada colaborador crea sus propias credenciales. La configuración de estrategia, los ajustes y la cartera se guardan en el navegador.
 
-Por ejemplo, la interfaz consulta `GET /api/series?symbol=AAPL&interval=1day` y recibe JSON. Después pasa los precios de cierre y el estado de los datos a `evaluateQuantDecision(prices, state)` en `decision.js`. La función devuelve, entre otros campos, `action`, `label`, `checks` y `historicalTest`. Si los datos no son utilizables, `label` incluye «No operar» y el motivo de bloqueo. Un cambio en ese campo requiere coordinar la función y la pantalla que lo muestra.
+## Áreas de trabajo
 
-### Abrir e integrar los PR
+| Área | Punto de partida | Documento |
+|---|---|---|
+| Interfaz | `index.html`, iconos y manifiesto | [Arquitectura y contrato](docs/architecture.md) |
+| Motor y datos | `decision.js`, `server.py`, `macro.py` y `relevance.py` | [Arquitectura y contrato](docs/architecture.md) |
+| Entrenamiento | Objetivo, datos, baseline y validación futura | [Plan de entrenamiento](docs/training.md) |
 
-1. Trabajad en vuestra rama y abrid un PR hacia `main` con el resumen, la tarea vinculada y los casos probados.
-2. Si cada PR funciona por separado, integrad primero el cambio del que dependa el otro. Si ambos cambios tienen que entrar a la vez, probadlos juntos en una rama de integración y fusionad un único PR.
-3. Tras fusionar el primer PR, actualizad la rama del segundo y volved a probar. Ejecutad lo siguiente desde vuestra rama, con los cambios locales guardados en un commit.
+Lee [CONTRIBUTING.md](CONTRIBUTING.md) antes de abrir un cambio.
 
-   ```sh
-   git fetch origin
-   git merge origin/main
-   git push origin HEAD
-   ```
+## Comprobaciones locales
 
-4. Si Git señala conflictos, revisad con la otra persona las líneas compartidas, resolvedlos en la rama de trabajo y repetid las pruebas antes de fusionar.
+```sh
+node --test tests/decision.test.cjs
+python3 tests/check_app.py
+```
 
-### Prueba antes de fusionar
+Las mismas comprobaciones se ejecutan en GitHub Actions con datos sintéticos y sin credenciales.
 
-Con la versión combinada, iniciad la aplicación con `INICIAR.command` y abrid el panel de un activo. Usad los ejemplos acordados cuando el proveedor real no permita reproducir un caso.
+## Referencias
 
-| Caso | Resultado esperado |
-| --- | --- |
-| Datos disponibles | Cargan el panel y los precios. La decisión y sus motivos coinciden con la respuesta del motor. |
-| Datos incompletos o desactualizados | La interfaz indica el estado. Si los datos bloquean la decisión, aparece «No operar» con su motivo. |
-| Error de la API | La interfaz muestra el error y mantiene disponibles los controles para cambiar de activo o reintentar. |
-
-Si el PR cambia la interfaz, verificad también los filtros y el panel en ancho móvil. Dejad el resultado en el PR e integradlo cuando las pruebas aplicables pasen. Usad etiquetas y notas en [Releases](https://github.com/masbalanza-create/quant-radar/releases) para registrar las versiones que publiquéis.
-
-[Notas operativas e historial anterior](README.txt)
+- [Manual operativo (PDF)](Quant_Radar_Manual_Operativo.pdf)
+- [Notas operativas e historial anterior](README.txt)
+- [Versiones publicadas](https://github.com/masbalanza-create/quant-radar/releases)
