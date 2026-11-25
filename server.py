@@ -13,7 +13,7 @@ cache={}
 def get_json(url,headers=None):
  req=urllib.request.Request(url,headers={'User-Agent':'QuantRadar/6.0',**(headers or {})})
  with urllib.request.urlopen(req,timeout=12) as r:return json.load(r)
-from datetime import datetime,timezone
+from datetime import date,datetime,timezone
 SYMBOLS={'ASML:Euronext Amsterdam':'ASML.AS','SAP:XETR':'SAP.DE','SAN:BME':'SAN.MC','7203:JPX':'7203.T','9984:JPX':'9984.T','EUR/USD':'EURUSD=X','USD/JPY':'JPY=X','XAU/USD':'GC=F','XAG/USD':'SI=F'}
 INTERVALS={'1min':('1m','1d',1),'5min':('5m','5d',5),'15min':('15m','5d',15),'30min':('30m','1mo',30),'1h':('60m','1mo',60),'1day':('1d','6mo',1440),'1week':('1wk','2y',10080)}
 def iso(t):return datetime.fromtimestamp(t,timezone.utc).isoformat()
@@ -93,6 +93,107 @@ def fx_rates():
 NEWS_NAMES={'AAPL':'Apple Inc','NVDA':'Nvidia','MSFT':'Microsoft','TSLA':'Tesla','AMZN':'Amazon.com','ASML:Euronext Amsterdam':'ASML','SAP:XETR':'SAP SE','SAN:BME':'Banco Santander','7203:JPX':'Toyota Motor','9984:JPX':'SoftBank Group','EUR/USD':'EUR USD ECB Federal Reserve','USD/JPY':'USD JPY Bank of Japan','SPY':'S&P 500','QQQ':'Nasdaq 100','XAU/USD':'gold futures','XAG/USD':'silver futures','BTC/USD':'Bitcoin','ETH/USD':'Ethereum'}
 def alpaca_headers():
  return {'APCA-API-KEY-ID':os.environ['APCA_API_KEY_ID'],'APCA-API-SECRET-KEY':os.environ['APCA_API_SECRET_KEY']}
+def market_quote(symbol):
+ if symbol in ('BTC/USD','ETH/USD','EUR/USD','USD/JPY'):
+  source='Kraken · libro público'
+  try:
+   payload=get_json('https://api.kraken.com/0/public/PreTrade?'+urllib.parse.urlencode({'symbol':symbol}))
+   book=payload['result']
+   if isinstance(book,list):book=next(item for item in book if item['symbol']==symbol)
+   bid=max(book['bids'],key=lambda item:float(item['price']))
+   ask=min(book['asks'],key=lambda item:float(item['price']))
+   return {'source':source,'bid':bid['price'],'ask':ask['price'],'bidSize':bid['qty'],
+           'askSize':ask['qty'],'bidTime':bid.get('publication_ts'),'askTime':ask.get('publication_ts'),
+           'snapshotAt':iso(time.time())}
+  except (OSError, KeyError, ValueError, TypeError, StopIteration):
+   return {'source':source,'reason':'Kraken no entregó los dos lados del libro.'}
+ if symbol in US_SYMBOLS:
+  if not alpaca_ready():return {'source':'Alpaca','reason':'Se necesita la conexión de datos de Alpaca para obtener bid y ask.'}
+  feed=os.getenv('ALPACA_FEED','iex').lower()
+  source='Alpaca · '+feed.upper()
+  try:
+   payload=get_json('https://data.alpaca.markets/v2/stocks/'+symbol+'/quotes/latest?'
+                    +urllib.parse.urlencode({'feed':feed}),alpaca_headers())
+   quote=payload['quote']
+   return {'source':source,'bid':quote['bp'],'ask':quote['ap'],'bidSize':quote.get('bs'),
+           'askSize':quote.get('as'),'bidTime':quote.get('t'),'askTime':quote.get('t')}
+  except (OSError, KeyError, ValueError, TypeError):
+   return {'source':source,'reason':'Alpaca no entregó una cotización bid/ask para este activo.'}
+ return {'reason':'El proveedor de velas de este activo no aporta aquí una cotización bid/ask fechada.'}
+
+SEC_COMPANIES = {'AAPL': 320193, 'NVDA': 1045810, 'MSFT': 789019, 'TSLA': 1318605, 'AMZN': 1018724,
+                 'SAP:XETR': 1000184}
+
+def annual_fundamentals(payload, currency='USD'):
+ ifrs = currency == 'EUR'
+ facts = payload.get('facts', {}).get('ifrs-full' if ifrs else 'us-gaap', {})
+ forms = ('20-F', '20-F/A') if ifrs else ('10-K', '10-K/A')
+
+ def rows(tags, unit=currency):
+  return [row for tag in tags.split() for row in facts.get(tag, {}).get('units', {}).get(unit, [])
+          if row.get('form') in forms]
+
+ revenue_tags = 'Revenue' if ifrs else 'RevenueFromContractWithCustomerExcludingAssessedTax Revenues SalesRevenueNet'
+ annual = [row for row in rows(revenue_tags) if row.get('start') and row.get('filed')
+           and 330 <= (date.fromisoformat(row['end']) - date.fromisoformat(row['start'])).days <= 400]
+ if not annual:
+  raise ValueError('Sin ingresos anuales publicados')
+ year_end = max(row['end'] for row in annual)
+ current = min((row for row in annual if row['end'] == year_end), key=lambda row: row['filed'])
+ filing = current['accn']
+
+ def value(tags, start=None, end=year_end, unit=currency):
+  return next((row['val'] for row in rows(tags, unit) if row.get('accn') == filing
+               and row.get('start') == start and row.get('end') == end), None)
+
+ comparable = {row['end']: row for row in reversed(annual) if row['accn'] == filing}
+ prior = sorted(end for end in comparable if end < year_end)
+ assets = value('Assets')
+ equity_tag = 'Equity' if ifrs else 'StockholdersEquity'
+ equity = value(equity_tag)
+ income = value('ProfitLoss' if ifrs else 'NetIncomeLoss', current['start'])
+ operating = value('ProfitLossFromOperatingActivities' if ifrs else 'OperatingIncomeLoss', current['start'])
+ earnings = value('DilutedEarningsLossPerShare' if ifrs else 'EarningsPerShareDiluted',
+                  current['start'], unit=currency + '/shares')
+ assets_before = value('Assets', end=prior[-1]) if prior else None
+ equity_before = value(equity_tag, end=prior[-1]) if prior else None
+
+ def ratio(numerator, denominator):
+  return numerator / denominator if numerator is not None and denominator is not None and denominator > 0 else None
+
+ def average(first, last):
+  return (first + last) / 2 if first is not None and last is not None else None
+
+ metrics = {'Margen operativo': ratio(operating, current['val']),
+            'ROA': ratio(income, average(assets_before, assets)),
+            'ROE': ratio(income, average(equity_before, equity))}
+ if prior:
+  years = (date.fromisoformat(year_end) - date.fromisoformat(prior[0])).days / 365.25
+  periods = round(years)
+  growth = ratio(current['val'], comparable[prior[0]]['val'])
+  if periods >= 1 and abs(years - periods) < 0.12 and growth is not None and growth > 0:
+   metrics[f'Crecimiento anual compuesto de ingresos ({periods} a.)'] = growth ** (1 / periods) - 1
+ return {'end': year_end, 'filed': current['filed'], 'currency': currency, 'revenue': current['val'], 'income': income,
+         'eps': earnings, 'metrics': {label: result for label, result in metrics.items() if result is not None},
+         'filingUrl': f"https://www.sec.gov/Archives/edgar/data/{payload['cik']}/{filing.replace('-', '')}/{filing}-index.html"}
+
+def fundamentals(symbol):
+ cik = SEC_COMPANIES.get(symbol)
+ if not cik:
+  return {'reason': 'Este activo aún no tiene una fuente de estados financieros conectada.'}
+ now = time.time()
+ key = ('fundamentals', symbol)
+ if key in cache and now - cache[key][0] < 3600:
+  return cache[key][1]
+ try:
+  payload = get_json(f'https://data.sec.gov/api/xbrl/companyfacts/CIK{cik:010d}.json',
+                     {'User-Agent': os.getenv('SEC_USER_AGENT') or 'Quant Radar/11 (financial statements viewer)'})
+  result = annual_fundamentals(payload, 'EUR' if symbol == 'SAP:XETR' else 'USD')
+  cache[key] = (now, result)
+  return result
+ except (OSError, ValueError, KeyError, TypeError):
+  return {'reason': 'SEC EDGAR no entregó un ejercicio anual utilizable. Puedes reintentar la consulta.'}
+
 def market_clock():
  key=('clock','us');now=time.time()
  if key in cache and now-cache[key][0]<45:return cache[key][1]
@@ -142,6 +243,8 @@ class Handler(SimpleHTTPRequestHandler):
  def do_GET(self):
   if not self.authorized():return
   u=urllib.parse.urlsplit(self.path);q=urllib.parse.parse_qs(u.query)
+  if u.path=='/api/market-quote':return self.reply(market_quote(q.get('symbol',[''])[0]))
+  if u.path=='/api/fundamentals':return self.reply(fundamentals(q.get('symbol',[''])[0]))
   if u.path=='/api/macro':return self.reply(macro_report(q.get('symbol',[''])[0]))
   if u.path=='/api/clock':return self.reply(market_clock())
   if u.path=='/api/news':
