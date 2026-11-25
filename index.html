@@ -1,7 +1,7 @@
 <!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Quant Radar</title><link rel="manifest" href="/manifest.webmanifest"><link rel="icon" href="/icon-192.png" type="image/png"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0B0F17"><style>
 :root {
   color-scheme: dark;
-  --numbers: "SF Mono", "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  --font-ui: -apple-system, BlinkMacSystemFont, Inter, Roboto, "Segoe UI", system-ui, sans-serif;
   --canvas: #0B0F17;
   --paper: #161E2E;
   --ink: #F8FAFC;
@@ -19,24 +19,41 @@ body {
   margin: 0;
   background: var(--canvas);
   color: var(--ink);
-  font: 15px/1.5 -apple-system, BlinkMacSystemFont, Inter, "Segoe UI", sans-serif;
+  font: 400 1rem/1.5 var(--font-ui);
+  font-variant-numeric: lining-nums tabular-nums;
 }
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 16px;
-  padding: 17px max(24px, calc((100% - 1376px) / 2));
-  background: var(--paper);
-  border-bottom: 1px solid var(--line);
+.quick-header {
+  display: flex; justify-content: flex-end;
+  max-width: 1440px; margin: 0 auto; padding: 12px 32px 0;
 }
-.brand { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 750; letter-spacing: -.05em; }
-.brand img { display: block; width: 38px; height: 38px; border-radius: 22%; }
-.brand span { color: var(--accent); }
+.quick-capsule {
+  display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 3px;
+  padding: 4px; max-width: 100%; border: 1px solid var(--line);
+  border-radius: 24px; background: var(--paper); box-shadow: var(--shadow);
+}
+.quick-capsule button, .quick-capsule a {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 38px; padding: 5px 10px; border: 1px solid transparent; border-radius: 18px;
+  font-size: .85rem; line-height: 1.2;
+}
+.quick-capsule #refresh { color: var(--accent); background: var(--accent-soft); }
+.quick-capsule #refresh:hover:not(:disabled) { border-color: var(--accent); }
+.quick-capsule #refresh:disabled { color: var(--muted); }
+.quick-capsule #sidebarToggle { padding-inline: 9px; }
+.sidebar-glyph {
+  position: relative; width: 16px; height: 13px;
+  border: 1.5px solid currentColor; border-radius: 3px;
+}
+.sidebar-glyph::before {
+  content: ""; position: absolute; inset: 0 auto 0 4px;
+  border-left: 1.5px solid currentColor;
+}
+.quick-header + main { padding-top: 16px; }
+@media (max-width: 650px) {
+  .quick-header { padding-inline: 15px; }
+  .quick-capsule button, .quick-capsule a { min-height: 44px; }
+}
 main { max-width: 1440px; margin: auto; padding: clamp(24px, 4vw, 64px) 32px 8px; }
-.hero { margin-bottom: clamp(26px, 4vw, 48px); }
-.hero p { margin: 8px 0 0; }
 h1, h2, h3, h4 { line-height: 1.17; letter-spacing: -.028em; }
 h1 { margin: 0; font-size: clamp(30px, 4.5vw, 60px); font-weight: 730; }
 h2 { margin: 0; font-size: clamp(18px, 2.1vw, 23px); }
@@ -53,6 +70,7 @@ button, select, input, textarea {
   border-radius: 11px;
   background: var(--paper);
   font: inherit;
+  font-variant-numeric: inherit;
   color: var(--ink);
   transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
 }
@@ -82,16 +100,29 @@ button:disabled { background: #202a3a; border-color: var(--line); color: var(--m
 }
 .toolbar, .split, .protocol-nav, .asset-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .split { justify-content: space-between; }
+.skip-link, .sr-only {
+  position: absolute;
+  width: 1px; height: 1px; padding: 0;
+  clip-path: inset(50%); overflow: hidden; white-space: nowrap;
+}
+.skip-link:focus {
+  position: fixed; top: 12px; left: 12px; z-index: 10;
+  width: auto; height: auto; padding: 10px 14px;
+  clip-path: none; border-radius: 8px; background: var(--paper);
+}
+.filter-panel {
+  margin: 20px 0 16px; padding: 0 14px;
+  border: 1px solid var(--line); border-radius: 16px; background: var(--paper);
+}
+.filter-panel > summary { padding: 12px 0; }
+.filter-field { display: grid; gap: 4px; min-width: 0; }
+.filter-field > span { font-size: .875rem; color: var(--muted); }
 .filters {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 165px), 1fr));
-  margin: 20px 0 16px;
-  padding: 12px;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  background: var(--paper);
+  padding: 0 0 14px;
 }
-.filters > * { width: 100%; }
+.filters :is(input, select) { width: 100%; }
 .notice {
   padding: 12px 15px;
   border: 1px solid #00c2ff33;
@@ -130,9 +161,9 @@ summary:hover { color: var(--accent); }
 .metric {
   margin: 8px 0;
   font-size: clamp(24px, 3.2vw, 43px);
-  font-weight: 720;
+  font-weight: 600;
   line-height: 1.13;
-  letter-spacing: -.055em;
+  letter-spacing: -.025em;
   font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
 }
@@ -168,10 +199,19 @@ button.asset-select:hover:not(:disabled) { background: transparent; color: var(-
   font-weight: 600;
 }
 .legend { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0; }
-.metric, .scroll td:nth-child(n+3):nth-child(-n+4), .scroll td:nth-child(6), .protocol-math dd { font-family: var(--numbers); font-variant-numeric: tabular-nums; }
+small, .watch-label > span, .watch-verdict, .watch-leader, .watch-summary, #chartReadout { letter-spacing: .015em; }
 #bull, #top { color: #10B981; }
 .chart-controls { display:flex; align-items:center; flex-wrap:wrap; gap:6px; margin-top:14px; }
-.chart-controls button { min-width:44px; }
+.chart-controls { justify-content: space-between; border-block: 1px solid var(--line); padding: 7px 0; }
+.chart-ranges { display: flex; align-items: center; gap: 3px; flex-wrap: wrap; }
+.chart-ranges button { min-width: 44px; min-height: 36px; padding: 5px 9px; border-color: transparent; font-size: .85rem; }
+.chart-ranges button[aria-pressed="true"] { color: var(--accent); background: var(--accent-soft); border-color: #00c2ff33; }
+.chart-ranges button:disabled { opacity: .65; }
+.chart-style { display: inline-flex; gap: 6px; align-items: center; color: var(--muted); font-size: .8rem; }
+.chart-style select { min-height: 36px; }
+@media (pointer: coarse) {
+  .chart-ranges button, .chart-style select { min-height: 44px; }
+}
 .chart-plot { position: relative; margin: 15px 0 10px; }
 #chart { height: clamp(255px, 32vw, 380px); touch-action:pan-y; cursor:crosshair; margin: 0; }
 #chartPoint {
@@ -183,7 +223,7 @@ button.asset-select:hover:not(:disabled) { background: transparent; color: var(-
   border-radius: 10px;
   background: #111827;
   box-shadow: 0 4px 16px #0006;
-  font: .75rem/1.4 var(--numbers);
+  font-size: .8rem; line-height: 1.4;
 }
 #chartPoint strong { display: block; color: var(--accent); font-size: .95rem; }
 #chartPoint span { display: block; color: var(--muted); }
@@ -197,7 +237,7 @@ canvas { display: block; width: 100%; height: 220px; margin: 15px 0 10px; }
   border: 1px solid var(--line);
   border-radius: 13px;
   font-size: 1.03rem;
-  font-weight: 720;
+  font-weight: 600;
 }
 #newslist { max-height: 480px; overflow: auto; }
 .newsitem { border-bottom: 1px solid var(--line); padding: 12px 0; }
@@ -252,23 +292,121 @@ footer { padding: 25px 0; color: var(--muted); font-size: .8rem; }
   .asset-detail > :last-child { grid-column: 1 / -1; }
 }
 @media (max-width: 650px) {
-  header, main { padding-inline: 15px; }
+  main { padding-inline: 15px; }
   .asset-detail { grid-template-columns: minmax(0, 1fr); }
   .cards { gap: 7px; }
   .cards .card { padding: 11px 9px; border-radius: 14px; }
   .cards small { font-size: .73rem; line-height: 1.25; display: block; overflow-wrap: anywhere; }
   .cards .metric { font-size: clamp(19px, 5vw, 26px); }
   .filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .filters input { grid-column: 1 / -1; }
+  .filter-search { grid-column: 1 / -1; }
+  button.asset-select { min-height: 44px; }
+  #protocolDialog { max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); }
   button, select, input, textarea { min-height: 44px; }
   select, input, textarea { font-size: 16px; }
   .asset-actions > button { flex: 1 1 165px; }
   body { padding-bottom: env(safe-area-inset-bottom); }
 }
+.asset-back { display: none; }
+@media (max-width: 1199px) {
+  .asset-back { display: inline-flex; align-items: center; min-height: 44px; }
+}
+@media (prefers-contrast: more) {
+  :root { --muted: #dbe7f7; --line: #8291aa; --control: #afc0d8; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  #protocolDialog::backdrop { background: #0b0f17; backdrop-filter: none; }
+}
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
-</style><header><div><div class="brand"><img src="/icon-192.png" width="38" height="38" alt=""><div>Quant<span> / </span>Radar</div></div></div><div class="toolbar" style="margin:0"><span class="pill" id="mode">DATOS REALES</span><button id="refresh" class="primary">Actualizar datos</button></div></header><main><div class="split hero"><div><h1>Radar de oportunidades</h1><p class="muted">Explora señales, compara riesgos y formula hipótesis de inversión.</p></div><small id="stamp"></small></div><div class="notice" id="notice">Esperando datos reales. No se generan precios ficticios.</div><div class="toolbar filters"><select id="view" aria-label="Vista"><option value="global">GLOBAL INVESTING</option><option value="live">LIVE TRADING · fuentes oficiales</option></select><select id="market" aria-label="Mercado"><option value="all">Todos los mercados</option><option>EE. UU.</option><option>Europa</option><option>Asia</option><option>Forex</option><option>ETF</option><option>Materias primas</option><option>Crypto</option></select><select id="horizon" aria-label="Horizonte"><option value="1day">Corto plazo · diario</option><option value="1min">Intradiario · 1 min</option><option value="15min">Intradiario · 15 min</option><option value="30min">Intradiario · 30 min</option><option value="1h">Intradiario · 60 min</option><option value="5min">Intradiario · 5 min</option><option value="1week">Largo plazo · semanal</option></select><select id="risk" aria-label="Riesgo"><option value="all">Todos los riesgos</option><option>Bajo</option><option>Medio</option><option>Alto</option></select><select id="currency" aria-label="Moneda de visualización"><option value="native">Moneda original</option><option value="EUR" selected>EUR · Euro</option><option value="USD">USD · Dólar estadounidense</option><option value="GBP">GBP · Libra esterlina</option><option value="JPY">JPY · Yen japonés</option><option value="CHF">CHF · Franco suizo</option><option value="CAD">CAD · Dólar canadiense</option><option value="AUD">AUD · Dólar australiano</option><option value="CNY">CNY · Yuan chino</option><option value="HKD">HKD · Dólar de Hong Kong</option><option value="SGD">SGD · Dólar de Singapur</option><option value="INR">INR · Rupia india</option><option value="KRW">KRW · Won surcoreano</option></select><input id="search" aria-label="Buscar activo" placeholder="Buscar activo"><select id="auto" aria-label="Frecuencia de actualización"><option value="0">Actualización manual</option><option value="30000">Cada 30 segundos</option><option value="60000" selected>Cada minuto</option><option value="300000">Cada 5 minutos</option><option value="900000">Cada 15 minutos</option></select></div><section class="settings" aria-label="Configuración"><details id="strategyPanel">
+
+.quick-capsule #sidebarToggle { display: none; }
+.workspace-content { min-width: 0; }
+@media (min-width: 1200px) {
+  main { padding-top: 28px; }
+  .workspace { display: grid; grid-template-columns: minmax(310px, 27%) minmax(0, 1fr); gap: 20px; align-items: start; }
+  .workspace.sidebar-collapsed { grid-template-columns: minmax(0, 1fr); }
+  .sidebar-collapsed .workspace-sidebar { display: none; }
+  .workspace-sidebar {
+    padding: 10px;
+    background: var(--paper); border: 1px solid var(--line); border-radius: 16px;
+  }
+  .quick-capsule #sidebarToggle:not([hidden]) { display: inline-flex; }
+  .workspace-sidebar .filter-panel { margin: 8px 0; padding: 0 8px; border-radius: 10px; }
+  .workspace-sidebar .filters { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+  .workspace-sidebar .filter-search { grid-column: 1 / -1; }
+  .workspace-sidebar .filters :is(input, select) { min-height: 34px; padding: 4px 8px; font-size: .875rem; }
+  .watchlist.card { padding: 10px 0 0; border: 0; box-shadow: none; }
+  .scroll th { position: sticky; top: 0; z-index: 1; }
+  .scroll :is(th, td) { padding: 6px 8px; }
+  .scroll td { font-size: .8125rem; }
+  .scroll button.asset-select:focus-visible { outline-offset: -2px; }
+  .chart-card #chart { height: clamp(320px, 43vh, 520px); }
+
+}
+.workspace-content .asset-detail { grid-template-columns: minmax(0, 1fr); gap: 0; }
+.panel-section { min-width: 0; padding: clamp(14px, 2vw, 24px) 0; }
+.panel-section + .panel-section, .methodology { border-top: 1px solid var(--line); }
+.chart-card { padding-top: 0; }
+.panel-section #allocationPanel { padding: 0; border: 0; border-radius: 0; background: transparent; }
+
+.watchlist h2 { font-size: 1.125rem; }
+.watch-rows { list-style: none; margin: 12px 0 0; padding: 2px; }
+.watch-rows li + li { border-top: 1px solid var(--line); }
+.watch-rows .asset-select {
+  width: 100%; min-width: 0; min-height: 64px; display: grid;
+  grid-template-columns: minmax(0,1fr) 56px minmax(0,1.25fr);
+  align-items: center; gap: 6px; padding: 7px;
+  border: 1px solid transparent; border-radius: 10px;
+}
+.watch-rows .asset-select:hover:not(:disabled) { background: #1b263a; color: var(--ink); }
+.watch-rows .asset-select[aria-pressed="true"] {
+  border-color: var(--verdict); background: #202c41;
+}
+.watch-rows .asset-select:focus-visible { outline-offset: -3px; }
+.watch-label, .watch-quote { display: grid; min-width: 0; }
+.watch-label strong, .watch-label > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.watch-label > span, .watch-verdict { font-size: .72rem; color: var(--muted); font-weight: 500; }
+.watch-quote { justify-items: end; text-align: right; }
+.watch-quote strong { font-size: .85rem; line-height: 1.35; font-weight: 600; overflow-wrap: anywhere; }
+.watch-change { padding: 1px 5px; border: 1px solid var(--verdict); border-radius: 6px; color: var(--verdict); font-size: .75rem; line-height: 1.4; font-weight: 500; }
+canvas.watch-spark { width: 56px; height: 28px; margin: 0; }
+.chart-card #name { font-size: clamp(1.5rem, 3vw, 2.5rem); }
+.chart-card #price { font-size: clamp(1.3rem, 2.4vw, 2rem); }
+.ai-review #deep { max-width: 80ch; overflow-wrap: anywhere; }
+.ai-review #deep:empty { display: none; }
+.workspace-content > .settings { margin-top: 18px; }
+.related-news { margin-top: 14px; }
+.app-sections { display: flex; flex-wrap: wrap; gap: 4px; }
+.app-sections a {
+  padding: 9px 12px; border-radius: 9px; color: var(--muted);
+  text-decoration: none; font-weight: 650;
+}
+.app-sections a[aria-current] { background: var(--accent-soft); color: var(--accent); }
+#settingsView { max-width: 64rem; margin-inline: auto; }
+#settingsView h1 { margin-bottom: 18px; font-size: clamp(1.6rem, 3vw, 2.25rem); }
+#workspace[hidden], #sidebarToggle[hidden] { display: none; }
+.watch-summary { margin: 5px 0 0; color: var(--muted); font-size: .8rem; }
+.watch-rows .asset-select.is-leader { background: #302a23; }
+.watch-rows .asset-select.is-leader[aria-pressed="true"] { background: #3b3328; }
+.watch-leader { color: #dfc99f; font-size: .68rem; font-weight: 650; }
+</style><a class="skip-link" href="#mainContent">Saltar al contenido</a><header class="quick-header"><div class="quick-capsule">
+<nav class="app-sections" aria-label="Apartados de Quant Radar">
+<a id="radarLink" href="#workspace" aria-current="page">Radar</a>
+<a id="settingsLink" href="#settingsView">Configuración</a>
+</nav><button id="sidebarToggle" type="button" aria-controls="workspaceSidebar" aria-expanded="true" aria-label="Ocultar barra lateral" title="Ocultar barra lateral"><span class="sidebar-glyph" aria-hidden="true"></span></button>
+<button id="refresh" type="button" aria-label="Actualizar datos">Actualizar</button>
+</div></header><main id="mainContent" tabindex="-1" aria-label="Quant Radar"><div class="workspace" id="workspace"><aside class="workspace-sidebar" id="workspaceSidebar" aria-label="Navegación y filtros">
+<details class="filter-panel" id="filterPanel"><summary>Filtros y búsqueda</summary><div class="toolbar filters"><label class="filter-field"><span>Vista</span><select id="view" aria-label="Vista"><option value="global">GLOBAL INVESTING</option><option value="live">LIVE TRADING · fuentes oficiales</option></select></label><label class="filter-field"><span>Mercado</span><select id="market" aria-label="Mercado"><option value="all">Todos los mercados</option><option>EE. UU.</option><option>Europa</option><option>Asia</option><option>Forex</option><option>ETF</option><option>Materias primas</option><option>Crypto</option></select></label><label class="filter-field"><span>Horizonte</span><select id="horizon" aria-label="Horizonte"><option value="1day">Corto plazo · diario</option><option value="1min">Intradiario · 1 min</option><option value="15min">Intradiario · 15 min</option><option value="30min">Intradiario · 30 min</option><option value="1h">Intradiario · 60 min</option><option value="5min">Intradiario · 5 min</option><option value="1week">Largo plazo · semanal</option></select></label><label class="filter-field"><span>Riesgo</span><select id="risk" aria-label="Riesgo"><option value="all">Todos los riesgos</option><option>Bajo</option><option>Medio</option><option>Alto</option></select></label><label class="filter-field"><span>Moneda</span><select id="currency" aria-label="Moneda de visualización"><option value="native">Moneda original</option><option value="EUR" selected>EUR · Euro</option><option value="USD">USD · Dólar estadounidense</option><option value="GBP">GBP · Libra esterlina</option><option value="JPY">JPY · Yen japonés</option><option value="CHF">CHF · Franco suizo</option><option value="CAD">CAD · Dólar canadiense</option><option value="AUD">AUD · Dólar australiano</option><option value="CNY">CNY · Yuan chino</option><option value="HKD">HKD · Dólar de Hong Kong</option><option value="SGD">SGD · Dólar de Singapur</option><option value="INR">INR · Rupia india</option><option value="KRW">KRW · Won surcoreano</option></select></label><label class="filter-field filter-search"><span>Buscar activo</span><input id="search" aria-label="Buscar activo" placeholder="Buscar activo"></label><label class="filter-field"><span>Actualización</span><select id="auto" aria-label="Frecuencia de actualización"><option value="0">Actualización manual</option><option value="30000">Cada 30 segundos</option><option value="60000" selected>Cada minuto</option><option value="300000">Cada 5 minutos</option><option value="900000">Cada 15 minutos</option></select></label></div></details><section class="card watchlist"><div class="split"><h2 id="assetListTitle" tabindex="-1">Clasificación de activos</h2><small class="pill"><span id="count">—</span> activos</small></div><p class="watch-summary">Sesgo alcista <strong id="bull">—</strong> · Puntuación conjunta ≥ 65</p><ul id="rows" class="watch-rows" aria-labelledby="assetListTitle"></ul><p class="muted" id="errors" role="status"></p></section></aside><div class="workspace-content"><div class="asset-detail"><section class="chart-card panel-section" aria-labelledby="name"><div class="split"><h2 id="name" tabindex="-1">Selecciona un activo</h2><span id="signal" class="pill"></span></div><a class="asset-back" href="#assetListTitle">Volver a los activos</a><div class="metric" id="price">—</div><div class="chart-controls" aria-label="Controles del gráfico">
+<div id="chartRanges" class="chart-ranges" role="group" aria-label="Rango temporal"></div>
+<label class="chart-style">Vista <select id="chartType"><option value="area" selected>Área</option><option value="candles">Velas</option></select></label>
+</div><div class="chart-plot"><canvas id="chart" tabindex="0" aria-label="Histórico de precios. Usa las flechas para inspeccionar y Mayús con las flechas para desplazar."></canvas><div id="chartPoint" hidden aria-hidden="true"><strong></strong><span></span><span></span></div></div><div id="chartReadout" class="muted"></div><span id="chartKeyboardStatus" class="sr-only" role="status"></span><div id="indicators" class="muted"></div><p class="muted" id="source"></p></section><section class="panel-section" aria-labelledby="assetDecisionTitle"><div class="split"><h2 id="assetDecisionTitle" tabindex="-1">Decisión del activo</h2><span class="pill">Motor cuantitativo</span></div><div id="allocationPanel" hidden>Porcentaje virtual: —</div><div id="analysis"></div><div class="asset-actions"><button id="openProtocol" type="button" aria-haspopup="dialog" disabled>Ver proceso cuantitativo</button></div><p class="muted">Hipótesis educativa. Simulación de operaciones.</p></section><section class="ai-review panel-section" aria-labelledby="aiReviewTitle">
+<div class="split"><h2 id="aiReviewTitle" tabindex="-1">Valoración de IA</h2><span class="pill" id="aiMode">IA bajo demanda</span></div>
+<div class="asset-actions"><button id="ask" class="primary">Generar valoración</button>
+<button id="copy" type="button">Copiar contexto para ChatGPT</button></div>
+<p id="aihelp" class="muted"></p><div id="deep" role="status"></div>
+<details class="related-news"><summary>Noticias utilizadas como contexto</summary><button id="reloadnews">Actualizar noticias</button><p id="newsstatus" class="muted"></p><div id="newslist"></div></details></section></div><p id="fxnote" class="muted" style="font-size:12px"></p><section class="panel-section methodology"><h2>Metodología y control de riesgo</h2><span class="pill" id="mode">Datos reales</span> <small id="stamp"></small><p class="muted" id="notice">Esperando datos de mercado.</p><p>Puntuación conjunta = técnica + ajuste de noticias (máximo ±12 puntos). Filtro de titulares de hasta 72 horas; impacto limitado a medios prioritarios y señales explícitas. No verifica artículos completos. Score técnico heurístico: momentum de 10 velas, relación con media de 20 velas y RSI de 14 periodos. Riesgo según volatilidad por vela y clase de activo; no equivale a una calificación regulatoria. Los horizontes cambian la frecuencia de las velas, no predicen el futuro. El universo es una lista inicial, no un escáner exhaustivo.</p><p class="muted">Datos: Alpaca (opcional), Kraken y Yahoo Finance (acceso no oficial). Sin conexión a bróker.</p></section></div></div><section id="settingsView" aria-labelledby="settingsTitle" hidden><h1 id="settingsTitle" tabindex="-1">Configuración</h1><section class="settings" aria-label="Configuración"><details id="strategyPanel">
 <summary>Mi estrategia virtual</summary>
 <form id="strategyForm" class="strategy-form">
 <label>Objetivo o idea que quieres probar
@@ -317,12 +455,7 @@ footer { padding: 25px 0; color: var(--muted); font-size: .8rem; }
 <div class="strategy-wide"><button class="primary" type="submit">Guardar cartera</button>
 <p id="personalPortfolioStatus" class="muted" role="status">Los importes se guardan en este navegador.</p></div>
 </form>
-</details></section><p id="fxnote" class="muted" style="font-size:12px"></p><div class="cards"><div class="card"><small>Activos disponibles</small><div class="metric" id="count">—</div><small>Universo seleccionado</small></div><div class="card"><small>Sesgo alcista</small><div class="metric" id="bull">—</div><small>Puntuación conjunta ≥ 65</small></div><div class="card"><small>Mayor puntuación</small><div class="metric" id="top">—</div><small>Puntuación técnica + ajuste informativo, no probabilidad</small></div></div><div class="layout"><div class="card"><div class="split"><h2>Clasificación de activos</h2><small>Orden por puntuación conjunta</small></div><div class="legend"><span style="background:#10b98124">Compra virtual validada</span><span style="background:#f0839124">Venta virtual validada</span><span style="background:#e6bd7024">No operar</span><span style="background:#64748b33">Cerrado</span><span style="background:#202a3a">Horario sin verificar</span></div><div class="scroll"><table><thead><tr><th>Activo</th><th>Decisión / sesión</th><th>Precio</th><th>Variación / vela</th><th>Fuente y última operación</th><th>Score</th><th>Riesgo</th></tr></thead><tbody id="rows"></tbody></table></div><p class="muted" id="errors"></p></div><div class="asset-detail"><div class="card"><div class="split"><h2 id="name">Selecciona un activo</h2><span id="signal" class="pill"></span></div><div class="metric" id="price">—</div><div class="chart-controls" aria-label="Controles del gráfico">
-<select id="chartType" aria-label="Tipo de gráfico"><option value="line">Línea</option><option value="candles">Velas</option><option value="area">Área</option></select>
-<button id="chartZoomIn" type="button" aria-label="Acercar">+</button>
-<button id="chartZoomOut" type="button" aria-label="Alejar">−</button>
-<button id="chartReset" type="button">Ver todo</button>
-</div><div class="chart-plot"><canvas id="chart" tabindex="0" aria-label="Histórico de precios. Usa las flechas para inspeccionar y Mayús con las flechas para desplazar."></canvas><div id="chartPoint" hidden aria-hidden="true"><strong></strong><span></span><span></span></div></div><div id="chartReadout" class="muted" aria-live="off"></div><div id="indicators" class="muted"></div><p class="muted" id="source"></p></div><div class="card"><div class="split"><h2>¿Qué haría ante esta situación?</h2><span class="pill" id="aiMode">Motor cuantitativo</span></div><div id="allocationPanel" hidden>Porcentaje virtual: —</div><div id="analysis"></div><div class="asset-actions"><button id="openProtocol" type="button" aria-haspopup="dialog" disabled>Ver proceso cuantitativo</button><button id="ask" class="primary">Análisis avanzado con IA</button></div><p id="aihelp" class="muted"></p><button id="copy">Copiar contexto para ChatGPT</button><div id="deep" style="margin-top:14px"></div><p class="muted">Hipótesis educativa; no ejecuta operaciones ni garantiza resultados.</p></div><div class="card"><div class="split"><h2>Noticias y acontecimientos</h2><button id="reloadnews">Actualizar noticias</button></div><p id="newsstatus" class="muted"></p><div id="newslist"></div></div></div></div><div class="card" style="margin-top:16px"><h2>Metodología y control de riesgo</h2><p>Puntuación conjunta = técnica + ajuste de noticias (máximo ±12 puntos). Filtro de titulares de hasta 72 horas; impacto limitado a medios prioritarios y señales explícitas. No verifica artículos completos. Score técnico heurístico: momentum de 10 velas, relación con media de 20 velas y RSI de 14 periodos. Riesgo según volatilidad por vela y clase de activo; no equivale a una calificación regulatoria. Los horizontes cambian la frecuencia de las velas, no predicen el futuro. El universo es una lista inicial, no un escáner exhaustivo.</p></div><footer>QUANT RADAR · Datos: Alpaca (opcional), Kraken y Yahoo Finance (acceso no oficial). Sin conexión a bróker.</footer></main>
+</details></section></section></main>
 <dialog id="protocolDialog" aria-labelledby="protocolTitle">
 <div class="protocol-head"><div class="split"><h2 id="protocolTitle">Proceso cuantitativo</h2>
 <form method="dialog"><button autofocus>Cerrar</button></form></div>
@@ -2447,7 +2580,119 @@ async function getNews(id,force=false){if(newsPending[id])return newsPending[id]
 function context(d){return {asset:d.u[1],symbol:d.u[0],horizon:$('horizon').value,session:session(d),fresh: fresh(d),stale:!!d.stale,source:d.meta.source,quoteTime:d.meta.quote_time,score:d.score,risk:d.risk,rsi:d.rsi,momentum:d.mom,volatility:d.vol,displayCurrency:conversion(d),displayPrices:{current:money(d.p,d),average:money(d.ma,d),recentHigh:money(d.high,d),recentLow:money(d.low,d)},technicalSignal:preliminaryDecision(d)[1],protocolVerdict:protocolVerdictFor(d),protocol:protocolReport(d),strategyProfile,virtualAllocation:allocation(d),combinedScore:joint(d),newsFilter:newsFilter(d),news:newsData[d.u[0]]||{items:[],errors:['Noticias no consultadas']}}}
 function allocationTextFromSnapshot(s){let a=s.virtualAllocation,n=a.percent.toLocaleString('es-ES');return a.action==='pending'?'Asignación pendiente de evaluación.':a.action==='buy'?'Compraría '+n+'% adicional del capital virtual.':a.action==='sell'?'Salida técnica si hay una posición larga virtual.':'0%: no realizaría ninguna operación.'}
 function deepKey(d){return d.u[0]+'|'+$('horizon').value+'|'+$('currency').value}
-function render(){let ds=filtered();$('count').textContent=ds.length;$('bull').textContent=ds.length?Math.round(ds.filter(x=>joint(x)>=65&&(!intra()||fresh(x))).length/ds.length*100)+'%':'—';$('top').textContent=ds.find(x=>!intra()||fresh(x))?.u[0].split(':')[0]||'—';$('rows').replaceChildren();for(let d of ds){let tr=document.createElement('tr');tr.dataset.id=d.u[0];let dec=decision(d);tr.className=dec[0]+(selected===d.u[0]?' selected':'');for(let [i,t] of [d.u[1]+' · '+d.u[2],money(d.meta.quote_price??d.p,d)+(d.stale?' (caché)':''), (d.change>=0?'+':'')+d.change.toFixed(2)+'%',(d.meta.source||'Proveedor')+' · '+quality(d)+' · '+quoteAge(d),intra()&&!fresh(d)?'—':joint(d)+'/100',d.risk,dec[1]].entries()){let td=document.createElement('td');td.textContent=t;if(i===0){const button=document.createElement('button');button.type='button';button.className='asset-select';button.textContent=t;button.setAttribute('aria-pressed',String(selected===d.u[0]));td.replaceChildren(button)}if(i===2)td.className=d.change>=0?'up':'down';if(i===4&&(!intra()||fresh(d))){let bar=document.createElement('div');bar.className='bar';let k=document.createElement('i');k.style.width=joint(d)+'%';bar.append(k);td.append(bar)}tr.append(td)}tr.insertBefore(tr.lastElementChild,tr.children[1]);tr.onclick=event=>{selected=d.u[0];render();if(event.detail===0){$('rows').querySelector('.selected .asset-select')?.focus();return}if(innerWidth<=1000)document.getElementById("allocationPanel")?.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"center"})};$('rows').append(tr)}let d=ds.find(x=>x.u[0]===selected)||ds[0];if(d){selected=d.u[0];const row=[...$('rows').children].find(row=>row.dataset.id===selected);row?.classList.add('selected');row?.querySelector('.asset-select').setAttribute('aria-pressed','true');detail(d)}else{showProtocol(null);$('allocationPanel').hidden=true;$('allocationPanel').textContent='Porcentaje virtual: —';$('name').textContent='Sin activos';$('price').textContent='—';$('signal').textContent='';$('analysis').textContent='No hay datos para estos filtros.';$('indicators').textContent='';$('source').textContent='';setChartAsset(null)}}
+const verdictColors = {
+  buy:'#35d9a4', sell:'#ff9aa7', hold:'#ebbf75', pending:'#aab8cb'
+};
+
+function watchSparkline(values, color) {
+  const canvas = document.createElement('canvas');
+  canvas.className = 'watch-spark';
+  canvas.setAttribute('aria-hidden','true');
+  const width = 56, height = 28, ratio = window.devicePixelRatio || 1;
+  canvas.width = Math.round(width*ratio);
+  canvas.height = Math.round(height*ratio);
+  const points = values.slice(-24);
+  if (points.length < 2) return canvas;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(ratio,ratio);
+  const low = Math.min(...points), range = Math.max(...points)-low;
+  const x = index => 1+index*(width-2)/(points.length-1);
+  const y = value => range ? height-3-(value-low)/range*(height-6) : height/2;
+  const trace = () => {
+    ctx.beginPath();
+    points.forEach((value,index) => index ? ctx.lineTo(x(index),y(value)) : ctx.moveTo(x(index),y(value)));
+  };
+  const fill = ctx.createLinearGradient(0,0,0,height);
+  fill.addColorStop(0,color+'45');
+  fill.addColorStop(1,color+'00');
+  trace();
+  ctx.lineTo(width-1,height);
+  ctx.lineTo(1,height);
+  ctx.closePath();
+  ctx.fillStyle = fill;
+  ctx.fill();
+  trace();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.65;
+  ctx.lineJoin = 'round';
+  ctx.stroke();
+  return canvas;
+}
+
+function render() {
+  const focusedAsset = document.activeElement?.closest('#rows [data-id]')?.dataset.id;
+  const assets = filtered();
+  const ranked = assets.filter(asset => !intra() || fresh(asset));
+  $('count').textContent = assets.length;
+  $('bull').textContent = assets.length ? Math.round(ranked.filter(asset => joint(asset)>=65).length/assets.length*100)+'%' : '—';
+  const leader = ranked[0];
+  const current = assets.find(asset => asset.u[0] === selected) || assets[0];
+  if (current) selected = current.u[0];
+
+  const rows = assets.map(asset => {
+    const row = document.createElement('li');
+    row.dataset.id = asset.u[0];
+    const verdict = protocolVerdictFor(asset);
+    const color = verdictColors[verdict.action];
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = asset === leader ? 'asset-select is-leader' : 'asset-select';
+    button.setAttribute('aria-pressed',String(asset === current));
+    button.style.setProperty('--verdict',color);
+    const caption = document.createElement('span');
+    caption.className = 'watch-label';
+    const ticker = document.createElement('strong');
+    ticker.textContent = asset.u[0].split(':')[0];
+    const name = document.createElement('span');
+    name.textContent = asset.u[1];
+    name.title = asset.u[1];
+    caption.append(ticker,name);
+    if (asset === leader) {
+      const marker = document.createElement('small');
+      marker.className = 'watch-leader';
+      marker.textContent = 'Mayor puntuación';
+      caption.append(marker);
+    }
+    const quote = document.createElement('span');
+    quote.className = 'watch-quote';
+    const price = document.createElement('strong');
+    price.textContent = money(asset.meta.quote_price ?? asset.p,asset);
+    const change = document.createElement('span');
+    change.className = 'watch-change';
+    change.textContent = (asset.change>=0?'+':'')+asset.change.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+'%';
+    const status = document.createElement('span');
+    status.className = 'watch-verdict';
+    status.textContent = verdict.stance;
+    quote.append(price,change,status);
+    button.append(caption,watchSparkline(asset.a,color),quote);
+    button.title = verdict.reason + (asset.stale ? ' · Cotización en caché' : '');
+    button.onclick = event => {
+      selected = asset.u[0];
+      render();
+      if (innerWidth<1200) $('name').focus();
+      else if (event.detail===0) $('rows').querySelector('[aria-pressed="true"]')?.focus();
+    };
+    row.append(button);
+    return row;
+  });
+  $('rows').replaceChildren(...rows);
+  if (current) {
+    detail(current);
+    rows.find(row => row.dataset.id === focusedAsset)?.firstElementChild.focus({preventScroll:true});
+    return;
+  }
+  showProtocol(null);
+  $('allocationPanel').hidden = true;
+  $('allocationPanel').textContent = 'Porcentaje virtual: —';
+  $('name').textContent = 'Sin activos';
+  $('price').textContent = '—';
+  $('signal').textContent = '';
+  $('analysis').textContent = 'No hay activos disponibles. Revisa los filtros o vuelve a actualizar.';
+  $('indicators').textContent = '';
+  $('source').textContent = '';
+  setChartAsset(null);
+}
+
 function updateProtocolConclusion(d) {
   const verdict = protocolVerdictFor(d);
   $('protocolOutcome').textContent = verdict.stance;
@@ -2461,7 +2706,7 @@ function refreshProtocolVerdict() {
   updateProtocolConclusion(dialog.asset);
   render();
 }
-function detail(d){let a=allocation(d);$('allocationPanel').textContent=a.action==='pending'?'Datos insuficientes':a.action==='sell'?'Salida de la posición larga virtual':'Porcentaje virtual: '+a.percent.toLocaleString('es-ES')+'% · '+(a.action==='buy'?'adicional del capital virtual':decision(d)[1]);$('allocationPanel').style.background=a.action==='buy'?'#10b98124':a.action==='sell'?'#f0839124':'#202a3a';$('name').textContent=d.u[1];$('price').textContent=money(d.p,d);if(d.meta.quote_price!=null&&d.meta.quote_time)$('price').textContent+=' · Última operación '+money(d.meta.quote_price,d);$('signal').textContent=intra()&&!fresh(d)?'Señal bloqueada':d.score>=65?'Tendencia a subir':d.score<=35?'Tendencia a bajar':'Sin dirección clara';$('indicators').textContent=`RSI ${d.rsi.toFixed(1)} · MA20 ${money(d.ma,d)} · Momentum ${d.mom.toFixed(2)}% · Vol. ${d.vol.toFixed(2)}% · MACD ${money(d.macd,d)} · ATR ${d.atr==null?"—":money(d.atr,d)} · Bollinger ${money(d.ma-2*d.sd,d)} / ${money(d.ma+2*d.sd,d)} · Volumen relativo ${d.volumeRatio==null?"—":d.volumeRatio.toFixed(2)+"×"}`;$('source').textContent='Última operación: '+quoteAge(d)+' · '+(d.meta.source||'Proveedor')+' · '+(d.stale?'CACHÉ ANTIGUA · ':'')+'última vela '+d.date+(d.meta.quote_time?' · última operación '+d.meta.quote_time:'')+' · '+(d.meta.exchange_timezone||d.meta.timezone||'zona no indicada');const f = newsFilter(d);
+function detail(d){let a=allocation(d);$('allocationPanel').textContent=a.action==='pending'?'Datos insuficientes':a.action==='sell'?'Salida de la posición larga virtual':'Porcentaje virtual: '+a.percent.toLocaleString('es-ES')+'% · '+(a.action==='buy'?'adicional del capital virtual':decision(d)[1]);$('name').textContent=d.u[1];$('price').textContent=money(d.p,d);if(d.meta.quote_price!=null&&d.meta.quote_time)$('price').textContent+=' · Última operación '+money(d.meta.quote_price,d);$('signal').textContent=intra()&&!fresh(d)?'Señal bloqueada':d.score>=65?'Tendencia a subir':d.score<=35?'Tendencia a bajar':'Sin dirección clara';$('indicators').textContent=`RSI ${d.rsi.toFixed(1)} · MA20 ${money(d.ma,d)} · Momentum ${d.mom.toFixed(2)}% · Vol. ${d.vol.toFixed(2)}% · MACD ${money(d.macd,d)} · ATR ${d.atr==null?"—":money(d.atr,d)} · Bollinger ${money(d.ma-2*d.sd,d)} / ${money(d.ma+2*d.sd,d)} · Volumen relativo ${d.volumeRatio==null?"—":d.volumeRatio.toFixed(2)+"×"}`;$('source').textContent='Última operación: '+quoteAge(d)+' · '+(d.meta.source||'Proveedor')+' · '+(d.stale?'CACHÉ ANTIGUA · ':'')+'última vela '+d.date+(d.meta.quote_time?' · última operación '+d.meta.quote_time:'')+' · '+(d.meta.exchange_timezone||d.meta.timezone||'zona no indicada');const f = newsFilter(d);
 const opinion = protocolVerdictFor(d);
 $('allocationPanel').hidden = false;
 $('analysis').textContent = 'DECISIÓN DEL PROTOCOLO\n' + opinion.stance + '. ' + opinion.reason
@@ -2471,9 +2716,94 @@ $('analysis').textContent = 'DECISIÓN DEL PROTOCOLO\n' + opinion.stance + '. ' 
   + ' · puntuación conjunta ' + joint(d) + '/100.'
   + '\nReferencias históricas: ' + money(d.low,d) + ' a ' + money(d.high,d) + '.';
 showProtocol(d);setChartAsset(d);showNews(d);$('deep').textContent=deepResults[deepKey(d)]||'';$('aihelp').textContent=ai?'IA por API: consulta bajo demanda, puede generar coste.':'Sin clave de OpenAI: puedes copiar el contexto y pegarlo en ChatGPT para un análisis completo.'}
+$('filterPanel').open = matchMedia('(min-width: 651px)').matches;
+function showWorkspaceSection() {
+  const settings = location.hash === '#settingsView';
+  $('workspace').hidden = settings;
+  $('settingsView').hidden = !settings;
+  $('sidebarToggle').hidden = settings;
+  $('radarLink').removeAttribute('aria-current');
+  $('settingsLink').removeAttribute('aria-current');
+  $(settings ? 'settingsLink' : 'radarLink').setAttribute('aria-current','page');
+  if (settings) $('settingsTitle').focus();
+}
+
+window.addEventListener('hashchange', showWorkspaceSection);
+showWorkspaceSection();
+
+$('sidebarToggle').onclick = () => {
+  const collapsed = $('workspace').classList.toggle('sidebar-collapsed');
+  $('sidebarToggle').setAttribute('aria-expanded', String(!collapsed));
+  const label = collapsed ? 'Mostrar barra lateral' : 'Ocultar barra lateral';
+  $('sidebarToggle').setAttribute('aria-label',label);
+  $('sidebarToggle').title = label;
+};
+
+$('rows').addEventListener('keydown', event => {
+  const control = event.target.closest('.asset-select');
+  if (!control || !['ArrowUp','ArrowDown','Home','End'].includes(event.key)) return;
+  const controls = [...$('rows').querySelectorAll('.asset-select')];
+  const index = controls.indexOf(control);
+  const next = {ArrowUp:index-1, ArrowDown:index+1, Home:0, End:controls.length-1}[event.key];
+  event.preventDefault();
+  controls[clamp(next,0,controls.length-1)].focus();
+});
 const chart = $('chart');
 const chartPoint = $('chartPoint');
-const chartState = {asset:null, bars:[], start:0, count:0, cursor:null};
+const minute = 60000, day = 1440*minute;
+const rangePresets = {
+  '1min': [['15 min',15*minute],['1 h',60*minute],['3 h',180*minute],['1 D',day]],
+  '5min': [['1 h',60*minute],['3 h',180*minute],['1 D',day],['1 S',7*day]],
+  '15min': [['3 h',180*minute],['1 D',day],['3 D',3*day],['1 S',7*day]],
+  '30min': [['6 h',360*minute],['1 D',day],['1 S',7*day],['1 M',30*day]],
+  '1h': [['12 h',720*minute],['1 D',day],['1 S',7*day],['1 M',30*day]],
+  '1day': [['1 S',7*day],['1 M',30*day],['3 M',90*day],['6 M',182*day],['1 A',365*day]],
+  '1week': [['1 M',30*day],['3 M',90*day],['6 M',182*day],['1 A',365*day],['2 A',730*day]]
+};
+
+function chartRangeStarts(bars, interval) {
+  const starts = new Map();
+  if (bars.length) {
+    const end = bars.at(-1).time;
+    const tolerance = interval === '1week' ? 7*day : interval === '1day' ? 3*day : 0;
+    for (const [label,duration] of rangePresets[interval] ?? []) {
+      const target = end-duration;
+      if (bars[0].time > target+tolerance) continue;
+      const first = bars.findIndex(bar => bar.time >= target);
+      if (first >= 0 && first < bars.length-1) starts.set(label,first);
+    }
+  }
+  starts.set('Todo',0);
+  return starts;
+}
+
+function syncChartRanges() {
+  const group = $('chartRanges');
+  const labels = [...chartState.ranges.keys()];
+  if (labels.join('|') !== group.dataset.labels) {
+    group.dataset.labels = labels.join('|');
+    group.replaceChildren(...labels.map(label => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.textContent = label;
+      button.onclick = () => {
+        chartState.range = label;
+        chartState.start = chartState.ranges.get(label);
+        chartState.count = chartState.bars.length-chartState.start;
+        chartState.cursor = null;
+        syncChartRanges();
+        paintChart();
+      };
+      return button;
+    }));
+  }
+  for (const button of group.children) {
+    button.disabled = !chartState.bars.length;
+    button.setAttribute('aria-pressed',String(button.textContent === chartState.range));
+  }
+}
+
+const chartState = {asset:null, bars:[], start:0, count:0, cursor:null, range:'Todo', ranges:new Map()};
 let chartDrag = null;
 
 function setChartAsset(asset) {
@@ -2489,10 +2819,20 @@ function setChartAsset(asset) {
     })).filter(bar => Number.isFinite(bar.time) && Number.isFinite(bar.close) && bar.close > 0)
       .sort((a,b) => a.time - b.time) : [];
     const length = chartState.bars.length;
+    chartState.ranges = chartRangeStarts(chartState.bars, asset?.interval);
     const same = key === chartState.key;
     chartState.count = same && !all ? Math.min(chartState.count,length) : length;
     chartState.start = same && !atEnd ? Math.min(chartState.start,length-chartState.count) : length-chartState.count;
-    if (!same) chartState.cursor = null;
+    if (!same) {
+      chartState.cursor = null;
+      if (!chartState.ranges.has(chartState.range)) chartState.range = 'Todo';
+    }
+    if (chartState.range !== null) {
+      if (!chartState.ranges.has(chartState.range)) chartState.range = 'Todo';
+      chartState.start = chartState.ranges.get(chartState.range);
+      chartState.count = length-chartState.start;
+    }
+    syncChartRanges();
     chartState.key = key;
   }
   paintChart();
@@ -2513,8 +2853,6 @@ function paintChart() {
   chart.height = Math.round(height*ratio);
   const ctx = chart.getContext('2d');
   ctx.scale(ratio,ratio);
-  $('chartZoomIn').disabled = count <= 8;
-  $('chartZoomOut').disabled = $('chartReset').disabled = count >= bars.length;
   const visible = bars.slice(start,start+count);
   chartPoint.hidden = true;
   if (!visible.length) {
@@ -2539,7 +2877,7 @@ function paintChart() {
   const number = new Intl.NumberFormat('es-ES',{maximumSignificantDigits:9});
   const axisNumber = new Intl.NumberFormat('es-ES',{maximumFractionDigits:
     Math.min(16, Math.max(0, Math.ceil(-Math.log10(tick))+1))});
-  ctx.font = '11px ui-monospace, monospace';
+  ctx.font = '500 12px ' + getComputedStyle(document.body).fontFamily;
   ctx.textBaseline = 'middle';
   const firstTick = Math.ceil(low*prices.rate/tick);
   const lastTick = Math.floor(high*prices.rate/tick);
@@ -2624,9 +2962,12 @@ function paintChart() {
 
 function changeChartZoom(factor, anchor = 1) {
   const {bars,count,start} = chartState;
-  const next = clamp(Math.round(count*factor),Math.min(8,bars.length),bars.length);
+  if (!count) return;
+  const next = clamp(Math.round(count*factor),Math.min(8,count),bars.length);
   chartState.start = clamp(Math.round(start+(count-next)*anchor),0,bars.length-next);
   chartState.count = next;
+  chartState.range = next === bars.length ? 'Todo' : null;
+  syncChartRanges();
   chartState.cursor = null;
   paintChart();
 }
@@ -2638,14 +2979,15 @@ function chartFraction(x) {
   return clamp((x-left)/(right-left),0,1);
 }
 function moveChart(start) {
-  chartState.start = clamp(start,0,chartState.bars.length-chartState.count);
+  const next = clamp(start,0,chartState.bars.length-chartState.count);
+  if (next === chartState.start) return;
+  chartState.start = next;
+  chartState.range = null;
+  syncChartRanges();
   chartState.cursor = null;
   paintChart();
 }
 $('chartType').onchange = paintChart;
-$('chartZoomIn').onclick = () => changeChartZoom(.67);
-$('chartZoomOut').onclick = () => changeChartZoom(1.5);
-$('chartReset').onclick = () => changeChartZoom(Infinity);
 chart.addEventListener('wheel',event => {
   if (!event.shiftKey) return;
   event.preventDefault();
@@ -2676,20 +3018,21 @@ chart.onkeydown = event => {
   const end = chartState.start+chartState.count-1;
   chartState.cursor = clamp((chartState.cursor ?? end)+direction,chartState.start,end);
   paintChart();
+  $('chartKeyboardStatus').textContent = $('chartReadout').textContent;
 };
 new ResizeObserver(paintChart).observe(chart);
 
 let newsBatch=false;async function queueNews(){if(newsBatch)return;newsBatch=true;try{let ids=filtered().map(d=>d.u[0]);for(let i=0;i<ids.length;i+=3){await Promise.all(ids.slice(i,i+3).filter(id=>!newsData[id]||Date.now()/1000-newsData[id].asof>=300).map(id=>getNews(id)))}}finally{newsBatch=false}}
 let reloadQueued=false;async function load(){if(busy){reloadQueued=true;return}busy=true;$('refresh').disabled=true;$('refresh').textContent='Actualizando…';
   try {
-    let errors=[];let alpacaConfigured=false;await loadFX();try{clock=await (await fetch('/api/clock')).json()}catch{clock={}}try{let r=await fetch('/api/status');let s=await r.json();connected=s.market;ai=s.ai;alpacaConfigured=s.alpaca}catch{connected=false;ai=false}let u=universe.filter(x=>($('view').value!=='live'||['Crypto','EE. UU.','ETF'].includes(x[2]))&&($('market').value==='all'||x[2]===$('market').value));let horizon=$('horizon').value;let results=await Promise.all(u.map(async a=>{try{if(!connected)throw Error('Abre la web desde el servidor local');let r=await fetch('/api/series?symbol='+encodeURIComponent(a[0])+'&interval='+horizon);let d=await r.json();if(d.error)throw Error(d.error);return {...compute(a,d), interval:horizon}}catch(e){errors.push(a[0]+': '+e.message);return null}}));data=results.filter(Boolean);$('mode').textContent='DATOS REALES';$('notice').textContent='Alpaca: '+(data.some(d=>String(d.meta.quality).startsWith('alpaca_')&&!d.stale)?'conexión confirmada en esta consulta':alpacaConfigured?'claves detectadas; sin respuesta válida de Alpaca en esta selección':'claves no detectadas')+'. Kraken: API pública. Yahoo: latencia no garantizada. Actualizar no equivale a recibir una operación nueva.';$('stamp').textContent='Consulta: '+new Date().toLocaleString('es-ES');$('errors').textContent=errors.join(' · ');$('aiMode').textContent=ai?'IA disponible':'Motor cuantitativo';$('ask').disabled=false;render();queueNews();
+    let errors=[];let alpacaConfigured=false;await loadFX();try{clock=await (await fetch('/api/clock')).json()}catch{clock={}}try{let r=await fetch('/api/status');let s=await r.json();connected=s.market;ai=s.ai;alpacaConfigured=s.alpaca}catch{connected=false;ai=false}let u=universe.filter(x=>($('view').value!=='live'||['Crypto','EE. UU.','ETF'].includes(x[2]))&&($('market').value==='all'||x[2]===$('market').value));let horizon=$('horizon').value;let results=await Promise.all(u.map(async a=>{try{if(!connected)throw Error('Abre la web desde el servidor local');let r=await fetch('/api/series?symbol='+encodeURIComponent(a[0])+'&interval='+horizon);let d=await r.json();if(d.error)throw Error(d.error);return {...compute(a,d), interval:horizon}}catch(e){errors.push(a[0]+': '+e.message);return null}}));data=results.filter(Boolean);$('mode').textContent='DATOS REALES';$('notice').textContent='Alpaca: '+(data.some(d=>String(d.meta.quality).startsWith('alpaca_')&&!d.stale)?'conexión confirmada en esta consulta':alpacaConfigured?'claves detectadas; sin respuesta válida de Alpaca en esta selección':'claves no detectadas')+'. Kraken: API pública. Yahoo: latencia no garantizada. Actualizar no equivale a recibir una operación nueva.';$('stamp').textContent='Consulta: '+new Date().toLocaleString('es-ES');$('errors').textContent=errors.join(' · ');$('aiMode').textContent=ai?'IA disponible':'IA sin configurar';$('ask').disabled=false;render();queueNews();
   } catch (error) {
     console.error('Error al actualizar Quant Radar', error);
     $('errors').textContent = 'No se pudo completar la actualización. Pulsa Actualizar datos para reintentar.';
   } finally {
     busy = false;
     $('refresh').disabled = false;
-    $('refresh').textContent = 'Actualizar datos';
+    $('refresh').textContent = 'Actualizar';
     if (reloadQueued) {
       reloadQueued = false;
       load();
