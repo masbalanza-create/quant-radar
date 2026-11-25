@@ -1,11 +1,256 @@
-<!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Quant Radar</title><link rel="manifest" href="/manifest.webmanifest"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#182d41"><style>
-*{box-sizing:border-box}body{margin:0;background:#f5f6f8;color:#192431;font:14px -apple-system,BlinkMacSystemFont,Arial,sans-serif}header{background:white;border-bottom:1px solid #e2e6eb;padding:20px 4%;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}h1{font-size:23px;margin:0;letter-spacing:-1px}h2{font-size:17px;margin:0 0 16px}small,.muted{color:#64748b}main{max-width:1500px;margin:auto;padding:28px 4%}button,select,input{font:inherit;border:1px solid #dce2e8;border-radius:8px;padding:10px;background:white;color:inherit}button{cursor:pointer}button.primary{background:#182d41;color:white;border:0}button:hover{opacity:.8}.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:18px 0}.card{background:white;border:1px solid #e2e6eb;border-radius:14px;padding:20px;min-width:0}.metric{font-size:28px;font-weight:650;letter-spacing:-1px;margin:8px 0}.layout{display:grid;grid-template-columns:1.3fr 1fr;gap:16px}.scroll{overflow:auto}table{border-collapse:collapse;width:100%;white-space:nowrap}td,th{text-align:left;padding:12px 9px;border-bottom:1px solid #edf0f3}th{color:#64748b;font-size:11px;text-transform:uppercase;letter-spacing:.5px}tr[data-id]{cursor:pointer}tr[data-id]:hover,tr.selected{background:#f0f5fa}.up{color:#087d59}.down{color:#bb4545}.pill{padding:5px 9px;border-radius:20px;background:#eef2f6;font-size:12px}.notice{padding:12px 16px;background:#fff6e2;border:1px solid #eed9a7;border-radius:10px;color:#775318}canvas{width:100%;height:220px}#analysis{white-space:pre-wrap;line-height:1.65}p{line-height:1.6}.split{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.bar{height:5px;background:#e9edf2;border-radius:8px;margin-top:5px}.bar i{display:block;height:100%;background:#527a9b;border-radius:8px}footer{padding:24px 0;color:#64748b;font-size:12px}@media(max-width:850px){.layout{grid-template-columns:1fr}.cards{grid-template-columns:1fr 1fr}.card{padding:14px}}@media(max-width:450px){.cards{grid-template-columns:1fr}}
-tr.buy{background:#e5f5eb}tr.sell{background:#fce8e8}tr.hold{background:#fff7dc}tr.closed{background:#e4e8ee;color:#536174}tr.unknown{background:#f1f3f5}tr.selected{outline:2px solid #50799c;outline-offset:-2px}tr:hover{filter:brightness(.97)}.legend{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.legend span{padding:6px 10px;border-radius:7px}.newsitem{border-bottom:1px solid #e2e6eb;padding:12px 0}.newsitem a{color:#284e70;font-weight:600;text-decoration:none}.newsitem a:hover{text-decoration:underline}#deep{white-space:pre-wrap;line-height:1.65}#newslist{max-height:480px;overflow:auto}@media(max-width:600px){main{padding:16px 12px}header{padding:14px 12px}.toolbar select{max-width:100%;flex:1 1 140px;font-size:16px}.toolbar button,button{min-height:44px}input{font-size:16px}.scroll{max-width:100%;overscroll-behavior-x:contain}td,th{padding:12px 8px}canvas{max-width:100%}h1{font-size:22px}.card{overflow-wrap:anywhere}body{padding-bottom:env(safe-area-inset-bottom)} }
-.strategy-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-top:14px}.strategy-form label{display:grid;gap:5px;font-size:14px}.strategy-form input,.strategy-form select,.strategy-form textarea{box-sizing:border-box;width:100%;padding:8px;border:1px solid #a9b7c5;border-radius:8px;font:inherit;color:inherit;background:#fff}.strategy-wide{grid-column:1/-1}.strategy-status{margin:8px 0 0}
-#protocolDialog{box-sizing:border-box;width:min(680px,calc(100% - 24px));max-height:85dvh;padding:20px;border:1px solid #dce2e8;border-radius:14px;color:inherit;background:#fff}#protocolDialog::backdrop{background:#16263799}#protocolDialog h2{margin:0}#protocolChecks{padding-left:24px}#protocolChecks li{padding:10px 0;border-bottom:1px solid #e7edf2}#protocolChecks p{margin:6px 0 0}#openProtocol{margin-top:12px}
-#protocolDialog{width:min(900px,calc(100% - 24px));padding:0;max-height:88vh;max-height:88dvh}#protocolDialog .protocol-head{position:sticky;top:0;z-index:1;background:#fff;padding:14px 20px;border-bottom:1px solid #dce2e8}#protocolAsset{margin:6px 0 0}.protocol-body{padding:4px 20px 20px}#protocolChecks{list-style:none;padding:0}#protocolChecks li{padding:12px 0}#protocolChecks summary{cursor:pointer;padding:7px 0;font-weight:700}.protocol-note{color:#465974}.protocol-math{margin:12px 0;padding:12px;background:#f2f6fa;border-radius:8px}.protocol-math h4{margin:0}.protocol-math dl{margin:6px 0 0}.protocol-math dt{font-weight:700;margin-top:7px}.protocol-math dd{margin:3px 0;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}.protocol-trades{overflow-x:auto}.protocol-trades table{width:100%;font-variant-numeric:tabular-nums}
-#protocolDialog[open]{display:flex;flex-direction:column;overflow:hidden}#protocolDialog .protocol-head{position:static;flex:none}#protocolDialog .protocol-body{min-height:0;overflow-y:auto;overscroll-behavior:contain}.protocol-nav{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.protocol-cost input{display:block;font:inherit;width:10em;padding:6px;margin:6px 0}
-#protocolChecks pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f2f6fa;padding:8px;border-radius:6px}.protocol-reference{margin-top:10px}#protocolIndicatorSummary{line-height:1.65}</style><header><div><h1>QUANT<span style="color:#6688a3">/</span> RADAR</h1><small>Inteligencia de mercado global · V11 · Mobile</small></div><div class="toolbar" style="margin:0"><span class="pill" id="mode">DATOS REALES</span><button id="refresh" class="primary">Actualizar datos</button></div></header><main><div class="split"><div><h1>Radar de oportunidades</h1><p class="muted">Explora señales, compara riesgos y formula hipótesis de inversión.</p></div><small id="stamp"></small></div><div class="notice" id="notice">Esperando datos reales. No se generan precios ficticios.</div><div class="toolbar"><select id="view"><option value="global">GLOBAL INVESTING</option><option value="live">LIVE TRADING · fuentes oficiales</option></select><select id="market"><option value="all">Todos los mercados</option><option>EE. UU.</option><option>Europa</option><option>Asia</option><option>Forex</option><option>ETF</option><option>Materias primas</option><option>Crypto</option></select><select id="horizon"><option value="1day">Corto plazo · diario</option><option value="1min">Intradiario · 1 min</option><option value="15min">Intradiario · 15 min</option><option value="30min">Intradiario · 30 min</option><option value="1h">Intradiario · 60 min</option><option value="5min">Intradiario · 5 min</option><option value="1week">Largo plazo · semanal</option></select><select id="risk"><option value="all">Todos los riesgos</option><option>Bajo</option><option>Medio</option><option>Alto</option></select><select id="currency" aria-label="Moneda de visualización"><option value="native">Moneda original</option><option value="EUR" selected>EUR · Euro</option><option value="USD">USD · Dólar estadounidense</option><option value="GBP">GBP · Libra esterlina</option><option value="JPY">JPY · Yen japonés</option><option value="CHF">CHF · Franco suizo</option><option value="CAD">CAD · Dólar canadiense</option><option value="AUD">AUD · Dólar australiano</option><option value="CNY">CNY · Yuan chino</option><option value="HKD">HKD · Dólar de Hong Kong</option><option value="SGD">SGD · Dólar de Singapur</option><option value="INR">INR · Rupia india</option><option value="KRW">KRW · Won surcoreano</option></select><input id="search" placeholder="Buscar activo"><select id="auto"><option value="0">Actualización manual</option><option value="30000">Cada 30 segundos</option><option value="60000" selected>Cada minuto</option><option value="300000">Cada 5 minutos</option><option value="900000">Cada 15 minutos</option></select></div><details class="card" id="strategyPanel">
+<!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Quant Radar</title><link rel="manifest" href="/manifest.webmanifest"><link rel="icon" href="/icon-192.png" type="image/png"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#0B0F17"><style>
+:root {
+  color-scheme: dark;
+  --numbers: "SF Mono", "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  --canvas: #0B0F17;
+  --paper: #161E2E;
+  --ink: #F8FAFC;
+  --muted: #aab8cb;
+  --line: #64748b33;
+  --control: #64748b80;
+  --accent: #00C2FF;
+  --accent-hover: #62dbff;
+  --accent-soft: #00c2ff19;
+  --radius: 22px;
+  --shadow: 0 2px 4px #00000022, 0 10px 30px #00000033;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--canvas);
+  color: var(--ink);
+  font: 15px/1.5 -apple-system, BlinkMacSystemFont, Inter, "Segoe UI", sans-serif;
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 17px max(24px, calc((100% - 1376px) / 2));
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+}
+.brand { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 750; letter-spacing: -.05em; }
+.brand img { display: block; width: 38px; height: 38px; border-radius: 22%; }
+.brand span { color: var(--accent); }
+main { max-width: 1440px; margin: auto; padding: clamp(24px, 4vw, 64px) 32px 8px; }
+.hero { margin-bottom: clamp(26px, 4vw, 48px); }
+.hero p { margin: 8px 0 0; }
+h1, h2, h3, h4 { line-height: 1.17; letter-spacing: -.028em; }
+h1 { margin: 0; font-size: clamp(30px, 4.5vw, 60px); font-weight: 730; }
+h2 { margin: 0; font-size: clamp(18px, 2.1vw, 23px); }
+small, .muted { color: var(--muted); }
+small { font-size: .84rem; }
+a { color: var(--accent); text-underline-offset: 3px; }
+p { line-height: 1.6; }
+button, select, input, textarea {
+  min-width: 0;
+  min-height: 42px;
+  max-width: 100%;
+  padding: 9px 13px;
+  border: 1px solid var(--control);
+  border-radius: 11px;
+  background: var(--paper);
+  font: inherit;
+  color: var(--ink);
+  transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+textarea { resize: vertical; }
+input::placeholder, textarea::placeholder { color: var(--muted); opacity: 1; }
+button { font-weight: 620; cursor: pointer; }
+button:hover:not(:disabled) { background: #1c293e; border-color: #00c2ff88; }
+button:active:not(:disabled) { transform: translateY(1px); }
+button.primary { background: var(--accent); border-color: var(--accent); color: var(--canvas); }
+button.primary:hover:not(:disabled) { background: var(--accent-hover); border-color: var(--accent-hover); }
+button:disabled { background: #202a3a; border-color: var(--line); color: var(--muted); cursor: default; }
+#refresh:disabled::before {
+  content: "";
+  display: inline-block;
+  width: .8em;
+  height: .8em;
+  margin-right: .6em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 850ms linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+:where(button, select, input, textarea, summary, a, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.toolbar, .split, .protocol-nav, .asset-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.split { justify-content: space-between; }
+.filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 165px), 1fr));
+  margin: 20px 0 16px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--paper);
+}
+.filters > * { width: 100%; }
+.notice {
+  padding: 12px 15px;
+  border: 1px solid #00c2ff33;
+  border-radius: 12px;
+  background: #102033;
+  color: #b6d6e6;
+  font-size: .85rem;
+}
+.card, .settings > details {
+  min-width: 0;
+  padding: clamp(16px, 2.3vw, 29px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper);
+  box-shadow: var(--shadow);
+}
+.settings { display: grid; gap: 8px; }
+.settings > details { padding: 0 17px; border-radius: 14px; }
+.settings > details[open] { padding-bottom: 17px; }
+.settings summary { padding: 12px 0; }
+summary { cursor: pointer; font-weight: 660; }
+summary::marker { color: var(--accent); }
+summary:hover { color: var(--accent); }
+.strategy-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  gap: 14px;
+  margin-top: 12px;
+  align-items: start;
+}
+.strategy-form label { display: grid; gap: 6px; }
+.strategy-form :is(input, select, textarea) { width: 100%; }
+.strategy-wide { grid-column: 1 / -1; }
+.strategy-status { margin: 8px 0 0; }
+.cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 24px 0 18px; }
+.metric {
+  margin: 8px 0;
+  font-size: clamp(24px, 3.2vw, 43px);
+  font-weight: 720;
+  line-height: 1.13;
+  letter-spacing: -.055em;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.layout { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.asset-detail { display: grid; gap: 18px; min-width: 0; }
+.scroll, .protocol-trades { overflow: auto; overscroll-behavior-inline: contain; }
+.scroll { border: 1px solid var(--line); border-radius: 13px; }
+table { width: 100%; border-collapse: separate; border-spacing: 0; white-space: nowrap; font-variant-numeric: tabular-nums; }
+td, th { padding: 11px 12px; border-bottom: 1px solid var(--line); text-align: left; }
+tbody tr:last-child td { border-bottom: 0; }
+th { color: var(--muted); background: #111827; font-size: .72rem; text-transform: uppercase; letter-spacing: .055em; }
+tr[data-id] { cursor: pointer; }
+tr[data-id] td { transition: background-color 160ms ease; }
+tr[data-id] td:first-child { box-shadow: inset 3px 0 var(--row-mark, transparent); font-weight: 620; }
+tr.buy { --row-mark: #10B981; }
+tr.sell { --row-mark: #f08391; }
+tr.hold { --row-mark: #e6bd70; }
+tr.closed, tr.unknown { --row-mark: #64748B; color: var(--muted); }
+tr[data-id]:hover td { background: #1a2639; }
+tr.selected td { background: var(--accent-soft); }
+tr.selected td:first-child { box-shadow: inset 3px 0 var(--accent); }
+button.asset-select { min-height: 36px; padding: 5px 2px; border: 0; background: transparent; text-align: left; }
+button.asset-select:hover:not(:disabled) { background: transparent; color: var(--accent); }
+.up { color: #37d5a0; }
+.down { color: #ff9aa7; }
+.pill, .legend span {
+  display: inline-block;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: #222e42;
+  color: #c4d2e3;
+  font-size: .78rem;
+  font-weight: 600;
+}
+.legend { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0; }
+.metric, .scroll td:nth-child(n+3):nth-child(-n+4), .scroll td:nth-child(6), .protocol-math dd { font-family: var(--numbers); font-variant-numeric: tabular-nums; }
+#bull, #top { color: #10B981; }
+canvas { display: block; width: 100%; height: 220px; margin: 15px 0 10px; }
+#analysis, #deep { white-space: pre-wrap; line-height: 1.65; }
+.asset-actions { margin-top: 16px; }
+#allocationPanel {
+  margin: 16px 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  font-size: 1.03rem;
+  font-weight: 720;
+}
+#newslist { max-height: 480px; overflow: auto; }
+.newsitem { border-bottom: 1px solid var(--line); padding: 12px 0; }
+.newsitem a { font-weight: 620; text-decoration: none; }
+.newsitem a:hover { text-decoration: underline; }
+.bar { height: 5px; margin-top: 5px; background: #263349; border-radius: 8px; }
+.bar i { display: block; height: 100%; background: var(--accent); border-radius: inherit; }
+footer { padding: 25px 0; color: var(--muted); font-size: .8rem; }
+#protocolDialog {
+  width: min(930px, calc(100% - 24px));
+  max-height: 90vh;
+  max-height: 90dvh;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 14px 64px #00000080;
+}
+#protocolDialog[open] { display: flex; flex-direction: column; overflow: hidden; animation: enter 180ms ease-out; }
+@keyframes enter { from { opacity: 0; transform: translateY(7px); } }
+#protocolDialog::backdrop { background: #0b0f17b8; backdrop-filter: blur(5px); }
+.protocol-head { flex: none; padding: clamp(13px, 3vw, 24px); border-bottom: 1px solid var(--line); }
+#protocolAsset { margin: 6px 0 0; }
+.protocol-nav { margin-top: 10px; }
+.protocol-body { min-height: 0; padding: 4px clamp(13px, 3vw, 24px) 24px; overflow-y: auto; overscroll-behavior: contain; }
+#protocolChecks { list-style: none; padding: 0; }
+#protocolChecks li { padding: 10px 0; border-bottom: 1px solid var(--line); }
+#protocolChecks summary { padding: 7px 0; }
+#protocolChecks p { margin: 7px 0 0; overflow-wrap: anywhere; }
+.protocol-note { color: var(--muted); }
+.protocol-math, #protocolChecks pre, #protocolConclusion {
+  margin: 12px 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: #111827;
+}
+.protocol-math h4 { margin: 0; }
+.protocol-math dl { margin: 6px 0 0; }
+.protocol-math dt { font-weight: 700; margin-top: 7px; }
+.protocol-math dd { margin: 3px 0; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.protocol-math fieldset { min-width: 0; margin: 12px 0; border: 1px solid var(--control); border-radius: 12px; }
+.protocol-math input { max-width: 100%; }
+.protocol-cost input { display: block; width: 12em; margin: 6px 0 12px; }
+#protocolChecks pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.protocol-reference { margin-top: 10px; }
+#protocolIndicatorSummary { line-height: 1.65; }
+@media (max-width: 1000px) {
+  .layout { grid-template-columns: minmax(0, 1fr); }
+  .asset-detail { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+  .asset-detail > :last-child { grid-column: 1 / -1; }
+}
+@media (max-width: 650px) {
+  header, main { padding-inline: 15px; }
+  .asset-detail { grid-template-columns: minmax(0, 1fr); }
+  .cards { gap: 7px; }
+  .cards .card { padding: 11px 9px; border-radius: 14px; }
+  .cards small { font-size: .73rem; line-height: 1.25; display: block; overflow-wrap: anywhere; }
+  .cards .metric { font-size: clamp(19px, 5vw, 26px); }
+  .filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .filters input { grid-column: 1 / -1; }
+  button, select, input, textarea { min-height: 44px; }
+  select, input, textarea { font-size: 16px; }
+  .asset-actions > button { flex: 1 1 165px; }
+  body { padding-bottom: env(safe-area-inset-bottom); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+</style><header><div><div class="brand"><img src="/icon-192.png" width="38" height="38" alt=""><div>Quant<span> / </span>Radar</div></div></div><div class="toolbar" style="margin:0"><span class="pill" id="mode">DATOS REALES</span><button id="refresh" class="primary">Actualizar datos</button></div></header><main><div class="split hero"><div><h1>Radar de oportunidades</h1><p class="muted">Explora señales, compara riesgos y formula hipótesis de inversión.</p></div><small id="stamp"></small></div><div class="notice" id="notice">Esperando datos reales. No se generan precios ficticios.</div><div class="toolbar filters"><select id="view" aria-label="Vista"><option value="global">GLOBAL INVESTING</option><option value="live">LIVE TRADING · fuentes oficiales</option></select><select id="market" aria-label="Mercado"><option value="all">Todos los mercados</option><option>EE. UU.</option><option>Europa</option><option>Asia</option><option>Forex</option><option>ETF</option><option>Materias primas</option><option>Crypto</option></select><select id="horizon" aria-label="Horizonte"><option value="1day">Corto plazo · diario</option><option value="1min">Intradiario · 1 min</option><option value="15min">Intradiario · 15 min</option><option value="30min">Intradiario · 30 min</option><option value="1h">Intradiario · 60 min</option><option value="5min">Intradiario · 5 min</option><option value="1week">Largo plazo · semanal</option></select><select id="risk" aria-label="Riesgo"><option value="all">Todos los riesgos</option><option>Bajo</option><option>Medio</option><option>Alto</option></select><select id="currency" aria-label="Moneda de visualización"><option value="native">Moneda original</option><option value="EUR" selected>EUR · Euro</option><option value="USD">USD · Dólar estadounidense</option><option value="GBP">GBP · Libra esterlina</option><option value="JPY">JPY · Yen japonés</option><option value="CHF">CHF · Franco suizo</option><option value="CAD">CAD · Dólar canadiense</option><option value="AUD">AUD · Dólar australiano</option><option value="CNY">CNY · Yuan chino</option><option value="HKD">HKD · Dólar de Hong Kong</option><option value="SGD">SGD · Dólar de Singapur</option><option value="INR">INR · Rupia india</option><option value="KRW">KRW · Won surcoreano</option></select><input id="search" aria-label="Buscar activo" placeholder="Buscar activo"><select id="auto" aria-label="Frecuencia de actualización"><option value="0">Actualización manual</option><option value="30000">Cada 30 segundos</option><option value="60000" selected>Cada minuto</option><option value="300000">Cada 5 minutos</option><option value="900000">Cada 15 minutos</option></select></div><section class="settings" aria-label="Configuración"><details id="strategyPanel">
 <summary>Mi estrategia virtual</summary>
 <form id="strategyForm" class="strategy-form">
 <label>Objetivo o idea que quieres probar
@@ -54,7 +299,7 @@ tr.buy{background:#e5f5eb}tr.sell{background:#fce8e8}tr.hold{background:#fff7dc}
 <div class="strategy-wide"><button class="primary" type="submit">Guardar cartera</button>
 <p id="personalPortfolioStatus" class="muted" role="status">Los importes se guardan en este navegador.</p></div>
 </form>
-</details><p id="fxnote" class="muted" style="font-size:12px"></p><div class="cards"><div class="card"><small>Activos disponibles</small><div class="metric" id="count">—</div><small>Universo seleccionado</small></div><div class="card"><small>Sesgo alcista</small><div class="metric" id="bull">—</div><small>Puntuación conjunta ≥ 65</small></div><div class="card"><small>Mayor puntuación</small><div class="metric" id="top">—</div><small>Puntuación técnica + ajuste informativo, no probabilidad</small></div></div><div class="layout"><div class="card"><div class="split"><h2>Clasificación de activos</h2><small>Orden por puntuación conjunta</small></div><div class="legend"><span style="background:#e5f5eb">Compra virtual validada</span><span style="background:#fce8e8">Venta virtual validada</span><span style="background:#fff7dc">No operar</span><span style="background:#e4e8ee">Cerrado</span><span style="background:#f1f3f5">Horario sin verificar</span></div><div class="scroll"><table><thead><tr><th>Activo</th><th>Precio</th><th>Variación / vela</th><th>Fuente y última operación</th><th>Score</th><th>Riesgo</th><th>Decisión / sesión</th></tr></thead><tbody id="rows"></tbody></table></div><p class="muted" id="errors"></p></div><div><div class="card"><div class="split"><h2 id="name">Selecciona un activo</h2><span id="signal" class="pill"></span></div><div class="metric" id="price">—</div><canvas id="chart"></canvas><div id="indicators" class="muted"></div><p class="muted" id="source"></p></div><div class="card" style="margin-top:16px"><div class="split"><h2>¿Qué haría ante esta situación?</h2><span class="pill" id="aiMode">Motor cuantitativo</span></div><div id="allocationPanel" style="padding:14px;margin:0 0 14px;border:1px solid #dce2e8;border-radius:10px;font-size:17px;font-weight:700" hidden>Porcentaje virtual: —</div><div id="analysis"></div><button id="openProtocol" type="button" aria-haspopup="dialog" disabled>Ver proceso cuantitativo</button><button id="ask" class="primary" style="margin-top:15px">Análisis avanzado con IA</button><p id="aihelp" class="muted"></p><button id="copy">Copiar contexto para ChatGPT</button><div id="deep" style="margin-top:14px"></div><p class="muted">Hipótesis educativa; no ejecuta operaciones ni garantiza resultados.</p></div><div class="card" style="margin-top:16px"><div class="split"><h2>Noticias y acontecimientos</h2><button id="reloadnews">Actualizar noticias</button></div><p id="newsstatus" class="muted"></p><div id="newslist"></div></div></div></div><div class="card" style="margin-top:16px"><h2>Metodología y control de riesgo</h2><p>Puntuación conjunta = técnica + ajuste de noticias (máximo ±12 puntos). Filtro de titulares de hasta 72 horas; impacto limitado a medios prioritarios y señales explícitas. No verifica artículos completos. Score técnico heurístico: momentum de 10 velas, relación con media de 20 velas y RSI de 14 periodos. Riesgo según volatilidad por vela y clase de activo; no equivale a una calificación regulatoria. Los horizontes cambian la frecuencia de las velas, no predicen el futuro. El universo es una lista inicial, no un escáner exhaustivo.</p></div><footer>QUANT RADAR · Datos: Alpaca (opcional), Kraken y Yahoo Finance (acceso no oficial). Sin conexión a bróker.</footer></main>
+</details></section><p id="fxnote" class="muted" style="font-size:12px"></p><div class="cards"><div class="card"><small>Activos disponibles</small><div class="metric" id="count">—</div><small>Universo seleccionado</small></div><div class="card"><small>Sesgo alcista</small><div class="metric" id="bull">—</div><small>Puntuación conjunta ≥ 65</small></div><div class="card"><small>Mayor puntuación</small><div class="metric" id="top">—</div><small>Puntuación técnica + ajuste informativo, no probabilidad</small></div></div><div class="layout"><div class="card"><div class="split"><h2>Clasificación de activos</h2><small>Orden por puntuación conjunta</small></div><div class="legend"><span style="background:#10b98124">Compra virtual validada</span><span style="background:#f0839124">Venta virtual validada</span><span style="background:#e6bd7024">No operar</span><span style="background:#64748b33">Cerrado</span><span style="background:#202a3a">Horario sin verificar</span></div><div class="scroll"><table><thead><tr><th>Activo</th><th>Decisión / sesión</th><th>Precio</th><th>Variación / vela</th><th>Fuente y última operación</th><th>Score</th><th>Riesgo</th></tr></thead><tbody id="rows"></tbody></table></div><p class="muted" id="errors"></p></div><div class="asset-detail"><div class="card"><div class="split"><h2 id="name">Selecciona un activo</h2><span id="signal" class="pill"></span></div><div class="metric" id="price">—</div><canvas id="chart"></canvas><div id="indicators" class="muted"></div><p class="muted" id="source"></p></div><div class="card"><div class="split"><h2>¿Qué haría ante esta situación?</h2><span class="pill" id="aiMode">Motor cuantitativo</span></div><div id="allocationPanel" hidden>Porcentaje virtual: —</div><div id="analysis"></div><div class="asset-actions"><button id="openProtocol" type="button" aria-haspopup="dialog" disabled>Ver proceso cuantitativo</button><button id="ask" class="primary">Análisis avanzado con IA</button></div><p id="aihelp" class="muted"></p><button id="copy">Copiar contexto para ChatGPT</button><div id="deep" style="margin-top:14px"></div><p class="muted">Hipótesis educativa; no ejecuta operaciones ni garantiza resultados.</p></div><div class="card"><div class="split"><h2>Noticias y acontecimientos</h2><button id="reloadnews">Actualizar noticias</button></div><p id="newsstatus" class="muted"></p><div id="newslist"></div></div></div></div><div class="card" style="margin-top:16px"><h2>Metodología y control de riesgo</h2><p>Puntuación conjunta = técnica + ajuste de noticias (máximo ±12 puntos). Filtro de titulares de hasta 72 horas; impacto limitado a medios prioritarios y señales explícitas. No verifica artículos completos. Score técnico heurístico: momentum de 10 velas, relación con media de 20 velas y RSI de 14 periodos. Riesgo según volatilidad por vela y clase de activo; no equivale a una calificación regulatoria. Los horizontes cambian la frecuencia de las velas, no predicen el futuro. El universo es una lista inicial, no un escáner exhaustivo.</p></div><footer>QUANT RADAR · Datos: Alpaca (opcional), Kraken y Yahoo Finance (acceso no oficial). Sin conexión a bróker.</footer></main>
 <dialog id="protocolDialog" aria-labelledby="protocolTitle">
 <div class="protocol-head"><div class="split"><h2 id="protocolTitle">Proceso cuantitativo</h2>
 <form method="dialog"><button autofocus>Cerrar</button></form></div>
@@ -2179,7 +2424,7 @@ async function getNews(id,force=false){if(newsPending[id])return newsPending[id]
 function context(d){return {asset:d.u[1],symbol:d.u[0],horizon:$('horizon').value,session:session(d),fresh: fresh(d),stale:!!d.stale,source:d.meta.source,quoteTime:d.meta.quote_time,score:d.score,risk:d.risk,rsi:d.rsi,momentum:d.mom,volatility:d.vol,displayCurrency:conversion(d),displayPrices:{current:money(d.p,d),average:money(d.ma,d),recentHigh:money(d.high,d),recentLow:money(d.low,d)},technicalSignal:preliminaryDecision(d)[1],protocolVerdict:protocolVerdictFor(d),protocol:protocolReport(d),strategyProfile,virtualAllocation:allocation(d),combinedScore:joint(d),newsFilter:newsFilter(d),news:newsData[d.u[0]]||{items:[],errors:['Noticias no consultadas']}}}
 function allocationTextFromSnapshot(s){let a=s.virtualAllocation,n=a.percent.toLocaleString('es-ES');return a.action==='pending'?'Asignación pendiente de evaluación.':a.action==='buy'?'Compraría '+n+'% adicional del capital virtual.':a.action==='sell'?'Salida técnica si hay una posición larga virtual.':'0%: no realizaría ninguna operación.'}
 function deepKey(d){return d.u[0]+'|'+$('horizon').value+'|'+$('currency').value}
-function render(){let ds=filtered();$('count').textContent=ds.length;$('bull').textContent=ds.length?Math.round(ds.filter(x=>joint(x)>=65&&(!intra()||fresh(x))).length/ds.length*100)+'%':'—';$('top').textContent=ds.find(x=>!intra()||fresh(x))?.u[0].split(':')[0]||'—';$('rows').replaceChildren();for(let d of ds){let tr=document.createElement('tr');tr.dataset.id=d.u[0];let dec=decision(d);tr.className=dec[0]+(selected===d.u[0]?' selected':'');for(let [i,t] of [d.u[1]+' · '+d.u[2],money(d.meta.quote_price??d.p,d)+(d.stale?' (caché)':''), (d.change>=0?'+':'')+d.change.toFixed(2)+'%',(d.meta.source||'Proveedor')+' · '+quality(d)+' · '+quoteAge(d),intra()&&!fresh(d)?'—':joint(d)+'/100',d.risk,dec[1]].entries()){let td=document.createElement('td');td.textContent=t;if(i===2)td.className=d.change>=0?'up':'down';if(i===4&&(!intra()||fresh(d))){let bar=document.createElement('div');bar.className='bar';let k=document.createElement('i');k.style.width=joint(d)+'%';bar.append(k);td.append(bar)}tr.append(td)}tr.onclick=()=>{selected=d.u[0];render();if(innerWidth<=850)document.getElementById("allocationPane")?.scrollIntoView({behavior:"smooth",block:"center"})};$('rows').append(tr)}let d=ds.find(x=>x.u[0]===selected)||ds[0];if(d){selected=d.u[0];detail(d)}else{showProtocol(null);$('allocationPanel').hidden=true;$('allocationPanel').textContent='Porcentaje virtual: —';$('name').textContent='Sin activos';$('price').textContent='—';$('signal').textContent='';$('analysis').textContent='No hay datos para estos filtros.';$('indicators').textContent='';$('source').textContent='';let c=$('chart');c.getContext('2d').clearRect(0,0,c.width,c.height)}}
+function render(){let ds=filtered();$('count').textContent=ds.length;$('bull').textContent=ds.length?Math.round(ds.filter(x=>joint(x)>=65&&(!intra()||fresh(x))).length/ds.length*100)+'%':'—';$('top').textContent=ds.find(x=>!intra()||fresh(x))?.u[0].split(':')[0]||'—';$('rows').replaceChildren();for(let d of ds){let tr=document.createElement('tr');tr.dataset.id=d.u[0];let dec=decision(d);tr.className=dec[0]+(selected===d.u[0]?' selected':'');for(let [i,t] of [d.u[1]+' · '+d.u[2],money(d.meta.quote_price??d.p,d)+(d.stale?' (caché)':''), (d.change>=0?'+':'')+d.change.toFixed(2)+'%',(d.meta.source||'Proveedor')+' · '+quality(d)+' · '+quoteAge(d),intra()&&!fresh(d)?'—':joint(d)+'/100',d.risk,dec[1]].entries()){let td=document.createElement('td');td.textContent=t;if(i===0){const button=document.createElement('button');button.type='button';button.className='asset-select';button.textContent=t;button.setAttribute('aria-pressed',String(selected===d.u[0]));td.replaceChildren(button)}if(i===2)td.className=d.change>=0?'up':'down';if(i===4&&(!intra()||fresh(d))){let bar=document.createElement('div');bar.className='bar';let k=document.createElement('i');k.style.width=joint(d)+'%';bar.append(k);td.append(bar)}tr.append(td)}tr.insertBefore(tr.lastElementChild,tr.children[1]);tr.onclick=event=>{selected=d.u[0];render();if(event.detail===0){$('rows').querySelector('.selected .asset-select')?.focus();return}if(innerWidth<=1000)document.getElementById("allocationPanel")?.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"center"})};$('rows').append(tr)}let d=ds.find(x=>x.u[0]===selected)||ds[0];if(d){selected=d.u[0];const row=[...$('rows').children].find(row=>row.dataset.id===selected);row?.classList.add('selected');row?.querySelector('.asset-select').setAttribute('aria-pressed','true');detail(d)}else{showProtocol(null);$('allocationPanel').hidden=true;$('allocationPanel').textContent='Porcentaje virtual: —';$('name').textContent='Sin activos';$('price').textContent='—';$('signal').textContent='';$('analysis').textContent='No hay datos para estos filtros.';$('indicators').textContent='';$('source').textContent='';let c=$('chart');c.getContext('2d').clearRect(0,0,c.width,c.height)}}
 function updateProtocolConclusion(d) {
   const verdict = protocolVerdictFor(d);
   $('protocolOutcome').textContent = verdict.stance;
@@ -2193,7 +2438,7 @@ function refreshProtocolVerdict() {
   updateProtocolConclusion(dialog.asset);
   render();
 }
-function detail(d){let a=allocation(d);$('allocationPanel').textContent=a.action==='pending'?'Datos insuficientes':a.action==='sell'?'Salida de la posición larga virtual':'Porcentaje virtual: '+a.percent.toLocaleString('es-ES')+'% · '+(a.action==='buy'?'adicional del capital virtual':decision(d)[1]);$('allocationPanel').style.background=a.action==='buy'?'#e5f5eb':a.action==='sell'?'#fce8e8':'#f1f3f5';$('name').textContent=d.u[1];$('price').textContent=money(d.p,d);if(d.meta.quote_price!=null&&d.meta.quote_time)$('price').textContent+=' · Última operación '+money(d.meta.quote_price,d);$('signal').textContent=intra()&&!fresh(d)?'Señal bloqueada':d.score>=65?'Tendencia a subir':d.score<=35?'Tendencia a bajar':'Sin dirección clara';$('indicators').textContent=`RSI ${d.rsi.toFixed(1)} · MA20 ${money(d.ma,d)} · Momentum ${d.mom.toFixed(2)}% · Vol. ${d.vol.toFixed(2)}% · MACD ${money(d.macd,d)} · ATR ${d.atr==null?"—":money(d.atr,d)} · Bollinger ${money(d.ma-2*d.sd,d)} / ${money(d.ma+2*d.sd,d)} · Volumen relativo ${d.volumeRatio==null?"—":d.volumeRatio.toFixed(2)+"×"}`;$('source').textContent='Última operación: '+quoteAge(d)+' · '+(d.meta.source||'Proveedor')+' · '+(d.stale?'CACHÉ ANTIGUA · ':'')+'última vela '+d.date+(d.meta.quote_time?' · última operación '+d.meta.quote_time:'')+' · '+(d.meta.exchange_timezone||d.meta.timezone||'zona no indicada');const f = newsFilter(d);
+function detail(d){let a=allocation(d);$('allocationPanel').textContent=a.action==='pending'?'Datos insuficientes':a.action==='sell'?'Salida de la posición larga virtual':'Porcentaje virtual: '+a.percent.toLocaleString('es-ES')+'% · '+(a.action==='buy'?'adicional del capital virtual':decision(d)[1]);$('allocationPanel').style.background=a.action==='buy'?'#10b98124':a.action==='sell'?'#f0839124':'#202a3a';$('name').textContent=d.u[1];$('price').textContent=money(d.p,d);if(d.meta.quote_price!=null&&d.meta.quote_time)$('price').textContent+=' · Última operación '+money(d.meta.quote_price,d);$('signal').textContent=intra()&&!fresh(d)?'Señal bloqueada':d.score>=65?'Tendencia a subir':d.score<=35?'Tendencia a bajar':'Sin dirección clara';$('indicators').textContent=`RSI ${d.rsi.toFixed(1)} · MA20 ${money(d.ma,d)} · Momentum ${d.mom.toFixed(2)}% · Vol. ${d.vol.toFixed(2)}% · MACD ${money(d.macd,d)} · ATR ${d.atr==null?"—":money(d.atr,d)} · Bollinger ${money(d.ma-2*d.sd,d)} / ${money(d.ma+2*d.sd,d)} · Volumen relativo ${d.volumeRatio==null?"—":d.volumeRatio.toFixed(2)+"×"}`;$('source').textContent='Última operación: '+quoteAge(d)+' · '+(d.meta.source||'Proveedor')+' · '+(d.stale?'CACHÉ ANTIGUA · ':'')+'última vela '+d.date+(d.meta.quote_time?' · última operación '+d.meta.quote_time:'')+' · '+(d.meta.exchange_timezone||d.meta.timezone||'zona no indicada');const f = newsFilter(d);
 const opinion = protocolVerdictFor(d);
 $('allocationPanel').hidden = false;
 $('analysis').textContent = 'DECISIÓN DEL PROTOCOLO\n' + opinion.stance + '. ' + opinion.reason
@@ -2203,7 +2448,7 @@ $('analysis').textContent = 'DECISIÓN DEL PROTOCOLO\n' + opinion.stance + '. ' 
   + ' · puntuación conjunta ' + joint(d) + '/100.'
   + '\nReferencias históricas: ' + money(d.low,d) + ' a ' + money(d.high,d) + '.';
 showProtocol(d);draw(d.a);showNews(d);$('deep').textContent=deepResults[deepKey(d)]||'';$('aihelp').textContent=ai?'IA por API: consulta bajo demanda, puede generar coste.':'Sin clave de OpenAI: puedes copiar el contexto y pegarlo en ChatGPT para un análisis completo.'}
-function draw(a){let c=$('chart'),w=c.clientWidth||400,h=220;c.width=w*devicePixelRatio;c.height=h*devicePixelRatio;let ctx=c.getContext('2d');ctx.scale(devicePixelRatio,devicePixelRatio);let lo=Math.min(...a),hi=Math.max(...a),pad=12;let x=i=>pad+i*(w-pad*2)/(a.length-1),y=v=>h-pad-(v-lo)/(hi-lo||1)*(h-pad*2);ctx.strokeStyle='#e7edf2';for(let i=0;i<5;i++){ctx.beginPath();ctx.moveTo(0,i*h/5);ctx.lineTo(w,i*h/5);ctx.stroke()}ctx.beginPath();a.forEach((v,i)=>i?ctx.lineTo(x(i),y(v)):ctx.moveTo(x(i),y(v)));ctx.strokeStyle='#355e7d';ctx.lineWidth=2;ctx.stroke()}
+function draw(a){let c=$('chart'),w=c.clientWidth||400,h=220;c.width=w*devicePixelRatio;c.height=h*devicePixelRatio;let ctx=c.getContext('2d');ctx.scale(devicePixelRatio,devicePixelRatio);let lo=Math.min(...a),hi=Math.max(...a),pad=12;let x=i=>pad+i*(w-pad*2)/(a.length-1),y=v=>h-pad-(v-lo)/(hi-lo||1)*(h-pad*2);ctx.strokeStyle='#64748b40';for(let i=0;i<5;i++){ctx.beginPath();ctx.moveTo(0,i*h/5);ctx.lineTo(w,i*h/5);ctx.stroke()}ctx.beginPath();a.forEach((v,i)=>i?ctx.lineTo(x(i),y(v)):ctx.moveTo(x(i),y(v)));ctx.strokeStyle='#00C2FF';ctx.lineWidth=2;ctx.stroke()}
 let newsBatch=false;async function queueNews(){if(newsBatch)return;newsBatch=true;try{let ids=filtered().map(d=>d.u[0]);for(let i=0;i<ids.length;i+=3){await Promise.all(ids.slice(i,i+3).filter(id=>!newsData[id]||Date.now()/1000-newsData[id].asof>=300).map(id=>getNews(id)))}}finally{newsBatch=false}}
 let reloadQueued=false;async function load(){if(busy){reloadQueued=true;return}busy=true;$('refresh').disabled=true;$('refresh').textContent='Actualizando…';
   try {
