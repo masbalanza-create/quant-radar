@@ -19,7 +19,6 @@ Conserva tu tarea en una rama corta. Si un PR depende de otro, indícalo y vuelv
 |---|---|---|
 | `main` | Activa | Fuente de la versión integrada y punto de partida de tareas nuevas. |
 | `ui/base`, `motor/base`, `entrenamiento/base` | Referencia por área | Úsalas solo si coinciden con `main`. Trabaja en una rama corta para cada cambio. |
-| `proyecto/base-colaboracion`, `proyecto/instrucciones-ia` | **Integradas · redundantes** | Los PR #3 y #4 ya están en `main`. No se necesitan para trabajar ni contienen una versión distinta de la aplicación. |
 | `ui/interfaz-v11`, `motor/datos-y-decision-v11` | **Históricas · conservar** | Ambas apuntan a `e4bfff9`, una instantánea anterior de la aplicación con diferencias de interfaz y motor. No son ramas activas. |
 
-Para recuperar una versión publicada, consulta [Releases](https://github.com/masbalanza-create/quant-radar/releases) y usa su etiqueta. Las etiquetas de versiones y las instantáneas históricas se conservan. Las ramas redundantes quedan identificadas en esta guía.
+Para recuperar una versión publicada, consulta [Releases](https://github.com/masbalanza-create/quant-radar/releases) y usa su etiqueta. Las etiquetas de versiones y las instantáneas históricas se conservan. Las ramas temporales de los PR #3 y #4 se retiraron tras integrarse en main.
