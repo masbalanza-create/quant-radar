@@ -10,3 +10,10 @@ El filtro revisa titulares y resúmenes de hasta 72 horas, elimina duplicados, r
 
 V10 — Tamaño de operaciones virtuales
 Copia .env desde V9 y cierra el servidor anterior. Compras: 2–5% del valor total de cartera, reducido al 75% para riesgo medio y 50% para alto; es también el peso máximo orientativo del activo tras la compra. Ventas: 50%, 75% o 100% de la posición existente según puntuación conjunta. Si no existe posición no hay venta. Señales bloqueadas o neutrales: 0%. No se conoce la cartera real ni virtual, no se ejecutan órdenes, no hay control agregado ni validación histórica.
+
+PROTOCOLO DE DECISIÓN
+La clasificación y los porcentajes heurísticos siguen disponibles como diagnóstico
+preliminar. La decisión del protocolo muestra «No operar» y asigna 0% mientras
+falte evidencia de validación, costes o riesgo de cartera. El panel del activo
+explica los bloqueos y muestra una prueba histórica exploratoria de una vela.
+La media bruta de esa prueba no es una predicción ni acredita una ventaja neta.

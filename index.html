@@ -1,36 +1,822 @@
 <!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Quant Radar</title><link rel="manifest" href="/manifest.webmanifest"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#182d41"><style>
 *{box-sizing:border-box}body{margin:0;background:#f5f6f8;color:#192431;font:14px -apple-system,BlinkMacSystemFont,Arial,sans-serif}header{background:white;border-bottom:1px solid #e2e6eb;padding:20px 4%;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}h1{font-size:23px;margin:0;letter-spacing:-1px}h2{font-size:17px;margin:0 0 16px}small,.muted{color:#64748b}main{max-width:1500px;margin:auto;padding:28px 4%}button,select,input{font:inherit;border:1px solid #dce2e8;border-radius:8px;padding:10px;background:white;color:inherit}button{cursor:pointer}button.primary{background:#182d41;color:white;border:0}button:hover{opacity:.8}.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:18px 0}.card{background:white;border:1px solid #e2e6eb;border-radius:14px;padding:20px;min-width:0}.metric{font-size:28px;font-weight:650;letter-spacing:-1px;margin:8px 0}.layout{display:grid;grid-template-columns:1.3fr 1fr;gap:16px}.scroll{overflow:auto}table{border-collapse:collapse;width:100%;white-space:nowrap}td,th{text-align:left;padding:12px 9px;border-bottom:1px solid #edf0f3}th{color:#64748b;font-size:11px;text-transform:uppercase;letter-spacing:.5px}tr[data-id]{cursor:pointer}tr[data-id]:hover,tr.selected{background:#f0f5fa}.up{color:#087d59}.down{color:#bb4545}.pill{padding:5px 9px;border-radius:20px;background:#eef2f6;font-size:12px}.notice{padding:12px 16px;background:#fff6e2;border:1px solid #eed9a7;border-radius:10px;color:#775318}canvas{width:100%;height:220px}#analysis{white-space:pre-wrap;line-height:1.65}p{line-height:1.6}.split{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.bar{height:5px;background:#e9edf2;border-radius:8px;margin-top:5px}.bar i{display:block;height:100%;background:#527a9b;border-radius:8px}footer{padding:24px 0;color:#64748b;font-size:12px}@media(max-width:850px){.layout{grid-template-columns:1fr}.cards{grid-template-columns:1fr 1fr}.card{padding:14px}}@media(max-width:450px){.cards{grid-template-columns:1fr}}
 tr.buy{background:#e5f5eb}tr.sell{background:#fce8e8}tr.hold{background:#fff7dc}tr.closed{background:#e4e8ee;color:#536174}tr.unknown{background:#f1f3f5}tr.selected{outline:2px solid #50799c;outline-offset:-2px}tr:hover{filter:brightness(.97)}.legend{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.legend span{padding:6px 10px;border-radius:7px}.newsitem{border-bottom:1px solid #e2e6eb;padding:12px 0}.newsitem a{color:#284e70;font-weight:600;text-decoration:none}.newsitem a:hover{text-decoration:underline}#deep{white-space:pre-wrap;line-height:1.65}#newslist{max-height:480px;overflow:auto}@media(max-width:600px){main{padding:16px 12px}header{padding:14px 12px}.toolbar select{max-width:100%;flex:1 1 140px;font-size:16px}.toolbar button,button{min-height:44px}input{font-size:16px}.scroll{max-width:100%;overscroll-behavior-x:contain}td,th{padding:12px 8px}canvas{max-width:100%}h1{font-size:22px}.card{overflow-wrap:anywhere}body{padding-bottom:env(safe-area-inset-bottom)} }
-</style><header><div><h1>QUANT<span style="color:#6688a3">/</span> RADAR</h1><small>Inteligencia de mercado global · V11 · Mobile</small></div><div class="toolbar" style="margin:0"><span class="pill" id="mode">DATOS REALES</span><button id="refresh" class="primary">Actualizar datos</button></div></header><main><div class="split"><div><h1>Radar de oportunidades</h1><p class="muted">Explora señales, compara riesgos y formula hipótesis de inversión.</p></div><small id="stamp"></small></div><div class="notice" id="notice">Esperando datos reales. No se generan precios ficticios.</div><div class="toolbar"><select id="view"><option value="global">GLOBAL INVESTING</option><option value="live">LIVE TRADING · fuentes oficiales</option></select><select id="market"><option value="all">Todos los mercados</option><option>EE. UU.</option><option>Europa</option><option>Asia</option><option>Forex</option><option>ETF</option><option>Materias primas</option><option>Crypto</option></select><select id="horizon"><option value="1day">Corto plazo · diario</option><option value="1min">Intradiario · 1 min</option><option value="15min">Intradiario · 15 min</option><option value="30min">Intradiario · 30 min</option><option value="1h">Intradiario · 60 min</option><option value="5min">Intradiario · 5 min</option><option value="1week">Largo plazo · semanal</option></select><select id="risk"><option value="all">Todos los riesgos</option><option>Bajo</option><option>Medio</option><option>Alto</option></select><select id="currency" aria-label="Moneda de visualización"><option value="native">Moneda original</option><option value="EUR" selected>EUR · Euro</option><option value="USD">USD · Dólar estadounidense</option><option value="GBP">GBP · Libra esterlina</option><option value="JPY">JPY · Yen japonés</option><option value="CHF">CHF · Franco suizo</option><option value="CAD">CAD · Dólar canadiense</option><option value="AUD">AUD · Dólar australiano</option><option value="CNY">CNY · Yuan chino</option><option value="HKD">HKD · Dólar de Hong Kong</option><option value="SGD">SGD · Dólar de Singapur</option><option value="INR">INR · Rupia india</option><option value="KRW">KRW · Won surcoreano</option></select><input id="search" placeholder="Buscar activo"><select id="auto"><option value="0">Actualización manual</option><option value="30000">Cada 30 segundos</option><option value="60000" selected>Cada minuto</option><option value="300000">Cada 5 minutos</option><option value="900000">Cada 15 minutos</option></select></div><p id="fxnote" class="muted" style="font-size:12px"></p><div class="cards"><div class="card"><small>Activos disponibles</small><div class="metric" id="count">—</div><small>Universo seleccionado</small></div><div class="card"><small>Sesgo alcista</small><div class="metric" id="bull">—</div><small>Puntuación conjunta ≥ 65</small></div><div class="card"><small>Mayor puntuación</small><div class="metric" id="top">—</div><small>Puntuación técnica + ajuste informativo, no probabilidad</small></div></div><div class="layout"><div class="card"><div class="split"><h2>Clasificación de activos</h2><small>Orden por puntuación conjunta</small></div><div class="legend"><span style="background:#e5f5eb">Comprar virtual</span><span style="background:#fce8e8">Reducir / vender virtual</span><span style="background:#fff7dc">No actuar</span><span style="background:#e4e8ee">Cerrado</span><span style="background:#f1f3f5">Horario sin verificar</span></div><div class="scroll"><table><thead><tr><th>Activo</th><th>Precio</th><th>Variación / vela</th><th>Fuente y última operación</th><th>Score</th><th>Riesgo</th><th>Decisión / sesión</th></tr></thead><tbody id="rows"></tbody></table></div><p class="muted" id="errors"></p></div><div><div class="card"><div class="split"><h2 id="name">Selecciona un activo</h2><span id="signal" class="pill"></span></div><div class="metric" id="price">—</div><canvas id="chart"></canvas><div id="indicators" class="muted"></div><p class="muted" id="source"></p></div><div class="card" style="margin-top:16px"><div class="split"><h2>¿Qué haría ante esta situación?</h2><span class="pill" id="aiMode">Motor cuantitativo</span></div><div id="allocationPanel" style="padding:14px;margin:0 0 14px;border:1px solid #dce2e8;border-radius:10px;font-size:17px;font-weight:700" hidden>Porcentaje virtual: —</div><div id="analysis"></div><button id="ask" class="primary" style="margin-top:15px">Análisis avanzado con IA</button><p id="aihelp" class="muted"></p><button id="copy">Copiar contexto para ChatGPT</button><div id="deep" style="margin-top:14px"></div><p class="muted">Hipótesis educativa; no ejecuta operaciones ni garantiza resultados.</p></div><div class="card" style="margin-top:16px"><div class="split"><h2>Noticias y acontecimientos</h2><button id="reloadnews">Actualizar noticias</button></div><p id="newsstatus" class="muted"></p><div id="newslist"></div></div></div></div><div class="card" style="margin-top:16px"><h2>Metodología y control de riesgo</h2><p>Puntuación conjunta = técnica + ajuste de noticias (máximo ±12 puntos). Filtro de titulares de hasta 72 horas; impacto limitado a medios prioritarios y señales explícitas. No verifica artículos completos. Score técnico heurístico: momentum de 10 velas, relación con media de 20 velas y RSI de 14 periodos. Riesgo según volatilidad por vela y clase de activo; no equivale a una calificación regulatoria. Los horizontes cambian la frecuencia de las velas, no predicen el futuro. El universo es una lista inicial, no un escáner exhaustivo.</p></div><footer>QUANT RADAR · Datos: Alpaca (opcional), Kraken y Yahoo Finance (acceso no oficial). Sin conexión a bróker.</footer></main><script>
+.strategy-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-top:14px}.strategy-form label{display:grid;gap:5px;font-size:14px}.strategy-form input,.strategy-form select,.strategy-form textarea{box-sizing:border-box;width:100%;padding:8px;border:1px solid #a9b7c5;border-radius:8px;font:inherit;color:inherit;background:#fff}.strategy-wide{grid-column:1/-1}.strategy-status{margin:8px 0 0}
+#protocolDialog{box-sizing:border-box;width:min(680px,calc(100% - 24px));max-height:85dvh;padding:20px;border:1px solid #dce2e8;border-radius:14px;color:inherit;background:#fff}#protocolDialog::backdrop{background:#16263799}#protocolDialog h2{margin:0}#protocolChecks{padding-left:24px}#protocolChecks li{padding:10px 0;border-bottom:1px solid #e7edf2}#protocolChecks p{margin:6px 0 0}#openProtocol{margin-top:12px}
+#protocolDialog{width:min(900px,calc(100% - 24px));padding:0;max-height:88vh;max-height:88dvh}#protocolDialog .protocol-head{position:sticky;top:0;z-index:1;background:#fff;padding:14px 20px;border-bottom:1px solid #dce2e8}#protocolAsset{margin:6px 0 0}.protocol-body{padding:4px 20px 20px}#protocolChecks{list-style:none;padding:0}#protocolChecks li{padding:12px 0}#protocolChecks summary{cursor:pointer;padding:7px 0;font-weight:700}.protocol-note{color:#465974}.protocol-math{margin:12px 0;padding:12px;background:#f2f6fa;border-radius:8px}.protocol-math h4{margin:0}.protocol-math dl{margin:6px 0 0}.protocol-math dt{font-weight:700;margin-top:7px}.protocol-math dd{margin:3px 0;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}.protocol-trades{overflow-x:auto}.protocol-trades table{width:100%;font-variant-numeric:tabular-nums}
+#protocolDialog[open]{display:flex;flex-direction:column;overflow:hidden}#protocolDialog .protocol-head{position:static;flex:none}#protocolDialog .protocol-body{min-height:0;overflow-y:auto;overscroll-behavior:contain}.protocol-nav{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.protocol-cost input{display:block;font:inherit;width:10em;padding:6px;margin:6px 0}
+#protocolChecks pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f2f6fa;padding:8px;border-radius:6px}.protocol-reference{margin-top:10px}#protocolIndicatorSummary{line-height:1.65}</style><header><div><h1>QUANT<span style="color:#6688a3">/</span> RADAR</h1><small>Inteligencia de mercado global · V11 · Mobile</small></div><div class="toolbar" style="margin:0"><span class="pill" id="mode">DATOS REALES</span><button id="refresh" class="primary">Actualizar datos</button></div></header><main><div class="split"><div><h1>Radar de oportunidades</h1><p class="muted">Explora señales, compara riesgos y formula hipótesis de inversión.</p></div><small id="stamp"></small></div><div class="notice" id="notice">Esperando datos reales. No se generan precios ficticios.</div><div class="toolbar"><select id="view"><option value="global">GLOBAL INVESTING</option><option value="live">LIVE TRADING · fuentes oficiales</option></select><select id="market"><option value="all">Todos los mercados</option><option>EE. UU.</option><option>Europa</option><option>Asia</option><option>Forex</option><option>ETF</option><option>Materias primas</option><option>Crypto</option></select><select id="horizon"><option value="1day">Corto plazo · diario</option><option value="1min">Intradiario · 1 min</option><option value="15min">Intradiario · 15 min</option><option value="30min">Intradiario · 30 min</option><option value="1h">Intradiario · 60 min</option><option value="5min">Intradiario · 5 min</option><option value="1week">Largo plazo · semanal</option></select><select id="risk"><option value="all">Todos los riesgos</option><option>Bajo</option><option>Medio</option><option>Alto</option></select><select id="currency" aria-label="Moneda de visualización"><option value="native">Moneda original</option><option value="EUR" selected>EUR · Euro</option><option value="USD">USD · Dólar estadounidense</option><option value="GBP">GBP · Libra esterlina</option><option value="JPY">JPY · Yen japonés</option><option value="CHF">CHF · Franco suizo</option><option value="CAD">CAD · Dólar canadiense</option><option value="AUD">AUD · Dólar australiano</option><option value="CNY">CNY · Yuan chino</option><option value="HKD">HKD · Dólar de Hong Kong</option><option value="SGD">SGD · Dólar de Singapur</option><option value="INR">INR · Rupia india</option><option value="KRW">KRW · Won surcoreano</option></select><input id="search" placeholder="Buscar activo"><select id="auto"><option value="0">Actualización manual</option><option value="30000">Cada 30 segundos</option><option value="60000" selected>Cada minuto</option><option value="300000">Cada 5 minutos</option><option value="900000">Cada 15 minutos</option></select></div><details class="card" id="strategyPanel">
+<summary>Mi estrategia virtual</summary>
+<form id="strategyForm" class="strategy-form">
+<label>Objetivo o idea que quieres probar
+<textarea id="strategyIdea" rows="2" maxlength="400" placeholder="Ej. Quiero estudiar si las subidas recientes suelen continuar."></textarea></label>
+<label>Mercado preferido
+<select id="strategyMarket"><option value="all">Todos</option><option>EE. UU.</option><option>Europa</option><option>Asia</option><option>Forex</option><option>ETF</option><option>Materias primas</option><option>Crypto</option></select></label>
+<label>Plazo que quieres estudiar
+<select id="strategyHorizon"><option value="1day">Diario</option><option value="1week">Semanal</option><option value="1h">Dentro del día · velas de 1 hora</option><option value="1min">Dentro del día · velas de 1 minuto</option></select></label>
+<label>Capital virtual (€)
+<input id="strategyCapital" type="number" min="0.01" max="1000000000" step="0.01" placeholder="Ej. 10000" required></label>
+<label>Máximo en un solo activo (%)
+<input id="strategyLimit" type="number" min="0.1" max="100" step="0.1" placeholder="Ej. 5" required></label>
+<div class="strategy-wide"><button class="primary" type="submit">Guardar y aplicar</button>
+<p id="strategyStatus" class="muted strategy-status" role="status">El perfil se guarda en este navegador. El protocolo sigue comprobando si hay evidencia para operar.</p></div>
+</form>
+</details><p id="fxnote" class="muted" style="font-size:12px"></p><div class="cards"><div class="card"><small>Activos disponibles</small><div class="metric" id="count">—</div><small>Universo seleccionado</small></div><div class="card"><small>Sesgo alcista</small><div class="metric" id="bull">—</div><small>Puntuación conjunta ≥ 65</small></div><div class="card"><small>Mayor puntuación</small><div class="metric" id="top">—</div><small>Puntuación técnica + ajuste informativo, no probabilidad</small></div></div><div class="layout"><div class="card"><div class="split"><h2>Clasificación de activos</h2><small>Orden por puntuación conjunta</small></div><div class="legend"><span style="background:#e5f5eb">Compra virtual validada</span><span style="background:#fce8e8">Venta virtual validada</span><span style="background:#fff7dc">No operar</span><span style="background:#e4e8ee">Cerrado</span><span style="background:#f1f3f5">Horario sin verificar</span></div><div class="scroll"><table><thead><tr><th>Activo</th><th>Precio</th><th>Variación / vela</th><th>Fuente y última operación</th><th>Score</th><th>Riesgo</th><th>Decisión / sesión</th></tr></thead><tbody id="rows"></tbody></table></div><p class="muted" id="errors"></p></div><div><div class="card"><div class="split"><h2 id="name">Selecciona un activo</h2><span id="signal" class="pill"></span></div><div class="metric" id="price">—</div><canvas id="chart"></canvas><div id="indicators" class="muted"></div><p class="muted" id="source"></p></div><div class="card" style="margin-top:16px"><div class="split"><h2>¿Qué haría ante esta situación?</h2><span class="pill" id="aiMode">Motor cuantitativo</span></div><div id="allocationPanel" style="padding:14px;margin:0 0 14px;border:1px solid #dce2e8;border-radius:10px;font-size:17px;font-weight:700" hidden>Porcentaje virtual: —</div><div id="analysis"></div><button id="openProtocol" type="button" aria-haspopup="dialog" disabled>Ver proceso cuantitativo</button><button id="ask" class="primary" style="margin-top:15px">Análisis avanzado con IA</button><p id="aihelp" class="muted"></p><button id="copy">Copiar contexto para ChatGPT</button><div id="deep" style="margin-top:14px"></div><p class="muted">Hipótesis educativa; no ejecuta operaciones ni garantiza resultados.</p></div><div class="card" style="margin-top:16px"><div class="split"><h2>Noticias y acontecimientos</h2><button id="reloadnews">Actualizar noticias</button></div><p id="newsstatus" class="muted"></p><div id="newslist"></div></div></div></div><div class="card" style="margin-top:16px"><h2>Metodología y control de riesgo</h2><p>Puntuación conjunta = técnica + ajuste de noticias (máximo ±12 puntos). Filtro de titulares de hasta 72 horas; impacto limitado a medios prioritarios y señales explícitas. No verifica artículos completos. Score técnico heurístico: momentum de 10 velas, relación con media de 20 velas y RSI de 14 periodos. Riesgo según volatilidad por vela y clase de activo; no equivale a una calificación regulatoria. Los horizontes cambian la frecuencia de las velas, no predicen el futuro. El universo es una lista inicial, no un escáner exhaustivo.</p></div><footer>QUANT RADAR · Datos: Alpaca (opcional), Kraken y Yahoo Finance (acceso no oficial). Sin conexión a bróker.</footer></main>
+<dialog id="protocolDialog" aria-labelledby="protocolTitle">
+<div class="protocol-head"><div class="split"><h2 id="protocolTitle">Proceso cuantitativo</h2>
+<form method="dialog"><button autofocus>Cerrar</button></form></div>
+<p id="protocolAsset" class="muted"></p>
+<div class="protocol-nav"><button type="button" id="protocolStart">Ir al inicio</button><button type="button" id="protocolEnd">Ir a la conclusión</button></div></div>
+<div class="protocol-body" id="protocolBody" tabindex="0"><p id="protocolOutcome"></p><p id="protocolForecast"></p><ol id="protocolChecks"></ol>
+<section id="protocolConclusion"><h3>Conclusión</h3><p id="protocolVerdict"></p><ul id="protocolIndicatorSummary"></ul><p class="muted">ChatGPT y el motor cuantitativo pueden cometer errores. Esta opinión es para simulación.</p></section>
+</div>
+</dialog>
+<script type="application/json" id="protocolSource">[["Definir exactamente qué se quiere predecir",[["1.1. Establecer el universo de inversión",["\\mathcal U_t=\\\\{A_1,A_2,\\ldots,A_N\\\\}"]],["1.3. Definir la variable objetivo",["y\\_{i,t}^{(h)}=\\frac{P\\_{i,t+h}}{P\\_{i,t}}-1","y\\_{i,t}^{(h)}=\\ln\\left(\\frac{P\\_{i,t+h}}{P\\_{i,t}}\\right)","y\\_{i,t}= \\begin{cases} 1 & R\\_{i,t+h}>0\\\\\\ 0 & R\\_{i,t+h}\\leq 0 \\end{cases}","y\\_{i,t}= \\begin{cases} +1 & R\\_{i,t+h}>\\theta\\_+\\\\\\ 0 & -\\theta\\_-\\leq R\\_{i,t+h}\\leq\\theta\\_+\\\\\\ -1 & R\\_{i,t+h}\u003c-\\theta\\_- \\end{cases}"]]]],["Recopilar todas las variables de entrada",[["Fórmulas del paso",["\\mathcal F_t=\\\\{X_s:s\\leq t\\\\}"]],["2.2. Control de disponibilidad temporal",["t\\_{\\text{publicación}}\\leq t\\_{\\text{decisión}}"]],["2.3. Construcción de la matriz de datos",["X= \\begin{pmatrix} x\\_{11}&x\\_{12}&\\cdots&x\\_{1p}\\\\\\ x\\_{21}&x\\_{22}&\\cdots&x\\_{2p}\\\\\\ \\vdots&\\vdots&\\ddots&\\vdots\\\\\\ x\\_{n1}&x\\_{n2}&\\cdots&x\\_{np} \\end{pmatrix}"]]]],["Limpiar, transformar y normalizar los datos",[["3.1. Calcular rentabilidades",["R_t=\\frac{P_t-P\\_{t-1}}{P\\_{t-1}}","r_t=\\ln(P_t)-\\ln(P\\_{t-1})","R\\_{\\text{acum}}=\\prod\\_{t=1}^{T}(1+R_t)-1"]],["3.3. Detectar valores anómalos",["\\bar x=\\frac{1}{n}\\sum\\_{i=1}^{n}x_i","s=\\sqrt{\\frac{\\sum\\_{i=1}^{n}(x_i-\\bar x)^2}{n-1}}","z_i=\\frac{x_i-\\bar x}{s}","MAD=\\operatorname{mediana}(|x_i-\\tilde x|)","z_i^{robusto}=\\frac{0.6745(x_i-\\tilde x)}{MAD}"]],["3.4. Winsorización",["x_i^\\*=\\min(\\max(x_i,Q\\_{\\alpha}),Q\\_{1-\\alpha})"]],["3.5. Normalización",["x_i^\\*=\\frac{x_i-\\mu}{\\sigma}","x_i^\\*=\\frac{x_i-x\\_{\\min}}{x\\_{\\max}-x\\_{\\min}}","z\\_{i,t}=\\frac{x\\_{i,t}-\\mu\\_{\\mathcal U,t}} {\\sigma\\_{\\mathcal U,t}}"]],["3.6. Análisis de estacionariedad",["\\Delta y_t= a+bt+\\gamma y\\_{t-1} +\\sum\\_{j=1}^{p}\\phi_j\\Delta y\\_{t-j} +\\varepsilon_t","H_0:\\gamma=0"]],["3.7. Diferenciación fraccionaria",["(1-L)^dX_t = \\sum\\_{k=0}^{\\infty} (-1)^k\\binom{d}{k}X\\_{t-k}","w_0=1","w_k=-w\\_{k-1}\\frac{d-k+1}{k}"]],["3.8. Reducir la dimensionalidad",["\\Sigma=\\frac{1}{n-1}X_c^\\top X_c","\\Sigma V=V\\Lambda","Z=X_cV_k","VE_k=\\frac{\\sum\\_{j=1}^{k}\\lambda_j} {\\sum\\_{j=1}^{p}\\lambda_j}"]]]],["Determinar el régimen de mercado",[["4.1. Calcular volatilidad histórica",["\\sigma_t= \\sqrt{\\frac{1}{n-1} \\sum\\_{i=1}^{n}(r_i-\\bar r)^2}","\\sigma\\_{\\text{anual}}=\\sigma\\_{\\text{diaria}}\\sqrt{252}"]],["4.2. Volatilidad realizada",["RV_t=\\sum\\_{j=1}^{M}r\\_{t,j}^2","\\sigma\\_{RV,t}=\\sqrt{RV_t}"]],["4.3. Estimador de Parkinson",["\\sigma_P^2= \\frac{1}{4n\\ln 2} \\sum\\_{i=1}^{n} \\left[\\ln\\left(\\frac{H_i}{L_i}\\right)\\right]^2"]],["4.4. Volatilidad EWMA",["\\sigma_t^2= \\lambda\\sigma\\_{t-1}^2+ (1-\\lambda)\\varepsilon\\_{t-1}^2"]],["4.5. Modelo GARCH",["r_t=\\mu_t+\\varepsilon_t","\\varepsilon_t=\\sigma_tz_t","\\sigma_t^2= \\omega+\\alpha\\varepsilon\\_{t-1}^2+ \\beta\\sigma\\_{t-1}^2","\\omega>0,\\quad \\alpha,\\beta\\geq0","\\alpha+\\beta\u003c1","\\bar\\sigma^2= \\frac{\\omega}{1-\\alpha-\\beta}"]],["4.6. Modelo GJR-GARCH",["\\sigma_t^2= \\omega+\\alpha\\varepsilon\\_{t-1}^2 +\\gamma I\\_{\\varepsilon\\_{t-1}\u003c0} \\varepsilon\\_{t-1}^2 +\\beta\\sigma\\_{t-1}^2"]],["4.7. Hidden Markov Model (HMM)",["S_t\\in\\\\{1,2,\\ldots,K\\\\}","a\\_{ij}=P(S_t=j\\mid S\\_{t-1}=i)","A= \\begin{pmatrix} a\\_{11}&a\\_{12}&\\cdots&a\\_{1K}\\\\\\ a\\_{21}&a\\_{22}&\\cdots&a\\_{2K}\\\\\\ \\vdots&\\vdots&\\ddots&\\vdots\\\\\\ a\\_{K1}&a\\_{K2}&\\cdots&a\\_{KK} \\end{pmatrix}","\\alpha_t(j)= b_j(x_t)\\sum_i\\alpha\\_{t-1}(i)a\\_{ij}","P(S_t=j\\mid X\\_{1:t})= \\frac{\\alpha_t(j)}{\\sum_k\\alpha_t(k)}"]],["4.8. Exponente de Hurst",["E[R(n)/S(n)]\\propto n^H"]]]],["Analizar el contexto macroeconómico",[["5.1. Calcular sorpresas macroeconómicas",["Surprise_t=Actual_t-Consensus_t","Z\\_{\\text{macro},t}= \\frac{Actual_t-Consensus_t} {\\sigma\\_{\\text{errores de previsión}}}","MSI_t=\\sum\\_{j=1}^{n}w_j Z\\_{j,t}"]],["5.2. Calcular tipos de interés reales",["r\\_{\\text{real}}\\approx i-\\pi^e","1+r\\_{\\text{real}}= \\frac{1+i}{1+\\pi^e}"]],["5.3. Analizar la curva de tipos",["Spread\\_{10Y-2Y}=Y\\_{10Y}-Y\\_{2Y}","Spread\\_{10Y-3M}=Y\\_{10Y}-Y\\_{3M}","y(\\tau)=\\beta_0+ \\beta_1\\frac{1-e^{-\\tau/\\lambda}}{\\tau/\\lambda} + \\beta_2 \\left( \\frac{1-e^{-\\tau/\\lambda}}{\\tau/\\lambda} -e^{-\\tau/\\lambda} \\right)"]],["5.4. Estimar la sensibilidad macroeconómica del activo",["R\\_{i,t}= \\alpha_i+ \\beta_1\\Delta Y_t+ \\beta_2\\Delta DXY_t+ \\beta_3R\\_{\\text{petróleo},t} +\\beta_4Z\\_{\\text{macro},t} +\\varepsilon\\_{i,t}"]],["5.5. Estudiar el efecto de un acontecimiento",["\\widehat R\\_{i,t}=\\hat\\alpha_i+\\hat\\beta_iR\\_{m,t}","AR\\_{i,t}=R\\_{i,t}-\\widehat R\\_{i,t}","CAR_i=\\sum\\_{t=t_1}^{t_2}AR\\_{i,t}"]]]],["Analizar los factores de tendencia y momentum",[["6.1. Momentum absoluto",["MOM\\_{n,t}=\\frac{P_t}{P\\_{t-n}}-1"]],["6.2. Rate of Change",["ROC\\_{n,t}=100\\left(\\frac{P_t}{P\\_{t-n}}-1\\right)"]],["6.3. Momentum ajustado por volatilidad",["MOM^{adj}\\_{n,t}= \\frac{\\sum\\_{j=0}^{n-1}r\\_{t-j}} {\\sqrt n\\\\,\\sigma\\_{n,t}}"]],["6.4. Momentum relativo",["RM\\_{i,t}=R\\_{i,t}^{(n)}-R\\_{\\text{benchmark},t}^{(n)}"]],["6.5. Media móvil simple",["SMA_n(t)=\\frac{1}{n}\\sum\\_{i=0}^{n-1}P\\_{t-i}"]],["6.6. Media móvil exponencial",["EMA_t=\\alpha P_t+(1-\\alpha)EMA\\_{t-1}","\\alpha=\\frac{2}{n+1}"]],["6.7. Distancia respecto a una media",["D\\_{SMA}=\\frac{P_t-SMA_n(t)}{SMA_n(t)}"]],["6.8. MACD",["MACD_t=EMA\\_{12}(t)-EMA\\_{26}(t)","Signal_t=EMA_9(MACD_t)","Histogram_t=MACD_t-Signal_t"]],["6.9. RSI",["RS=\\frac{\\text{Ganancia media suavizada}} {\\text{Pérdida media suavizada}}","RSI=100-\\frac{100}{1+RS}"]],["6.10. Average True Range",["TR_t=\\max \\begin{cases} H_t-L_t\\\\\\ |H_t-C\\_{t-1}|\\\\\\ |L_t-C\\_{t-1}| \\end{cases}","ATR_t=\\frac{(n-1)ATR\\_{t-1}+TR_t}{n}"]],["6.11. ADX",["+DI=100\\frac{S(+DM)}{ATR}","-DI=100\\frac{S(-DM)}{ATR}","DX=100\\frac{|+DI-(-DI)|}{+DI+(-DI)}","ADX=S(DX)"]],["6.12. Pendiente de la tendencia mediante regresión",["\\ln P_t=\\alpha+\\beta t+\\varepsilon_t","\\hat\\beta= \\frac{\\sum(t-\\bar t)(\\ln P_t-\\overline{\\ln P})} {\\sum(t-\\bar t)^2}","R^2=1-\\frac{SS\\_{\\text{res}}}{SS\\_{\\text{tot}}}"]]]],["Detectar oportunidades de reversión a la media",[["7.1. Z-score de una serie",["z_t=\\frac{x_t-\\mu_t}{\\sigma_t}"]],["7.2. Bandas de Bollinger",["Upper_t=SMA_t+k\\sigma_t","Lower_t=SMA_t-k\\sigma_t","\\\\%B=\\frac{P_t-Lower_t}{Upper_t-Lower_t}"]],["7.3. Proceso Ornstein-Uhlenbeck",["dX_t=\\kappa(\\mu-X_t)dt+\\sigma dW_t","E[X\\_{t+h}\\mid X_t] = \\mu+(X_t-\\mu)e^{-\\kappa h}","Var(X\\_{t+h}\\mid X_t)= \\frac{\\sigma^2}{2\\kappa} (1-e^{-2\\kappa h})","HalfLife=\\frac{\\ln2}{\\kappa}"]],["7.4. Modelo autorregresivo AR(1)",["X_t=c+\\phi X\\_{t-1}+\\varepsilon_t","HalfLife=-\\frac{\\ln2}{\\ln\\phi}"]]]],["Buscar arbitraje estadístico",[["8.1. Correlación de Pearson",["\\rho\\_{XY}= \\frac{Cov(X,Y)}{\\sigma_X\\sigma_Y}"]],["8.2. Regresión entre activos",["\\ln P\\_{A,t}= \\alpha+\\beta\\ln P\\_{B,t}+\\varepsilon_t"]],["8.3. Construir el spread",["Spread_t= \\ln P\\_{A,t}-\\hat\\beta\\ln P\\_{B,t} -\\hat\\alpha"]],["8.5. Estandarizar la desviación",["Z\\_{\\text{spread},t}= \\frac{Spread_t-\\mu\\_{\\text{spread}}} {\\sigma\\_{\\text{spread}}}"]],["8.6. Modelo de corrección de error",["\\Delta Y_t= \\alpha(Y\\_{t-1}-\\beta X\\_{t-1}-c) + \\sum\\_{j=1}^{p}\\gamma_j\\Delta Y\\_{t-j} + \\sum\\_{j=1}^{p}\\delta_j\\Delta X\\_{t-j} +\\varepsilon_t"]],["8.7. Ratio de cobertura dinámico",["\\beta_t=\\beta\\_{t-1}+\\eta_t","Y_t=\\beta_tX_t+\\varepsilon_t","\\hat x\\_{t|t-1}=F\\hat x\\_{t-1|t-1}","P\\_{t|t-1}=FP\\_{t-1|t-1}F^\\top+Q","K_t=P\\_{t|t-1}H^\\top (HP\\_{t|t-1}H^\\top+R)^{-1}","\\hat x\\_{t|t}= \\hat x\\_{t|t-1} +K_t(y_t-H\\hat x\\_{t|t-1})","P\\_{t|t}=(I-K_tH)P\\_{t|t-1}"]]]],["Analizar la microestructura del mercado",[["9.1. Mid-price",["Mid_t=\\frac{Ask_t+Bid_t}{2}"]],["9.2. Bid-ask spread",["Spread_t=Ask_t-Bid_t","Spread_t^{rel}= \\frac{Ask_t-Bid_t}{Mid_t}"]],["9.3. Order book imbalance",["OBI_t= \\frac{Q\\_{bid,t}-Q\\_{ask,t}} {Q\\_{bid,t}+Q\\_{ask,t}}"]],["9.4. Microprice",["Microprice_t= \\frac{Ask_tQ\\_{bid,t}+Bid_tQ\\_{ask,t}} {Q\\_{bid,t}+Q\\_{ask,t}}"]],["9.5. Order Flow Imbalance dinámico",["\\begin{aligned} e_n={}& I\\_{P_n^B\\geq P\\_{n-1}^B}q_n^B\\\\\\ &-I\\_{P_n^B\\leq P\\_{n-1}^B}q\\_{n-1}^B\\\\\\ &-I\\_{P_n^A\\leq P\\_{n-1}^A}q_n^A\\\\\\ &+I\\_{P_n^A\\geq P\\_{n-1}^A}q\\_{n-1}^A \\end{aligned}","OFI_t=\\sum\\_{n\\in t}e_n","\\Delta P_t=\\beta_tOFI_t+\\varepsilon_t"]],["9.6. VWAP",["VWAP_t= \\frac{\\sum\\_{i=1}^{t}P_iV_i} {\\sum\\_{i=1}^{t}V_i}"]],["9.7. Volumen relativo",["RVOL_t= \\frac{V_t}{E[V_t\\mid\\text{hora y sesión}]}"]],["9.8. Iliquidez de Amihud",["ILLIQ= \\frac{1}{D}\\sum\\_{t=1}^{D} \\frac{|R_t|}{VolumenMonetario_t}"]],["9.9. Modelo de impacto de Kyle",["\\Delta P_t=\\lambda Q_t+\\varepsilon_t"]],["9.10. Procesos de Hawkes",["\\lambda(t)=\\mu+ \\sum\\_{t_i\\\u003ct}\\alpha e^{-\\beta(t-t_i)}"]]]],["Analizar fundamentales y valoración",[["10.1. Ratios de valoración",["EV=Capitalización+Deuda-Caja"]],["10.2. Calidad financiera",["ROE=\\frac{BeneficioNeto}{PatrimonioMedio}","ROA=\\frac{BeneficioNeto}{ActivosMedios}","ROIC=\\frac{NOPAT}{CapitalInvertido}","NOPAT=EBIT(1-T)","MargenEBITDA=\\frac{EBITDA}{Ingresos}"]],["10.3. Endeudamiento",["NetDebt=DeudaFinanciera-Caja","DebtRatio=\\frac{NetDebt}{EBITDA}","InterestCoverage=\\frac{EBIT}{GastosFinancieros}"]],["10.4. Crecimiento compuesto",["CAGR= \\left(\\frac{V_f}{V_i}\\right)^{1/n}-1"]],["10.5. Sorpresas de resultados",["SUE_t= \\frac{EPS_t-E[EPS_t]} {\\sigma\\_{\\text{errores históricos}}}"]],["10.6. Revisiones de beneficios",["Revision_t= \\frac{EPS_t^{forecast}-EPS\\_{t-n}^{forecast}} {|EPS\\_{t-n}^{forecast}|}"]],["10.7. Descuento de flujos de caja",["EV= \\sum\\_{t=1}^{T} \\frac{FCFF_t}{(1+WACC)^t} + \\frac{TV}{(1+WACC)^T}","TV=\\frac{FCFF\\_{T+1}}{WACC-g}","WACC= \\frac{E}{D+E}r_E+ \\frac{D}{D+E}r_D(1-T)","r_E=r_f+\\beta(E[R_m]-r_f)"]],["10.8. Valoración relativa sectorial",["Z\\_{value,i}= \\frac{Multiple_i-\\mu\\_{\\text{sector}}} {\\sigma\\_{\\text{sector}}}"]]]],["Analizar factores de riesgo y rentabilidad",[["11.1. CAPM",["R_i-R_f= \\alpha_i+\\beta_i(R_m-R_f)+\\varepsilon_i","\\beta_i= \\frac{Cov(R_i,R_m)}{Var(R_m)}"]],["11.2. Modelo Fama-French de cinco factores",["\\begin{aligned} R_i-R_f={}&\\alpha_i+ \\beta_m(R_m-R_f)\\\\\\ &+\\beta_sSMB+\\beta_hHML\\\\\\ &+\\beta_rRMW+\\beta_cCMA+\\varepsilon_i \\end{aligned}"]],["11.3. Modelo multifactorial generalizado",["R\\_{i,t}= \\alpha_i+\\sum\\_{k=1}^{K}\\beta\\_{ik}F\\_{k,t} +\\varepsilon\\_{i,t}","R=B F+\\varepsilon","\\Sigma=B\\Sigma_F B^\\top+D"]],["11.4. Neutralización de factores",["B^\\top w=0"]]]],["Analizar noticias, sentimiento y acontecimientos",[["12.1. Puntuación de sentimiento",["S_t=P(Positivo)-P(Negativo)"]],["12.2. Ponderación temporal de noticias",["S_t^{agg}= \\frac{ \\sum\\_{j=1}^{n}w_je^{-\\lambda(t-t_j)}S_j }{ \\sum\\_{j=1}^{n}w_je^{-\\lambda(t-t_j)} }"]],["12.3. Novedad semántica",["CosSim(u,v)= \\frac{u^\\top v}{\\\\|u\\\\|\\\\|v\\\\|}","Novelty=1-\\max_j CosSim(u,v_j)"]],["12.4. Sentimiento inesperado",["SentimentSurprise_t= S_t-E[S_t\\mid\\mathcal F\\_{t-1}]"]]]],["Construir la señal Alpha",[["13.1. Modelo lineal multifactorial",["\\hat\\alpha\\_{i,t}= \\beta_0+\\sum\\_{j=1}^{p}\\beta_jX\\_{i,j,t}","\\hat\\beta=(X^\\top X)^{-1}X^\\top y"]],["13.2. Ridge Regression",["\\hat\\beta= \\arg\\min\\_\\beta \\left[ \\\\|y-X\\beta\\\\|\\_2^2+ \\lambda\\\\|\\beta\\\\|\\_2^2 \\right]","\\hat\\beta=(X^\\top X+\\lambda I)^{-1}X^\\top y"]],["13.3. LASSO",["\\hat\\beta= \\arg\\min\\_\\beta \\left[ \\frac{1}{2n}\\\\|y-X\\beta\\\\|\\_2^2+ \\lambda\\\\|\\beta\\\\|\\_1 \\right]"]],["13.4. Elastic Net",["\\mathcal L= \\frac{1}{2n}\\\\|y-X\\beta\\\\|\\_2^2+ \\lambda \\left[ a\\\\|\\beta\\\\|\\_1+ \\frac{1-a}{2}\\\\|\\beta\\\\|\\_2^2 \\right]"]],["13.5. Neutralizar la señal",["\\alpha^{res}= \\alpha-B(B^\\top B)^{-1}B^\\top\\alpha"]],["13.6. Medir la capacidad predictiva de la señal",["IC_t=Corr(\\alpha\\_{i,t},R\\_{i,t+h})","RankIC_t= Corr(Rank(\\alpha\\_{i,t}),Rank(R\\_{i,t+h}))","ICIR=\\frac{\\overline{IC}}{\\sigma(IC)}"]],["13.7. Medir la pérdida de capacidad predictiva",["IC(h)=Corr(\\alpha_t,R\\_{t\\rightarrow t+h})"]]]],["Construir modelos predictivos avanzados",[["14.1. Regresión logística",["P(Y=1\\mid X)= \\frac{1}{1+e^{-(\\beta_0+\\beta^\\top X)}}","\\mathcal L= -\\frac{1}{n}\\sum\\_{i=1}^{n} [y_i\\ln p_i+(1-y_i)\\ln(1-p_i)]"]],["14.2. Clasificación multiclase",["P(Y=k\\mid X)= \\frac{e^{z_k}}{\\sum\\_{j=1}^{K}e^{z_j}}","P(Y=-1),\\quad P(Y=0),\\quad P(Y=+1)"]],["14.3. ARIMA",["\\Phi(B)(1-B)^dX_t= c+\\Theta(B)\\varepsilon_t"]],["14.4. Vector Autoregression (VAR)",["Y_t=c+A_1Y\\_{t-1} +\\cdots+A_pY\\_{t-p}+\\varepsilon_t"]],["14.5. Random Forest",["\\hat f(X)=\\frac{1}{M}\\sum\\_{m=1}^{M}T_m(X)"]],["14.6. Gradient Boosting y XGBoost",["\\hat y_i=\\sum\\_{k=1}^{K}f_k(X_i)","\\mathcal L= \\sum\\_{i=1}^{n}l(y_i,\\hat y_i) +\\sum\\_{k=1}^{K}\\Omega(f_k)","\\Omega(f)= \\gamma T+\\frac{\\lambda}{2}\\sum\\_{j=1}^{T}w_j^2"]],["14.7. Redes neuronales",["h^{(l)}= \\phi(W^{(l)}h^{(l-1)}+b^{(l)})","\\theta\\_{t+1}= \\theta_t-\\eta\\nabla\\_\\theta\\mathcal L"]],["14.8. LSTM",["f_t=\\sigma(W_f[h\\_{t-1},x_t]+b_f)","i_t=\\sigma(W_i[h\\_{t-1},x_t]+b_i)","\\tilde C_t=\\tanh(W_c[h\\_{t-1},x_t]+b_c)","C_t=f_t\\odot C\\_{t-1}+i_t\\odot\\tilde C_t","o_t=\\sigma(W_o[h\\_{t-1},x_t]+b_o)","h_t=o_t\\odot\\tanh(C_t)"]],["14.9. Transformers",["Attention(Q,K,V)= Softmax\\left(\\frac{QK^\\top}{\\sqrt{d_k}}\\right)V"]],["14.10. Actualización bayesiana",["P(H\\mid D)= \\frac{P(D\\mid H)P(H)}{P(D)}"]],["14.11. Ensemble de modelos",["\\hat y_t=\\sum\\_{m=1}^{M}w_m\\hat y\\_{m,t}","\\sum_mw_m=1"]],["14.12. Reinforcement Learning",["J(\\pi)= E\\_\\pi\\left[ \\sum\\_{t=0}^{T}\\gamma^tr_t \\right]","Q^\\*(s,a)= E\\left[ r+\\gamma\\max\\_{a'}Q^\\*(s',a') \\right]"]]]],["Estimar la distribución completa de resultados",[["Fórmulas del paso",["R\\_{t+h}\\mid\\mathcal F_t \\sim \\mathcal D(\\theta_t)"]],["15.1. Esperanza condicional",["\\mu_t=E[R\\_{t+h}\\mid\\mathcal F_t]"]],["15.2. Varianza condicional",["\\sigma_t^2= E[(R\\_{t+h}-\\mu_t)^2\\mid\\mathcal F_t]"]],["15.3. Probabilidad de subida bajo una hipótesis normal",["P(R>0)= \\Phi\\left(\\frac{\\mu}{\\sigma}\\right)"]],["15.4. Probabilidad de superar un objetivo",["P(R>r^\\*)= 1-\\Phi\\left(\\frac{r^\\*-\\mu}{\\sigma}\\right)"]],["15.5. Cuantiles de rentabilidad",["Q_p=\\mu+\\sigma\\Phi^{-1}(p)"]],["15.6. Regresión cuantílica",["\\hat Q\\_\\tau(X)=f\\_\\tau(X)","\\rho\\_\\tau(u)= u(\\tau-I\\_{u\u003c0})","\\mathcal L\\_\\tau= \\sum\\_{i=1}^{n}\\rho\\_\\tau(y_i-\\hat y_i)"]],["15.7. Distribución Student-t",["f(x)= \\frac{\\Gamma((\\nu+1)/2)} {\\sqrt{\\nu\\pi}\\Gamma(\\nu/2)} \\left(1+\\frac{x^2}{\\nu}\\right)^{-(\\nu+1)/2}"]],["15.8. Movimiento browniano geométrico",["dS_t=\\mu S_tdt+\\sigma S_tdW_t","S_T=S_0 \\exp\\left[ \\left(\\mu-\\frac{\\sigma^2}{2}\\right)T +\\sigma\\sqrt T Z \\right]"]],["15.9. Jump-diffusion",["\\frac{dS_t}{S\\_{t^-}}= (\\mu-\\lambda k)dt+ \\sigma dW_t+ (J-1)dN_t"]],["15.10. Volatilidad estocástica de Heston",["dS_t=\\mu S_tdt+\\sqrt{v_t}S_tdW_t^S","dv_t=\\kappa(\\theta-v_t)dt+ \\xi\\sqrt{v_t}dW_t^v","dW_t^SdW_t^v=\\rho dt"]]]],["Simular escenarios mediante Monte Carlo",[["16.1. Generar trayectorias",["S\\_{t+\\Delta t}= S_t\\exp\\left[ (\\mu-\\tfrac12\\sigma^2)\\Delta t+ \\sigma\\sqrt{\\Delta t}Z_t \\right]","Z_t\\sim N(0,1)"]],["16.2. Simulación conjunta de activos",["\\Sigma=LL^\\top","R=\\mu+LZ"]],["16.3. Probabilidad empírica",["\\hat P(R>r^\\*)= \\frac{1}{N}\\sum\\_{j=1}^{N}I(R_j>r^\\*)","SE=\\sqrt{\\frac{\\hat p(1-\\hat p)}{N}}"]],["16.4. Probabilidad de alcanzar el take profit antes del stop loss",["\\tau\\_{TP}=\\inf\\\\{t:S_t\\geq TP\\\\}","\\tau\\_{SL}=\\inf\\\\{t:S_t\\leq SL\\\\}","P\\_{TP}= \\frac{1}{N} \\sum\\_{j=1}^{N} I(\\tau\\_{TP,j}\u003c\\tau\\_{SL,j}, \\ \\tau\\_{TP,j}\\leq T)"]]]],["Incorporar información del mercado de opciones",[["17.1. Black-Scholes-Merton",["C=S_0e^{-qT}\\Phi(d_1) -Ke^{-rT}\\Phi(d_2)","d_1= \\frac{\\ln(S_0/K)+(r-q+\\sigma^2/2)T} {\\sigma\\sqrt T}","d_2=d_1-\\sigma\\sqrt T","P=Ke^{-rT}\\Phi(-d_2) -S_0e^{-qT}\\Phi(-d_1)"]],["17.2. Volatilidad implícita",["\\sigma\\_{IV}: C\\_{BS}(\\sigma\\_{IV})=C\\_{\\text{mercado}}"]],["17.4. Put-call parity",["C-P=S_0e^{-qT}-Ke^{-rT}"]],["17.5. Volatility Risk Premium",["VRP_t=IV_t^2-E_t[RV\\_{t,T}]"]],["17.6. Distribución implícita en opciones",["f_Q(K)=e^{rT}\\frac{\\partial^2C(K,T)} {\\partial K^2}"]]]],["Diseñar el backtesting",[["18.3. Purged Cross-Validation",["[t\\_{i,0},t\\_{i,1}] \\cap [t\\_{j,0},t\\_{j,1}] \\neq\\varnothing"]],["18.4. Simular la ejecución real",["R\\_{p,t+1}^{net} =w_t^\\top R\\_{t+1} -C_t^{trade}-C_t^{holding}","V\\_{t+1}=V_t(1+R\\_{p,t+1}^{net})"]]]],["Medir la significación estadística",[["19.1. Contraste de hipótesis",["H_0:E[R^{exceso}]\\leq0","H_1:E[R^{exceso}]>0","t=\\frac{\\bar R}{s/\\sqrt n}"]],["19.2. Corrección Newey-West",["\\hat S= \\hat\\gamma_0+ 2\\sum\\_{k=1}^{L} \\left(1-\\frac{k}{L+1}\\right)\\hat\\gamma_k","SE\\_{HAC}(\\bar R)= \\sqrt{\\frac{\\hat S}{n}}"]],["19.3. Intervalo de confianza",["IC\\_{95\\\\%}= \\hat\\mu\\pm1.96SE(\\hat\\mu)"]],["19.4. Bootstrap",["\\theta_b=\\hat\\theta(X_b^\\*)","IC=[Q\\_{0.025}(\\theta_b),Q\\_{0.975}(\\theta_b)]"]],["19.5. Corrección por pruebas múltiples",["\\alpha^\\*=\\frac{\\alpha}{m}","P(FP\\geq1)=1-(1-\\alpha)^m"]],["19.6. False Discovery Rate",["p\\_{(1)}\\leq p\\_{(2)}\\leq\\cdots\\leq p\\_{(m)}","p\\_{(k)}\\leq\\frac{k}{m}q"]],["19.7. Probabilistic Sharpe Ratio",["PSR= \\Phi\\left( \\frac{ (\\widehat{SR}-SR^\\*)\\sqrt{T-1} }{ \\sqrt{ 1-\\hat\\gamma_3\\widehat{SR} +\\frac{\\hat\\gamma_4-1}{4}\\widehat{SR}^2 } } \\right)"]],["19.8. Deflated Sharpe Ratio",["DSR=PSR(SR^\\*\\_{\\text{ajustado}})"]],["19.9. Probability of Backtest Overfitting",["\\lambda_c= \\ln\\left(\\frac{\\omega_c}{1-\\omega_c}\\right)","PBO=P(\\lambda_c\u003c0)"]]]],["Evaluar la calidad predictiva",[["20.2. Platt Scaling",["p\\_{\\text{calibrado}}= \\frac{1}{1+e^{Af+B}}"]],["20.3. Isotonic Regression",["\\min\\_{g\\text{ monótona}} \\sum\\_{i=1}^{n}(y_i-g(p_i))^2"]],["20.4. Expected Calibration Error",["ECE= \\sum\\_{m=1}^{M}\\frac{|B_m|}{n} |acc(B_m)-conf(B_m)|"]],["20.5. Interpretabilidad mediante SHAP",["\\phi_j= \\sum\\_{S\\subseteq F\\setminus\\\\{j\\\\}} \\frac{|S|!(|F|-|S|-1)!}{|F|!} [v(S\\cup\\\\{j\\\\})-v(S)]","f(X)=\\phi_0+\\sum\\_{j=1}^{p}\\phi_j"]]]],["Calcular todos los costes de negociación",[["21.1. Coste total",["C\\_{\\text{total}}= C\\_{\\text{comisión}}+ C\\_{\\text{spread}}+ C\\_{\\text{impacto}}+ C\\_{\\text{slippage}}+ C\\_{\\text{financiación}}+ C\\_{\\text{préstamo}}"]],["21.2. Modelo aproximado de impacto de mercado",["Impact\\approx Y\\sigma\\sqrt{\\frac{Q}{ADV}}"]],["21.3. Coste de financiación",["C_f=N\\_{\\text{financiado}}r_f \\frac{d}{365}"]],["21.4. Coste del préstamo de acciones",["C_b=N\\_{\\text{short}}r_b \\frac{d}{365}"]],["21.5. Implementation Shortfall",["IS= \\sum\\_{j=1}^{m}q_j(P_j-P_0) +(Q-Q\\_{\\text{ejecutado}})(P_T-P_0) +Fees"]]]],["Calcular la esperanza matemática",[["22.1. Operación con dos resultados",["EV=pG-(1-p)L-C"]],["22.2. Operación con múltiples escenarios",["EV=\\sum\\_{j=1}^{K}p_jR_j-C"]],["22.3. Distribución continua",["EV=\\int\\_{-\\infty}^{\\infty}r f(r)\\\\,dr-C"]],["22.4. Probabilidad mínima de equilibrio",["p\\_{\\min}=\\frac{L+C}{G+L}"]],["22.5. Relación beneficio/riesgo",["RR=\\frac{G}{L}"]],["22.6. Margen de seguridad estadístico",["EV\\_{\\text{conservador}}= \\widehat{EV}-z\\_\\alpha SE(\\widehat{EV})>0"]],["22.7. Ajuste por deterioro de la señal",["\\alpha\\_{\\text{ejecutable}} =\\alpha_0e^{-\\lambda\\Delta t}","EV\\_{\\text{realizable}}= \\alpha\\_{\\text{ejecutable}}-C\\_{\\text{total}}"]]]],["Calcular las métricas de riesgo",[["23.1. Sharpe Ratio",["SR=\\frac{E[R_p-R_f]}{\\sigma(R_p-R_f)}"]],["23.2. Sortino Ratio",["Sortino= \\frac{E[R_p]-MAR} {\\sqrt{E[\\min(R_p-MAR,0)^2]}}"]],["23.3. Maximum Drawdown",["DD_t=1-\\frac{V_t}{\\max\\_{s\\leq t}V_s}","MDD=\\max_t DD_t"]],["23.4. Calmar Ratio",["Calmar=\\frac{CAGR}{MDD}"]],["23.5. Value at Risk",["VaR\\_\\alpha=Q\\_\\alpha(L)","VaR\\_\\alpha=-\\mu+\\sigma\\Phi^{-1}(\\alpha)"]],["23.6. Expected Shortfall",["ES\\_\\alpha= \\frac{1}{1-\\alpha} \\int\\_\\alpha^1VaR_u\\\\,du","ES\\_\\alpha= -\\mu+\\sigma \\frac{\\phi(\\Phi^{-1}(\\alpha))} {1-\\alpha}"]],["23.7. Asimetría",["Skewness= E\\left[\\left(\\frac{R-\\mu}{\\sigma}\\right)^3\\right]"]],["23.8. Curtosis",["Kurtosis= E\\left[\\left(\\frac{R-\\mu}{\\sigma}\\right)^4\\right]"]],["23.9. Teoría de valores extremos",["G(y)= 1-\\left(1+\\frac{\\xi y}{\\beta}\\right)^{-1/\\xi}"]],["23.10. Stress testing",["\\Delta V\\_{\\text{stress}}= V(X+\\Delta X\\_{\\text{stress}})-V(X)"]]]],["Calcular el tamaño óptimo de la posición",[["24.1. Kelly Criterion",["f^\\*=\\frac{bp-q}{b}","b=\\frac{G}{L},\\qquad q=1-p"]],["24.2. Kelly generalizado",["f^\\*=\\arg\\max_fE[\\ln(1+fR)]"]],["24.3. Aproximación continua",["f^\\*\\approx\\frac{\\mu-r_f}{\\sigma^2}"]],["24.4. Kelly fraccionado",["f=\\lambda f^\\*,\\qquad 0\u003c\\lambda\u003c1"]],["24.5. Dimensionamiento por presupuesto de riesgo",["RiskBudget=Capital\\cdot r","Q=\\frac{RiskBudget}{|P\\_{\\text{entrada}}-P\\_{\\text{stop}}|}"]],["24.6. Dimensionamiento por volatilidad",["w_t=\\frac{\\sigma\\_{\\text{objetivo}}} {\\hat\\sigma\\_{\\text{activo},t}}"]],["24.7. Restricción de liquidez",["Q\\_{\\max}\\leq\\eta ADV"]],["24.8. Tamaño definitivo",["Q^\\*= \\min \\begin{cases} Q\\_{\\text{riesgo}}\\\\\\ Q\\_{\\text{capital}}\\\\\\ Q\\_{\\text{liquidez}}\\\\\\ Q\\_{\\text{cartera}}\\\\\\ Q\\_{\\text{concentración}} \\end{cases}"]]]],["Optimizar la cartera completa",[["25.1. Rentabilidad esperada",["E[R_p]=w^\\top\\mu"]],["25.2. Varianza de la cartera",["\\sigma_p^2=w^\\top\\Sigma w"]],["25.3. Optimización de Markowitz",["\\max_w \\left[ w^\\top\\mu-\\frac{\\lambda}{2}w^\\top\\Sigma w \\right]","\\sum_iw_i=1","w\\_{\\min}\\leq w_i\\leq w\\_{\\max}"]],["25.4. Matriz de covarianza regularizada",["\\hat\\Sigma= (1-\\delta)S+\\delta F"]],["25.5. Black-Litterman",["\\mu\\_{BL}= \\left[ (\\tau\\Sigma)^{-1} +P^\\top\\Omega^{-1}P \\right]^{-1}","\\cdot \\left[ (\\tau\\Sigma)^{-1}\\pi+ P^\\top\\Omega^{-1}q \\right]"]],["25.6. Risk Parity",["MRC_i=\\frac{(\\Sigma w)\\_i}{\\sigma_p}","RC_i=w_iMRC_i","RC_i=\\frac{\\sigma_p}{N}"]],["25.7. Optimización mediante CVaR",["\\min\\_{w,z} \\left[ z+\\frac{1}{(1-\\alpha)N} \\sum\\_{j=1}^{N} \\max(L_j(w)-z,0) \\right]"]],["25.8. Optimización robusta",["\\max\\_{w\\in\\mathcal W} \\min\\_{\\mu\\in\\mathcal U} \\left[ w^\\top\\mu-\\lambda w^\\top\\Sigma w \\right]"]],["25.9. Optimización incorporando costes",["\\max_w \\left[ w^\\top\\mu -\\lambda w^\\top\\Sigma w -C(w-w\\_{t-1}) \\right]"]]]],["Construir el motor de decisión",[["Fórmulas del paso",["a\\in\\\\{\\text{comprar, vender, mantener, abstenerse}\\\\}","\\begin{aligned} U(a)={}&E[R(a)\\mid\\mathcal F_t]\\\\\\ &-\\lambda_1Var[R(a)]\\\\\\ &-\\lambda_2ES\\_\\alpha(a)\\\\\\ &-C(a)\\\\\\ &-\\lambda_3Uncertainty(a) \\end{aligned}","a^\\*=\\arg\\max\\_{a\\in\\mathcal A\\_{\\text{factible}}}U(a)"]]]],["Determinar el punto de entrada y salida",[["27.1. Triple Barrier Method",["B\\_{\\text{superior}}=P_0(1+k_u\\sigma_h)","B\\_{\\text{inferior}}=P_0(1-k_d\\sigma_h)","B\\_{\\text{temporal}}=t_0+h"]],["27.2. Optimal Stopping",["V(s)= \\max\\left\\\\{ G(s), E[e^{-r\\Delta t}V(S\\_{t+\\Delta t})\\mid S_t=s] \\right\\\\}"]],["27.3. Condición dinámica de salida",["U\\_{\\text{mantener}}\u003c U\\_{\\text{cerrar}}"]]]],["Seleccionar la estrategia de ejecución",[["28.1. TWAP",["TWAP=\\frac{1}{N}\\sum\\_{i=1}^{N}P_i"]],["28.2. VWAP execution",["q_i=Q\\frac{\\hat V_i}{\\sum_j\\hat V_j}"]],["28.3. Percentage of Volume",["q_t=\\rho V_t"]],["28.4. Modelo Almgren-Chriss",["\\min\\_{x(t)} E[C]+\\lambda Var(C)","\\min\\_{x(t)} \\int_0^T \\left[ \\eta\\dot x(t)^2+ \\lambda\\sigma^2x(t)^2 \\right]dt","x(0)=X,\\qquad x(T)=0","x(t)= X\\frac{\\sinh(\\kappa(T-t))} {\\sinh(\\kappa T)}","\\kappa=\\sqrt{\\frac{\\lambda\\sigma^2}{\\eta}}"]],["28.5. Market Making: Avellaneda-Stoikov",["r_t=S_t-q_t\\gamma\\sigma^2(T-t)","\\delta_a+\\delta_b= \\gamma\\sigma^2(T-t) +\\frac{2}{\\gamma} \\ln\\left(1+\\frac{\\gamma}{k}\\right)"]],["28.6. Probabilidad de ejecución",["P(\\text{ejecución antes de }T)=1-e^{-\\lambda T}"]]]],["Monitorizar continuamente la operación",[["29.1. Rentabilidad y pérdida acumulada",["PnL_t=Q(P_t-P\\_{\\text{entrada}})-C_t"]],["29.2. Descomposición factorial",["R\\_{p,t}= \\alpha\\_{p,t}+ \\sum\\_{k=1}^{K}\\beta\\_{p,k}F\\_{k,t} +\\varepsilon\\_{p,t}"]],["29.3. Detectar cambios en los datos",["PSI= \\sum\\_{i=1}^{K} (A_i-E_i)\\ln\\left(\\frac{A_i}{E_i}\\right)","D\\_{KL}(P\\\\|Q)= \\sum_xP(x)\\ln\\frac{P(x)}{Q(x)}"]],["29.4. Detectar deterioro del modelo",["S_t^+= \\max(0,S\\_{t-1}^++x_t-\\mu_0-k)","S_t^-= \\max(0,S\\_{t-1}^-+\\mu_0-x_t-k)"]]]],["Evaluar la operación después del cierre",[["30.1. Profit Factor",["PF= \\frac{\\sum GananciasBrutas} {|\\sum PérdidasBrutas|}"]],["30.2. Expectancy observada",["Expectancy= WinRate\\cdot AvgWin - LossRate\\cdot AvgLoss"]],["30.3. Information Ratio",["IR= \\frac{E[R_p-R_b]} {\\sigma(R_p-R_b)}"]],["30.4. Tracking Error",["TE=\\sigma(R_p-R_b)"]],["30.5. Maximum Favorable Excursion",["MFE=\\max\\_{t\\in[0,T]} \\left(\\frac{P_t-P_0}{P_0}\\right)"]],["30.6. Maximum Adverse Excursion",["MAE=\\max\\_{t\\in[0,T]} \\left(\\frac{P_0-P_t}{P_0}\\right)"]],["30.7. Atribución del error",["Error\\_{\\text{predicción}} =R\\_{\\text{real}}-\\hat R"]]]]]</script>
+<script src="/decision.js"></script><script>
 const $=id=>document.getElementById(id), universe=[['AAPL','Apple','EE. UU.',190],['NVDA','Nvidia','EE. UU.',145],['MSFT','Microsoft','EE. UU.',420],['TSLA','Tesla','EE. UU.',250],['AMZN','Amazon','EE. UU.',200],['ASML:Euronext Amsterdam','ASML','Europa',780],['SAP:XETR','SAP','Europa',210],['SAN:BME','Santander','Europa',5],['7203:JPX','Toyota','Asia',2700],['9984:JPX','SoftBank','Asia',8000],['EUR/USD','Euro / dólar','Forex',1.08],['USD/JPY','Dólar / yen','Forex',150],['SPY','S&P 500 ETF','ETF',550],['QQQ','Nasdaq 100 ETF','ETF',480],['XAU/USD','Oro · futuro','Materias primas',2700],['XAG/USD','Plata · futuro','Materias primas',30],['BTC/USD','Bitcoin','Crypto',65000],['ETH/USD','Ethereum','Crypto',3200]];let clock={},newsData={},newsPending={},deepResults={},selectedNews=null;let data=[],selected=null,connected=false,ai=false,timer,busy=false;const fmt=n=>Number(n).toLocaleString('es-ES',{maximumFractionDigits:4}),avg=a=>a.reduce((s,x)=>s+x,0)/a.length,clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 let fx={rates:{}};try{let saved=localStorage.getItem('qr_currency');if(saved&&[...$('currency').options].some(o=>o.value===saved))$('currency').value=saved}catch{}
 function conversion(d){let from=d.meta.currency,to=$('currency').value,unit=1;if(d.u[2]==='Forex'||to==='native'||from===to)return {rate:1,currency:from||'',converted:false};if(from==='GBp'||from==='GBX'){from='GBP';unit=.01}if(!fx.rates[from]||!fx.rates[to])return {rate:1,currency:d.meta.currency||'',converted:false,missing:true};return {rate:unit*fx.rates[to]/fx.rates[from],currency:to,converted:true}}
 function money(n,d){let c=conversion(d);return (c.converted?'≈ ':'')+fmt(n*c.rate)+' '+c.currency+(c.missing?' (original)':'')}
 function fxNote(){let date=fx.asof?new Date(fx.asof*1000).toLocaleString('es-ES'):'no disponible';$('fxnote').textContent=$('currency').value==='native'?'Precios en moneda de negociación.':'Conversión orientativa: '+(fx.source||'tipo de cambio no disponible')+' · fecha '+date+(fx.stale?' · dato guardado':'')+'. Forex conserva la moneda del par. Si falta el cambio, se muestra la moneda original. La conversión no incluye comisiones.'}
 async function loadFX(){try{let r=await fetch('/api/fx');fx=await r.json()}catch{}fxNote()}
-function compute(u,d){let a=d.values.map(v=>Number(v.close)).filter(x=>Number.isFinite(x)&&x>0);if(a.length<21)throw Error('Histórico insuficiente');let p=a.at(-1),ma=avg(a.slice(-20)),mom=(p/a.at(-11)-1)*100,delta=a.slice(1).map((v,i)=>v-a[i]).slice(-14),g=avg(delta.map(v=>Math.max(0,v))),l=avg(delta.map(v=>Math.max(0,-v))),rsi=l===0?(g===0?50:100):100-100/(1+g/l),ret=a.slice(1).map((v,i)=>v/a[i]-1).slice(-20),m=avg(ret),vol=Math.sqrt(avg(ret.map(x=>(x-m)**2)))*100,score=Math.round(clamp(50+clamp(mom*3,-25,25)+clamp((p/ma-1)*300,-15,15)+clamp((rsi-50)*.4,-10,10),0,100)),risk=u[2]==='Crypto'||vol>2?'Alto':vol>.65?'Medio':'Bajo';let ema=(arr,n)=>arr.reduce((v,x,i)=>i===0?x:x*2/(n+1)+v*(1-2/(n+1)),0),macd=ema(a,12)-ema(a,26),sd=Math.sqrt(avg(a.slice(-20).map(x=>(x-ma)**2))),rows=d.values.filter(v=>v.high!=null&&v.low!=null&&v.close!=null),tr=rows.slice(1).map((v,i)=>Math.max(+v.high-+v.low,Math.abs(+v.high-+rows[i].close),Math.abs(+v.low-+rows[i].close))),atr=tr.length>=14?avg(tr.slice(-14)):null,vr=rows.slice(-21,-1).map(v=>+v.volume),volumeRatio=vr.length&&avg(vr)>0?+rows.at(-1).volume/avg(vr):null;return {u,a,p,ma,mom,macd,sd,atr,volumeRatio,rsi,vol,score,risk,change:(p/a.at(-2)-1)*100,meta:d.meta||{},stale:d.stale,fetched:d.fetched_at,date:d.values.at(-1).datetime,low:Math.min(...a.slice(-20)),high:Math.max(...a.slice(-20))}}
+function compute(u,d){let a=d.values.map(v=>Number(v.close)).filter(x=>Number.isFinite(x)&&x>0);if(a.length<21)throw Error('Histórico insuficiente');let p=a.at(-1),ma=avg(a.slice(-20)),mom=(p/a.at(-11)-1)*100,delta=a.slice(1).map((v,i)=>v-a[i]).slice(-14),g=avg(delta.map(v=>Math.max(0,v))),l=avg(delta.map(v=>Math.max(0,-v))),rsi=l===0?(g===0?50:100):100-100/(1+g/l),ret=a.slice(1).map((v,i)=>v/a[i]-1).slice(-20),m=avg(ret),vol=Math.sqrt(avg(ret.map(x=>(x-m)**2)))*100,score=Math.round(clamp(50+clamp(mom*3,-25,25)+clamp((p/ma-1)*300,-15,15)+clamp((rsi-50)*.4,-10,10),0,100)),risk=u[2]==='Crypto'||vol>2?'Alto':vol>.65?'Medio':'Bajo';let ema=(arr,n)=>arr.reduce((v,x,i)=>i===0?x:x*2/(n+1)+v*(1-2/(n+1)),0),macd=ema(a,12)-ema(a,26),sd=Math.sqrt(avg(a.slice(-20).map(x=>(x-ma)**2))),rows=d.values.filter(v=>v.high!=null&&v.low!=null&&v.close!=null),tr=rows.slice(1).map((v,i)=>Math.max(+v.high-+v.low,Math.abs(+v.high-+rows[i].close),Math.abs(+v.low-+rows[i].close))),atr=tr.length>=14?avg(tr.slice(-14)):null,vr=rows.slice(-21,-1).map(v=>+v.volume),volumeRatio=vr.length&&avg(vr)>0?+rows.at(-1).volume/avg(vr):null;return {u,a,values:d.values,p,ma,mom,g,l,returnMean:m,macd,sd,atr,volumeRatio,rsi,vol,score,risk,change:(p/a.at(-2)-1)*100,meta:d.meta||{},stale:d.stale,fetched:d.fetched_at,date:d.values.at(-1).datetime,low:Math.min(...a.slice(-20)),high:Math.max(...a.slice(-20))}}
 function quoteAge(d){let t=typeof d.meta.quote_time==='number'?d.meta.quote_time*1000:Date.parse(d.meta.quote_time);if(!Number.isFinite(t))return 'hora no disponible';let age=Math.max(0,Math.floor((Date.now()-t)/1000));return new Date(t).toLocaleTimeString('es-ES')+' · hace '+(age<120?age+' s':Math.floor(age/60)+' min');}
-const intra=()=>['1min','5min','15min','30min','1h'].includes($('horizon').value);function quality(d){if(!d.stale&&String(d.meta.quality).startsWith('alpaca_'))return (fresh(d)?'Reciente · ':'Sin señal en directo · ')+d.meta.quality.split('_')[1].toUpperCase();if(d.stale)return 'Caché antigua';if(d.meta.quality==='public_rest')return fresh(d)?'Kraken · vela reciente':'Kraken · consulta REST';if(d.meta.delay>0)return 'Retraso declarado: '+d.meta.delay+' (unidad no verificada)';return 'Latencia no verificada'}function fresh(d){return !d.stale&&['public_rest','alpaca_iex','alpaca_sip'].includes(d.meta.quality)&&Date.now()/1000-d.fetched<75&&Date.now()-Date.parse(d.date)<120000&&Number.isFinite(Date.parse(d.meta.quote_time))&&Date.now()-Date.parse(d.meta.quote_time)<60000&&Date.now()-Date.parse(d.meta.quote_time)>=-5000&&$('horizon').value==='1min'}function filtered(){return data.filter(d=>($('view').value!=='live'||fresh(d))&&($('market').value==='all'||d.u[2]===$('market').value)&&($('risk').value==='all'||d.risk===$('risk').value)&&d.u.slice(0,3).join(' ').toLowerCase().includes($('search').value.toLowerCase())).sort((a,b)=>joint(b)-joint(a))}
+const intra=()=>['1min','5min','15min','30min','1h'].includes($('horizon').value);function quality(d){if(!d.stale&&String(d.meta.quality).startsWith('alpaca_'))return (fresh(d)?'Reciente · ':'Sin señal en directo · ')+d.meta.quality.split('_')[1].toUpperCase();if(d.stale)return 'Caché antigua';if(d.meta.quality==='public_rest')return fresh(d)?'Kraken · vela reciente':'Kraken · consulta REST';if(d.meta.delay>0)return 'Retraso declarado: '+d.meta.delay+' (unidad no verificada)';return 'Latencia no verificada'}function fresh(d){return !d.stale&&['public_rest','alpaca_iex','alpaca_sip'].includes(d.meta.quality)&&Date.now()/1000-d.fetched<75&&Date.now()-Date.parse(d.date)<120000&&Number.isFinite(Date.parse(d.meta.quote_time))&&Date.now()-Date.parse(d.meta.quote_time)<60000&&Date.now()-Date.parse(d.meta.quote_time)>=-5000&&$('horizon').value==='1min'}function filtered(){return data.filter(d=>d.interval===$('horizon').value&&($('view').value!=='live'||fresh(d))&&($('market').value==='all'||d.u[2]===$('market').value)&&($('risk').value==='all'||d.risk===$('risk').value)&&d.u.slice(0,3).join(' ').toLowerCase().includes($('search').value.toLowerCase())).sort((a,b)=>joint(b)-joint(a))}
 function session(d){if(d.u[2]==='Crypto')return 'open';if(['EE. UU.','ETF'].includes(d.u[2])&&clock.state&&Date.now()/1000-clock.asof<120)return clock.state;let s=d.meta.session,z=d.meta.exchange_timezone;if(s&&s.start&&s.end&&z){let now=Date.now()/1000;try{let f=new Intl.DateTimeFormat('en-CA',{timeZone:z,year:'numeric',month:'2-digit',day:'2-digit'});if(f.format(new Date(s.start*1000))===f.format(new Date()))return now>=s.start&&now<s.end?'open':'closed'}catch{}}return 'unknown'}
 function newsFilter(d){let n=newsData[d.u[0]];return n&&Date.now()/1000-n.asof<900?n.filter:null}
 function joint(d){return clamp(d.score+(newsFilter(d)?.adjustment||0),0,100)}
 function posture(d){let f=newsFilter(d),score=joint(d);if(!f||newsData[d.u[0]]?.errors?.length)return ['hold','No actuar · contexto incompleto'];if(score>=75&&d.mom>0&&d.p>d.ma&&d.rsi<75&&f.adjustment>=-4)return ['buy','Comprar virtual'];if(score<=35)return ['sell','Reducir / vender virtual'];return ['hold','No actuar']}
-function decision(d){let state=session(d);if(state==='closed')return ['closed','Cerrado · '+posture(d)[1]];if(state==='unknown')return ['unknown','Horario sin verificar'];if(d.stale||(intra()&&!fresh(d)))return ['hold','No actuar · dato no verificado'];return posture(d)}
-function allocation(d){let action=decision(d)[0],score=joint(d);if(action==='buy'){let base=score>=90?5:score>=85?4:score>=80?3:2;let factor=d.risk==='Alto'?.5:d.risk==='Medio'?.75:1;return {action,percent:Math.round(base*factor*10)/10,basis:'valor total de la cartera virtual'}}if(action==='sell')return {action,percent:score<=15?100:score<=25?75:50,basis:'posición virtual existente en este activo'};return {action,percent:0,basis:'sin operación'}}
-function allocationText(d){let a=allocation(d),n=a.percent.toLocaleString('es-ES');return a.action==='buy'?'Compraría '+n+'% del valor total de la cartera virtual (como máximo disponible en efectivo; no superar ese peso total en este activo).':a.action==='sell'?'Vendería '+n+'% de la posición virtual existente en este activo, si la tuviera. Si no tengo posición, no haría nada.':'0% · No realizaría ninguna operación ahora.'}
-function allocationLabel(d){let a=allocation(d);return a.action==='buy'?' · '+a.percent.toLocaleString('es-ES')+'% cartera':a.action==='sell'?' · '+a.percent+'% posición':' · 0%'}
+function preliminaryDecision(d){let state=session(d);if(state==='closed')return ['closed','Cerrado · '+posture(d)[1]];if(state==='unknown')return ['unknown','Horario sin verificar'];if(d.stale||(intra()&&!fresh(d)))return ['hold','No actuar · dato no verificado'];return posture(d)}
+function preliminaryAllocation(d){let action=preliminaryDecision(d)[0],score=joint(d);if(action==='buy'){let base=score>=90?5:score>=85?4:score>=80?3:2;let factor=d.risk==='Alto'?.5:d.risk==='Medio'?.75:1;return {action,percent:Math.min(Math.round(base*factor*10)/10,strategyProfile?.limit??100),basis:'valor total de la cartera virtual'}}if(action==='sell')return {action,percent:score<=15?100:score<=25?75:50,basis:'posición virtual existente en este activo'};return {action,percent:0,basis:'sin operación'}}
+const strategyKey = 'qr_strategy_v1';
+let strategyProfile = null;
+try { strategyProfile = normalizeStrategy(JSON.parse(localStorage.getItem(strategyKey))); } catch {}
+
+function applyStrategyFilters(){
+  if (!strategyProfile) return;
+  if (strategyProfile.horizon !== '1min') $('view').value = 'global';
+  $('market').value = strategyProfile.market;
+  $('horizon').value = strategyProfile.horizon;
+}
+
+if (strategyProfile) {
+  $('strategyIdea').value = strategyProfile.idea;
+  $('strategyMarket').value = strategyProfile.market;
+  $('strategyHorizon').value = strategyProfile.horizon;
+  $('strategyCapital').value = strategyProfile.capital;
+  $('strategyLimit').value = strategyProfile.limit;
+  $('strategyStatus').textContent = 'Perfil guardado en este navegador.';
+  applyStrategyFilters();
+}
+
+$('strategyForm').onsubmit = event => {
+  event.preventDefault();
+  const profile = normalizeStrategy({
+    idea: $('strategyIdea').value,
+    market: $('strategyMarket').value,
+    horizon: $('strategyHorizon').value,
+    capital: $('strategyCapital').valueAsNumber,
+    limit: $('strategyLimit').valueAsNumber
+  });
+  if (!profile) {
+    $('strategyStatus').textContent = 'Revisa el capital y el porcentaje máximo.';
+    return;
+  }
+  strategyProfile = profile;
+  try {
+    localStorage.setItem(strategyKey, JSON.stringify(profile));
+    $('strategyStatus').textContent = 'Perfil guardado y filtros aplicados.';
+  } catch {
+    $('strategyStatus').textContent = 'Perfil aplicado. El navegador no permite guardarlo para otra visita.';
+  }
+  applyStrategyFilters();
+  render();
+  load();
+};
+
+function protocolReport(d){
+  const usable = d.interval === $('horizon').value && session(d) === 'open' && !d.stale && (!intra() || fresh(d))
+    && !!newsFilter(d) && !newsData[d.u[0]]?.errors?.length;
+  const dataReason = session(d) === 'closed' ? 'mercado cerrado'
+    : session(d) === 'unknown' ? 'horario sin verificar'
+    : d.interval !== $('horizon').value || d.stale || (intra() && !fresh(d)) ? 'cotización sin verificar'
+    : !usable ? 'contexto de noticias incompleto' : 'Cotización y titulares disponibles para el diagnóstico.';
+  d.protocolCache ??= new Map();
+  const key = JSON.stringify([usable, dataReason, strategyProfile]);
+  if (!d.protocolCache.has(key)) {
+    const now = Date.now();
+    const audit = auditForecastInputs(d.values, {
+      interval:d.interval, now:d.stale ? d.fetched*1000 : now,
+      source:d.meta.source, stale:d.stale, continuous:d.u[2]==='Crypto'
+    });
+    const preparation = prepareForecastSeries(audit.bars, d.u[2]);
+    const bars = preparation.bars;
+    const report = evaluateQuantDecision(bars.map(bar=>bar.close), {usable:usable && audit.ready,
+      dataReason:audit.ready ? dataReason : audit.blockers.join(' '), strategyProfile});
+    report.inputs = {...audit, bars:undefined, count:bars.length,
+      first:bars[0]?.time, last:bars.at(-1)?.time};
+    report.preparation = {...preparation, bars:undefined};
+    Object.defineProperty(report, 'preparedBars', {value:bars});
+    report.forecast = audit.ready ? commonForecast(bars) : null;
+    if (report.forecast) {
+      const ledgerKey = 'qr_forecasts_v1';
+      try {
+        const saved = JSON.parse(localStorage.getItem(ledgerKey)) ?? [];
+        const series = [d.u[0], d.interval, d.meta.source, preparation.corporate].join('|');
+        const ledger = recordForecast(saved, series, audit.bars, report.forecast, now);
+        localStorage.setItem(ledgerKey, JSON.stringify(ledger));
+        const lastClosed = ledger.slice().reverse().find(entry=>entry.key===series && entry.result);
+        report.forecast.lastClosed = lastClosed
+          ? {issuedAt:lastClosed.issuedAt, direction:lastClosed.direction, reference:lastClosed.reference, close:lastClosed.result.close}
+          : null;
+        report.forecast.recorded = true;
+      } catch {
+        report.forecast.recorded = false;
+      }
+    }
+    d.protocolCache.set(key, report);
+  }
+  return d.protocolCache.get(key);
+}
+function decision(d){
+  const report = protocolReport(d);
+  const market = session(d);
+  return [market === 'open' ? report.action : market, report.label];
+}
+function allocation(d){
+  return {action: protocolReport(d).action, percent: 0, basis: 'sin operación virtual autorizada'};
+}
+const protocolSource = JSON.parse($('protocolSource').textContent);
+const protocolCoverage = [
+  ['Calculado', 'Universo, frecuencia y objetivo de la prueba histórica.', 0],
+  ['Por comprobar', 'Entradas obligatorias de la previsión técnica y cobertura de indicadores adicionales.', 1],
+  ['Por comprobar', 'Preparación de la serie que alimenta la previsión técnica.'],
+  ['Sin datos suficientes', 'Clasificación técnica del régimen del activo con velas cerradas.'],
+  ['Requiere datos', 'Contexto de tipos soberanos a 2 y 10 años para el activo seleccionado.'],
+  ['Sin datos suficientes', 'Dirección, fuerza y comparación con una referencia del radar.', 2],
+  ['Parcial', 'Bandas y Z-score de cierres. Faltan ajuste y validación de un modelo de reversión.'],
+  ['Requiere datos y modelo', 'Segundo activo sincronizado, cointegración y validación del spread.'],
+  ['Parcial', 'Volumen relativo cuando el proveedor lo entrega. Faltan bid, ask, profundidad y flujo de órdenes.'],
+  ['Según el activo', 'Para acciones hacen falta estados financieros, revisiones y comparables fechados. En divisas se estudia el contexto macro.'],
+  ['Requiere datos y modelo', 'Rentabilidad de referencia, tasa sin riesgo, series factoriales y ajuste de exposiciones.'],
+  ['Parcial', 'Filtro de titulares actuales. Faltan históricos de noticias y expectativas para validar su aporte.'],
+  ['Exploratorio', 'Hay una puntuación heurística. Falta estimar y validar el alpha predictivo.'],
+  ['Experimental', 'Previsión común para la próxima vela. Entrenamiento y calibración pendientes.'],
+  ['Histórico', 'Distribución empírica de la regla. Falta calibrar una distribución predictiva.', 3],
+  ['Requiere datos y modelo', 'Trayectorias calibradas y barreras de entrada y salida.'],
+  ['Según la estrategia', 'Cadena histórica de opciones, vencimientos y tipos de interés.'],
+  ['Exploratorio', 'Prueba cronológica con referencia del mismo activo. Faltan validación repetida y costes verificados.', 4],
+  ['Por implementar', 'Cuantificar incertidumbre, dependencia temporal y pruebas múltiples con una muestra suficiente.'],
+  ['Por implementar', 'Predicciones fechadas y resultados posteriores para medir calibración.'],
+  ['Simulación disponible', 'Puedes introducir un coste agregado de ida y vuelta.', 5],
+  ['Parcial', 'Media de la muestra y escenario neto del paso 21. Falta una esperanza predictiva validada.'],
+  ['Parcial', 'Volatilidad y caída máxima de las velas cerradas. Faltan pruebas de estrés de cartera.'],
+  ['Parcial', 'Tope del perfil. Faltan exposición vigente, efectivo y presupuesto de pérdida.', 6],
+  ['Requiere datos y modelo', 'Posiciones y series sincronizadas de todos los activos de la cartera.'],
+  ['Opinión virtual', 'El informe compara la señal actual con la evidencia histórica. La asignación del protocolo requiere validación.'],
+  ['Exploratorio', 'La prueba usa entrada en el cierre siguiente y salida una vela más tarde. Faltan barreras verificadas.'],
+  ['Según la estrategia', 'Para evaluar ejecución se necesitan precios negociables, liquidez y condiciones de órdenes.'],
+  ['Registro local', 'Las previsiones se cotejan al recibir la siguiente vela cerrada. Quedan pendientes las posiciones y los controles de deterioro.'],
+  ['Parcial', 'Se ven los retornos de las operaciones históricas. Falta atribuir resultados de posiciones registradas.']
+];
+
+function protocolDetails(d, report){
+  const f = (n, digits=4) => Number(n).toLocaleString('es-ES', {maximumFractionDigits:digits});
+  const history = report.historicalTest;
+  const adjustment = newsFilter(d)?.adjustment ?? 0;
+  const momentumPoints = clamp(d.mom*3,-25,25);
+  const averagePoints = clamp((d.p/d.ma-1)*300,-15,15);
+  const rsiPoints = clamp((d.rsi-50)*.4,-10,10);
+  const preliminary = preliminaryDecision(d)[1];
+  const profile = strategyProfile;
+  return [
+    ['Mercado: ' + d.u[2] + '. Histórico utilizado: ' + d.a.length + ' cierres válidos de la frecuencia seleccionada.'],
+    ['Fuente: ' + (d.meta.source || 'sin identificar') + ' · Última vela: ' + d.date + ' · Última operación: ' + quoteAge(d) + '.',
+     'Datos adicionales según la estrategia: histórico ajustado y fechado, referencia de mercado y publicaciones con su fecha original.'],
+    ['Puntuación técnica = 50 + momentum (' + f(momentumPoints) + ') + distancia a la media (' + f(averagePoints) + ') + RSI (' + f(rsiPoints) + '), limitada a 0–100 y redondeada = ' + d.score + '/100.',
+     'Puntuación conjunta = ' + d.score + ' + ' + f(adjustment) + ' puntos de titulares, limitada a 0–100 = ' + joint(d) + '/100. Diagnóstico preliminar: ' + preliminary + '. Es una puntuación de reglas, sin interpretación probabilística.'],
+    [history.observations ? 'Subidas observadas = ' + history.positive + ' ÷ ' + history.observations + ' × 100 = ' + f(history.positive/history.observations*100,2) + '%. Percentiles históricos 10 y 90: ' + f(history.p10*100,3) + '% y ' + f(history.p90*100,3) + '%. Se obtienen ordenando los rendimientos y tomando la posición redondeada hacia arriba. Con pocos casos el rango es inestable.' : 'La regla no produjo casos en esta ventana.',
+     'Implementación pendiente: modelo predictivo y calibración fuera de muestra. Datos necesarios: histórico suficiente para el horizonte elegido y variables disponibles en el momento de cada decisión.'],
+    ['Regla evaluada: cierre por encima de su media de 20 velas y del cierre de hace 10 velas. Rendimiento simulado = cierre dos velas después de la señal ÷ cierre de la vela siguiente − 1.',
+     'Ventana evaluada: tramo final del histórico, desde el índice ' + history.cutoff + ' (numeración desde cero). Casos: ' + history.observations + '.',
+     history.meanGrossReturn === null ? 'Sin casos elegibles para calcular una media.' : 'Media bruta = suma de los rendimientos ÷ número de casos ≈ ' + f(history.sumGrossReturn*100) + '% ÷ ' + history.observations + ' = ' + f(history.meanGrossReturn*100,3) + '%. Describe esa muestra histórica.',
+     history.benchmarkMean === null ? 'Sin histórico para la referencia.' : 'Referencia: entrar en las ' + history.benchmarkCount + ' fechas elegibles, con media bruta del ' + f(history.benchmarkMean*100,3) + '%.' + (history.meanGrossReturn === null ? '' : ' Diferencia regla − referencia = ' + f((history.meanGrossReturn-history.benchmarkMean)*100,3) + ' puntos porcentuales.'),
+     'Implementación pendiente: estabilidad por periodos e incertidumbre estadística.'],
+    ['Indica el coste total de abrir y cerrar como porcentaje del importe de la operación. Incluye comisión, diferencial, deslizamiento y los demás costes aplicables.'],
+    [profile ? 'Tope declarado = ' + f(profile.capital,2) + ' € × ' + f(profile.limit,2) + '% ≈ ' + f(profile.capital * profile.limit / 100,2) + ' €. Es el máximo por activo declarado en el formulario.' : 'Completa Mi estrategia virtual para calcular el tope por activo.',
+     'Datos necesarios: efectivo, posiciones y límites de pérdida. Implementación pendiente: escenarios de estrés, exposición total y tamaño de posición.'],
+    ['Implementación pendiente: reglas de entrada, salida e invalidación, seguimiento de posiciones simuladas y evaluación tras el cierre.']
+  ];
+}
+
+function indicatorCalculations(d, history){
+  const f = (n, digits=4) => n.toLocaleString('es-ES', {maximumFractionDigits:digits});
+  const ema = n => d.a.reduce((previous, close, i) => i ? close*2/(n+1) + previous*(1-2/(n+1)) : close, 0);
+  const fast = ema(12), slow = ema(26);
+  const blocks = [
+    ['Variación de la última vela', '(Cierre actual ÷ cierre anterior − 1) × 100',
+      '(' + f(d.p) + ' ÷ ' + f(d.a.at(-2)) + ' − 1) × 100 ≈ ' + f(d.change,3) + '%',
+      'Mide el cambio respecto de la vela anterior.'],
+    ['Media móvil de 20 cierres', 'Σ cierres ÷ 20',
+      f(d.ma*20) + ' ÷ 20 ≈ ' + f(d.ma),
+      'El cierre queda ' + (d.p >= d.ma ? 'en o por encima' : 'por debajo') + ' de su referencia reciente.'],
+    ['Momentum de 10 velas', '(Cierre actual ÷ cierre de hace 10 velas − 1) × 100',
+      '(' + f(d.p) + ' ÷ ' + f(d.a.at(-11)) + ' − 1) × 100 ≈ ' + f(d.mom,3) + '%',
+      'El signo indica la dirección del cambio acumulado.'],
+    ['RSI de 14 velas', '100 − 100 ÷ (1 + ganancia media ÷ pérdida media)',
+      d.l === 0 ? 'Pérdida media = 0. Caso especial → ' + f(d.rsi,2) + '/100'
+        : '100 − 100 ÷ (1 + ' + f(d.g,6) + ' ÷ ' + f(d.l,6) + ') ≈ ' + f(d.rsi,2) + '/100',
+      'Por encima de 50 dominan las ganancias medias y por debajo dominan las pérdidas medias.'],
+    ['Volatilidad por vela', '√(Σ(rᵢ − μ)² ÷ 20), con rendimientos en %',
+      'μ = ' + f(d.returnMean*100,4) + '%; √(' + f(d.vol*d.vol,6) + ') ≈ ' + f(d.vol,3) + '%',
+      'Dispersión reciente de los rendimientos. Riesgo heurístico del radar: ' + d.risk + '.'],
+    ['MACD', 'EMA₁₂ − EMA₂₆; EMAₙ = α × cierre + (1 − α) × EMA anterior, α = 2 ÷ (n + 1)',
+      f(fast,6) + ' − ' + f(slow,6) + ' ≈ ' + f(d.macd,6),
+      'La diferencia indica si la media rápida está por encima o por debajo de la lenta.'],
+    ['Bandas de Bollinger', 'Media de 20 cierres ± 2 × desviación de los cierres',
+      f(d.ma,5) + ' ± 2 × ' + f(d.sd,5) + ' → ' + f(d.ma-2*d.sd,5) + ' a ' + f(d.ma+2*d.sd,5),
+      'Referencias de dispersión de precios alrededor de la media reciente.'],
+    ['ATR de 14 velas', 'Media de max(máximo − mínimo, |máximo − cierre previo|, |mínimo − cierre previo|)',
+      d.atr == null ? 'Sin 14 rangos completos' : 'Suma de rangos ' + f(d.atr*14,6) + ' ÷ 14 ≈ ' + f(d.atr,6),
+      'Mide la amplitud de los movimientos en unidades del precio.'],
+    ['Volumen relativo', 'Volumen de la última vela ÷ media del volumen previo utilizado',
+      d.volumeRatio == null ? 'Sin volumen previo utilizable' : f(d.volumeRatio,3) + '×',
+      'Por encima de 1× indica mayor actividad que la media previa.']
+  ];
+  const distribution = history.observations ? [['Frecuencia de subidas', 'Casos con retorno > 0 ÷ total × 100',
+    history.positive + ' ÷ ' + history.observations + ' × 100 ≈ ' + f(history.positive/history.observations*100,2) + '%',
+    'Frecuencia histórica en la muestra de la regla.']] : [];
+  const validation = history.observations ? [['Rentabilidad bruta media', 'Σ rendimientos ÷ número de operaciones',
+    f(history.sumGrossReturn*100,5) + '% ÷ ' + history.observations + ' ≈ ' + f(history.meanGrossReturn*100,4) + '%',
+    'Resultado medio por operación simulada antes de costes.']] : [];
+  return [[blocks[0]], [], blocks.slice(1), distribution, validation, [], [], []];
+}
+
+function protocolCalculation([name, formula, values, interpretation]){
+  const box = document.createElement('div');
+  box.className = 'protocol-math';
+  const title = document.createElement('h4');
+  title.textContent = name;
+  const list = document.createElement('dl');
+  for (const [label, text] of [['Fórmula', formula], ['Sustitución y resultado', values], ['Interpretación', interpretation]]) {
+    const term = document.createElement('dt'), description = document.createElement('dd');
+    term.textContent = label;
+    description.textContent = text;
+    list.append(term, description);
+  }
+  box.append(title, list);
+  return box;
+}
+
+function protocolTrades(trades){
+  const section = document.createElement('details');
+  const title = document.createElement('summary');
+  title.textContent = 'Ver las ' + trades.length + ' operaciones de la muestra';
+  const wrapper = document.createElement('div');
+  wrapper.className = 'protocol-trades';
+  const table = document.createElement('table');
+  const headings = table.createTHead().insertRow();
+  for (const label of ['Vela de señal', 'Entrada', 'Salida', 'Retorno bruto']) {
+    const cell = document.createElement('th');
+    cell.scope = 'col';
+    cell.textContent = label;
+    headings.append(cell);
+  }
+  const body = table.createTBody();
+  for (const trade of trades) {
+    const row = body.insertRow();
+    for (const value of [trade.index + 1, trade.entry, trade.exit, (trade.gross*100).toFixed(4) + '%']) {
+      row.insertCell().textContent = value;
+    }
+  }
+  wrapper.append(table);
+  section.append(title, wrapper);
+  return section;
+}
+
+const protocolCostInputs = new Map();
+
+function protocolCostScenario(key, gross){
+  const section = document.createElement('div');
+  section.className = 'protocol-math protocol-cost';
+  const label = document.createElement('label');
+  label.textContent = 'Coste total simulado de ida y vuelta (%)';
+  const input = document.createElement('input');
+  input.type = 'number';
+  input.min = '0';
+  input.max = '100';
+  input.step = 'any';
+  input.value = protocolCostInputs.get(key) ?? '';
+  const output = document.createElement('p');
+  output.setAttribute('role', 'status');
+  const format = value => value.toLocaleString('es-ES', {maximumFractionDigits: 5});
+  function update(){
+    if (gross === null) {
+      output.textContent = 'Sin casos históricos para estimar la media neta.';
+      return;
+    }
+    if (input.validity.badInput || !input.checkValidity()) {
+      output.textContent = 'Introduce un coste entre 0% y 100%.';
+      return;
+    }
+    if (input.value === '') {
+      output.textContent = gross > 0
+        ? 'Coste de equilibrio histórico: ' + format(gross*100) + '%. A ese coste, la media neta sería cero.'
+        : 'La media bruta histórica es ' + format(gross*100) + '%. Ya es cero o negativa con coste cero.';
+      return;
+    }
+    const cost = input.valueAsNumber;
+    const net = gross*100 - cost;
+    output.textContent = 'Media neta simulada = ' + format(gross*100) + '% − ' + format(cost)
+      + '% ≈ ' + format(net) + '%. Frente a abstenerse (0% en esta comparación), la media es '
+      + (net > 0 ? 'superior' : net < 0 ? 'inferior' : 'igual') + '.';
+  }
+  input.addEventListener('input', () => {
+    protocolCostInputs.set(key, input.value);
+    update();
+  });
+  label.append(input);
+  section.append(label, output);
+  update();
+  return section;
+}
+
+$('protocolStart').onclick = () => { $('protocolBody').scrollTop = 0; };
+$('protocolEnd').onclick = () => { $('protocolBody').scrollTop = $('protocolBody').scrollHeight; };
+
+function opinionForAsset(d){
+  const signal = preliminaryDecision(d);
+  if (!['buy','sell','hold'].includes(signal[0]) || d.stale || (intra() && !fresh(d))
+      || !newsFilter(d) || newsData[d.u[0]]?.errors?.length) {
+    return {stance: 'Esperaría antes de cambiar la posición virtual', reason: signal[1] + '.'};
+  }
+  return virtualOpinion(protocolReport(d), signal[0]);
+}
+
+const macroBySymbol = new Map();
+
+function loadMacro(d, retry = false) {
+  const symbol = d.u[0];
+  const cached = macroBySymbol.get(symbol);
+  if (cached?.loading || (!retry && cached && Date.now() - cached.time < 300000)) return;
+  macroBySymbol.set(symbol, {time:Date.now(), loading:true});
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 21000);
+  fetch('/api/macro?symbol=' + encodeURIComponent(symbol), {signal:controller.signal})
+    .then(response => {
+      if (!response.ok) throw Error('Datos macro no disponibles');
+      return response.json();
+    })
+    .then(report => macroBySymbol.set(symbol, {time:Date.now(), report}))
+    .catch(error => macroBySymbol.set(symbol, {time:Date.now()-270000,
+      failed:error.name === 'AbortError' ? 'La consulta superó los 21 segundos.' : 'No se pudo consultar el módulo macro.'}))
+    .finally(() => {
+      clearTimeout(timeout);
+      const dialog = $('protocolDialog');
+      if (dialog.open && dialog.asset?.u[0] === symbol) showProtocol(dialog.asset);
+    });
+}
+
+function showMacro(section, d, macro) {
+  const info = macro?.report;
+  const text = value => {
+    const line = document.createElement('p');
+    line.textContent = value;
+    section.append(line);
+  };
+  const fmtRate = value => value.toLocaleString('es-ES',{maximumFractionDigits:3});
+  const retry = () => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = 'Reintentar consulta macro';
+    button.onclick = () => {
+      loadMacro(d, true);
+      showProtocol(d);
+    };
+    section.append(button);
+  };
+  if (!info) {
+    text(macro?.failed || 'Consultando las curvas soberanas públicas…');
+    if (macro?.failed) retry();
+    return;
+  }
+  if (d.u[2] === 'Crypto' || d.u[2] === 'Materias primas') text('La curva de EE. UU. se usa como referencia general para este activo cotizado en dólares.');
+  for (const curve of info.economies) {
+    const source = document.createElement('a');
+    source.href = curve.url;
+    source.textContent = curve.name + ' · ' + curve.source;
+    source.target = '_blank';
+    source.rel = 'noopener noreferrer';
+    section.append(source);
+    if (curve.error) {
+      text(curve.error);
+      continue;
+    }
+    text('Fecha de observación: ' + curve.date + (curve.age > 7 ? ' · dato de hace ' + curve.age + ' días.' : '.'));
+    section.append(protocolCalculation(['Pendiente de la curva · ' + curve.name,
+      'Rendimiento a 10 años − rendimiento a 2 años',
+      fmtRate(curve.long) + '% − (' + fmtRate(curve.short) + '%) = ' + fmtRate(curve.slope) + ' puntos porcentuales',
+      (curve.slope < 0 ? 'Curva invertida en esos vencimientos.' : curve.slope > 0 ? 'El tramo a 10 años rinde más que el de 2 años.' : 'Ambos vencimientos tienen el mismo rendimiento.')
+        + (curve.change === null ? '' : ' Cambio desde ' + curve.previous + ': ' + fmtRate(curve.change) + ' puntos porcentuales.')]));
+  }
+  if (info.economies.some(curve=>curve.error)) retry();
+  if (!info.economies.length) text('Aún no hay una referencia asignada para este símbolo.');
+  if (info.difference) {
+    const {left, right, date} = info.difference;
+    section.append(protocolCalculation(['Diferencial entre economías · ' + date,
+      'Tipo de la economía base menos tipo de la economía cotizada al mismo plazo',
+      [2,10].map((term,i)=>term + ' años: ' + fmtRate(left[i]) + '% − (' + fmtRate(right[i])
+        + '%) = ' + fmtRate(left[i]-right[i]) + ' puntos porcentuales').join(' · '),
+      'Compara fechas de observación comunes. Las metodologías de las curvas pueden diferir.']));
+  } else if (info.economies.length === 2) {
+    const missing = info.economies.filter(curve=>curve.error).map(curve=>curve.name);
+    text(missing.length ? 'Faltan los rendimientos de ' + missing.join(', ') + ' para calcular el diferencial.'
+      : 'Falta una fecha común con ambos vencimientos para calcular el diferencial.');
+  }
+  text('Las curvas se muestran como contexto actual. Para validar su efecto en el histórico hacen falta fechas de publicación. Siguen pendientes la inflación, las sorpresas macro y el estudio de anuncios.');
+}
+
+const trendReferenceCache = new Map();
+const trendReferenceKey = d => trendReferences[d.u[0]] + '|' + d.interval;
+
+function loadTrendReference(d, force = false) {
+  const symbol = trendReferences[d.u[0]];
+  const reference = universe.find(asset=>asset[0] === symbol);
+  if (!reference) return;
+  const key = trendReferenceKey(d);
+  const cached = trendReferenceCache.get(key);
+  if (cached?.loading || (!force && cached && Date.now()-cached.time<60000)) return;
+  trendReferenceCache.set(key,{loading:true,time:Date.now()});
+  const controller = new AbortController();
+  const timeout = setTimeout(()=>controller.abort(),15000);
+  fetch('/api/series?symbol='+encodeURIComponent(symbol)+'&interval='+encodeURIComponent(d.interval),
+    {signal:controller.signal})
+    .then(async response=>{
+      const result = await response.json();
+      if (!response.ok || result.error || !Array.isArray(result.values)) throw Error('Serie de referencia no disponible.');
+      const audit = auditForecastInputs(result.values,{interval:d.interval, now:Date.now(),
+        source:result.meta?.source, stale:result.stale, continuous:reference[2]==='Crypto'});
+      if (!audit.ready) throw Error(audit.blockers.join(' '));
+      return prepareForecastSeries(audit.bars,reference[2]).bars;
+    })
+    .then(bars=>trendReferenceCache.set(key,{bars,time:Date.now()}))
+    .catch(error=>trendReferenceCache.set(key,{error:error.name==='AbortError'?'La referencia agotó el tiempo de espera.':error.message,time:Date.now()}))
+    .finally(()=>{
+      clearTimeout(timeout);
+      const dialog = $('protocolDialog');
+      if (dialog.open && dialog.asset && trendReferenceKey(dialog.asset)===key) showProtocol(dialog.asset);
+    });
+}
+
+function showProtocol(d){
+  const dialog = $('protocolDialog');
+  $('openProtocol').disabled = !d;
+  if (!d) {
+    if (dialog.open) dialog.close();
+    return;
+  }
+  if (!dialog.open) return;
+  const report = protocolReport(d);
+  const macro = macroBySymbol.get(d.u[0]);
+  const comparison = trendReferenceCache.get(trendReferenceKey(d));
+  const reference = universe.find(asset=>asset[0]===trendReferences[d.u[0]]);
+  const invert = d.u[2]==='Forex';
+  const matched = report.forecast && comparison?.bars
+    ? relativeMomentum(report.preparedBars, comparison.bars, d.interval, invert) : null;
+  // Keep the report intact while the user reads or edits the scenario.
+  if (dialog.report === report && dialog.asset === d && dialog.macro === macro && dialog.comparison === comparison) return;
+  dialog.report = report;
+  dialog.asset = d;
+  dialog.macro = macro;
+  dialog.comparison = comparison;
+  const details = protocolDetails(d, report);
+  const calculations = indicatorCalculations(d, report.historicalTest);
+  const expanded = Array.from($('protocolChecks').children, item => ({
+    step: item.firstElementChild.open,
+    trades: item.querySelector('.protocol-trades')?.parentElement.open,
+    reference: item.querySelector('.protocol-reference')?.open
+  }));
+  $('protocolAsset').textContent = d.u[1] + ' · ' + $('horizon').selectedOptions[0].textContent;
+  $('protocolChecks').replaceChildren(...protocolSource.map(([name, groups], index) => {
+    const [defaultStatus, description, panel] = protocolCoverage[index];
+    const inputs = report.inputs;
+    const prep = report.preparation;
+    const preparationStatus = !inputs.ready || prep.corporate === 'unverified' || prep.corporate === 'roll' || prep.checked + prep.flat === 0
+      ? 'Parcial' : prep.anomalies.length ? 'Calculado · anomalías para revisar' : 'Completo para la previsión técnica';
+    const regime = report.forecast?.regime;
+    const regimeLabel = regime
+      ? regime.trend + (regime.elevated ? ' con volatilidad elevada' : '')
+      : null;
+    const curves = macro?.report?.economies ?? [];
+    const availableCurves = curves.filter(curve=>!curve.error).length;
+    const macroStatus = availableCurves
+      ? (availableCurves === curves.length ? 'Curvas disponibles' : 'Cobertura parcial')
+      : macro?.report || macro?.failed ? 'Datos no disponibles' : 'Consultando';
+    const trendStatus = !report.forecast ? 'Sin datos suficientes'
+      : comparison?.loading ? 'Consultando referencia'
+      : matched && report.forecast.adx !== null && report.forecast.rSquared !== null && report.forecast.volatility > 0
+        ? 'Calculado para la estrategia técnica' : 'Resultados parciales';
+    const status = index === 5 ? trendStatus : index === 4 ? macroStatus : index === 3 && regime ? (regime.complete ? 'Régimen calculado' : 'Régimen provisional')
+      : index === 2 ? preparationStatus
+      : index === 1 ? (inputs.ready ? 'Completo para la previsión técnica' : 'Entradas insuficientes')
+      : defaultStatus;
+    const item = document.createElement('li');
+    const section = document.createElement('details');
+    section.open = expanded[index]?.step ?? index === 0;
+    const title = document.createElement('summary');
+    title.textContent = (index + 1) + '. ' + name + ' · ' + status;
+    section.append(title);
+    const note = document.createElement('p');
+    note.className = 'protocol-note';
+    note.textContent = description;
+    section.append(note);
+    for (const calculation of calculations[panel] ?? []) section.append(protocolCalculation(calculation));
+    if (index === 1) {
+      const date = value => new Date(value).toLocaleString('es-ES');
+      const lines = [
+        'Datos obligatorios: fuente identificada y al menos 21 cierres positivos y fechados de la frecuencia seleccionada.',
+        'Fuente: ' + (d.meta.source || 'sin identificar') + ' · ' + inputs.count + ' cierres utilizables'
+          + (inputs.count ? ' · de ' + date(inputs.first) + ' a ' + date(inputs.last) : '') + '.',
+        'Control de calidad: ' + inputs.invalid + ' filas inválidas, ' + inputs.open + ' velas aún fuera del corte de cierre, '
+          + inputs.duplicates + ' duplicados y ' + inputs.unordered + ' filas fuera de orden. Se ordenan las fechas y se excluyen las filas inválidas.',
+        'Saltos de intervalo detectados: ' + inputs.gaps.length + '. '
+          + (d.u[2]==='Crypto' ? 'Los saltos en la ventana reciente impiden emitir la previsión.'
+            : 'Pueden incluir cierres de mercado. Esta versión no comprueba los huecos contra un calendario bursátil.'),
+        'Disponibilidad temporal: se exige que transcurra la duración de la vela desde la marca del proveedor. La prueba usa solo precios anteriores al cálculo de cada señal.',
+        inputs.adxReady ? 'Datos adicionales: máximos y mínimos disponibles para ADX.'
+          : 'Datos adicionales: ADX necesita al menos 28 velas y máximos y mínimos válidos.',
+        'Los titulares actuales son contexto. La previsión técnica usa únicamente precios; macro, fundamentales y opciones quedan fuera de esta estrategia.',
+        ...inputs.blockers
+      ];
+      for (const text of lines) {
+        const line = document.createElement('p');
+        line.textContent = text;
+        section.append(line);
+      }
+    }
+    for (const explanation of index === 1 ? [] : (details[panel] ?? [])) {
+      const line = document.createElement('p');
+      line.textContent = explanation;
+      section.append(line);
+    }
+    const format = (n, digits = 3) => n.toLocaleString('es-ES', {maximumFractionDigits: digits});
+    if (index === 2) {
+      const adjustmentNotes = {
+        adjusted: 'El proveedor entregó cierres ajustados para toda la serie. Se reescala la serie al último cierre publicado y se aplica el mismo factor a máximos y mínimos de cada vela.',
+        unverified: 'Ajuste corporativo sin verificar. El proveedor entregó cierres ajustados para ' + prep.adjustedCount
+          + ' de ' + inputs.count + ' velas. Se usa una serie uniforme de cierres publicados.',
+        roll: 'Los cambios de contrato del futuro continuo pueden generar saltos. El proveedor no suministra aquí una serie de empalme verificada.',
+        notApplicable: 'Los ajustes por dividendos y splits de acciones no aplican a esta serie.'
+      };
+      const notes = [
+        adjustmentNotes[prep.corporate],
+        'Se comparan los retornos logarítmicos con la mediana y la desviación absoluta mediana de los 20 retornos anteriores. Umbral: |Z robusto| > 3,5.',
+        prep.checked + ' retornos evaluados con Z robusto · ' + prep.flat
+          + ' ventanas de dispersión nula · ' + prep.anomalies.length + ' movimientos para revisar. Se conservan los movimientos detectados.',
+        'La estrategia actual usa retornos y pendiente. No exige estacionariedad ni aplica winsorización, diferenciación fraccionaria o PCA.'
+      ];
+      for (const anomaly of prep.anomalies) {
+        notes.push(new Date(anomaly.time).toLocaleString('es-ES') + ' · retorno logarítmico '
+          + format(anomaly.value*100,4) + '% · '
+          + (anomaly.score === null ? 'cambio tras una ventana sin dispersión' : 'Z robusto ' + format(anomaly.score,2)) + '.');
+      }
+      for (const text of notes) {
+        const line = document.createElement('p');
+        line.textContent = text;
+        section.append(line);
+      }
+      if (prep.previous) {
+        const ratio = prep.current/prep.previous;
+        const prices = format(prep.current,6) + ' ÷ ' + format(prep.previous,6);
+        section.append(protocolCalculation(['Rentabilidad simple', '(Cierre ÷ cierre previo − 1) × 100',
+          '(' + prices + ' − 1) × 100 ≈ ' + format((ratio-1)*100,5) + '%', 'Cambio porcentual en la serie preparada.']));
+        section.append(protocolCalculation(['Rentabilidad logarítmica', 'ln(Cierre ÷ cierre previo) × 100',
+          'ln(' + prices + ') × 100 ≈ ' + format(Math.log(ratio)*100,5) + '%', 'Retorno que se utiliza para detectar anomalías.']));
+      }
+    }
+    if (index === 3) section.append(protocolCalculation(calculations[2][3]));
+    const forecast = report.forecast;
+    if (forecast && index === 3) section.append(protocolCalculation(['Volatilidad EWMA',
+      'vₜ = λvₜ₋₁ + (1−λ)rₜ²; volatilidad = √vₜ',
+      'λ = 0,94; √' + format(forecast.variance,10) + ' ≈ ' + format(forecast.volatility*100,4) + '%',
+      'Los movimientos recientes tienen mayor peso. Se utilizan 20 rendimientos logarítmicos.']));
+    if (regime && index === 3) {
+      section.append(protocolCalculation(['Dirección y fuerza',
+        'Pendiente relativa = pendiente ÷ media. Se exige |pendiente relativa| > EWMA ÷ 10 y ADX ≥ 25 para clasificar tendencia.',
+        format(regime.normalizedSlope*100,5) + '% por vela · umbral ±' + format(regime.limit*100,5)
+          + '% · ADX ' + (regime.adx === null ? 'sin datos' : format(regime.adx,2)),
+        regime.trend + (regime.adx === null ? ' provisional por pendiente, sin confirmación del ADX.' : ' según los umbrales técnicos.')] ));
+      section.append(protocolCalculation(['Volatilidad relativa',
+        'EWMA actual ÷ mediana de las EWMA anteriores. Volatilidad elevada si el ratio es ≥ 1,5.',
+        regime.typical === null ? 'Hay ' + regime.baselineCount + ' ventanas previas; se necesitan al menos 5.'
+          : format(forecast.volatility*100,4) + '% ÷ ' + format(regime.typical*100,4) + '% → '
+            + (regime.relative === null ? 'referencia cero' : format(regime.relative,2) + '×'),
+        regime.elevated === null ? 'Sin referencia suficiente.'
+          : regime.elevated ? 'Volatilidad elevada frente a su propio histórico.'
+          : 'La volatilidad no supera el criterio de elevada.']));
+      const summary = document.createElement('p');
+      summary.textContent = 'Régimen técnico: ' + regimeLabel
+        + '. Umbrales heurísticos. GARCH y modelos de Markov quedan como referencia.';
+      section.append(summary);
+    }
+    if (index === 4) showMacro(section, d, macro);
+    if (forecast && index === 5) {
+      section.append(protocolCalculation(['Pendiente por regresión', 'Σ(t − t̄)(precio − media) ÷ Σ(t − t̄)²',
+        format(forecast.numerator,6) + ' ÷ ' + forecast.denominator + ' ≈ ' + format(forecast.slope,6),
+        'Cambio lineal estimado por vela en unidades de precio.']));
+      section.append(protocolCalculation(['ADX de Wilder', 'ADXₜ = (13 × ADXₜ₋₁ + DXₜ) ÷ 14',
+        forecast.adx === null ? 'Requiere 28 velas completas con máximos y mínimos.' : format(forecast.adx,2) + '/100',
+        'Mide intensidad de tendencia. La dirección se obtiene de otros indicadores.']));
+    }
+    if (forecast && index === 5) {
+      const momentumLog = Math.log(forecast.reference/forecast.prior10);
+      const ratio = forecast.volatility > 0 ? momentumLog/(forecast.volatility*Math.sqrt(10)) : null;
+      section.append(protocolCalculation(['Distancia a la media de 20 cierres',
+        '(Último cierre preparado ÷ media de 20 cierres − 1) × 100',
+        '(' + format(forecast.reference,6) + ' ÷ ' + format(forecast.mean,6) + ' − 1) × 100 ≈ '
+          + format((forecast.reference/forecast.mean-1)*100) + '%',
+        'Una distancia positiva indica que el cierre está por encima de su media reciente.']));
+      section.append(protocolCalculation(['Momentum ajustado por volatilidad',
+        'ln(cierre ÷ cierre de hace 10 velas) ÷ (EWMA × √10)',
+        ratio === null ? 'La volatilidad es cero.' : format(momentumLog,6) + ' ÷ ('
+          + format(forecast.volatility,6) + ' × √10) ≈ ' + format(ratio,4),
+        'Expresa el movimiento en unidades de volatilidad escalada. El escalado es una aproximación.']));
+      section.append(protocolCalculation(['Calidad del ajuste lineal',
+        'R² = covariación² ÷ (variación temporal × variación de los cierres)',
+        forecast.rSquared === null ? 'Los cierres no tienen variación.' :
+          format(forecast.numerator,6) + '² ÷ (' + forecast.denominator + ' × '
+          + format(forecast.priceVariation,6) + ') ≈ ' + format(forecast.rSquared*100,2) + '%',
+        'Porcentaje de variación de los cierres que explica la recta dentro de la ventana.']));
+      const note = document.createElement('p');
+      note.textContent = 'Referencia: ' + (reference?.[1] ?? 'sin asignar') + '. '
+        + (invert ? 'Se invierte el par de referencia para comparar los dos pares con el dólar en el mismo lado.'
+          : 'Comparación con un activo del radar, que puede representar un mercado amplio o un par comparable.');
+      section.append(note);
+      if (matched) {
+        section.append(protocolCalculation(['Momentum relativo de 10 velas',
+          'Rentabilidad del activo − rentabilidad de la referencia',
+          format(matched.asset*100,3) + '% − (' + format(matched.reference*100,3) + '%) = '
+            + format(matched.difference*100,3) + ' puntos porcentuales',
+          (matched.difference > 0 ? 'El activo superó a su referencia.' : matched.difference < 0
+            ? 'El activo quedó por debajo de su referencia.' : 'Ambos obtuvieron el mismo rendimiento.')
+            + ' Se usaron 11 velas alineadas, del ' + new Date(matched.from).toISOString().slice(0,10)
+            + ' al ' + new Date(matched.to).toISOString().slice(0,10) + ' (UTC).']));
+      } else {
+        const pending = document.createElement('p');
+        pending.textContent = comparison?.error ?? (comparison?.loading ? 'Consultando la referencia…'
+          : 'La referencia debe cubrir las mismas 11 velas cerradas del activo.');
+        section.append(pending);
+        if (comparison?.error) {
+          const retry = document.createElement('button');
+          retry.type = 'button';
+          retry.textContent = 'Reintentar referencia';
+          retry.onclick = () => {loadTrendReference(d,true);showProtocol(d);};
+          section.append(retry);
+        }
+      }
+    }
+    if (forecast && index === 13) section.append(protocolCalculation(['Dirección experimental',
+      'Deriva = (momentum logarítmico medio + pendiente ÷ precio medio) ÷ 2',
+      '(' + format(forecast.momentum*100,5) + '% + ' + format(forecast.slope/forecast.mean*100,5)
+      + '%) ÷ 2 ≈ ' + format(forecast.drift*100,5) + '%. Umbral lateral ±'
+      + format(forecast.threshold*100,5) + '%. Resultado: ' + forecast.direction,
+      'El rango indicativo usa una volatilidad EWMA alrededor de la deriva. Su cobertura todavía no está calibrada.']));
+    if (forecast && index === 22) section.append(protocolCalculation(['Caída máxima histórica',
+      'máximo(1 − cierre ÷ máximo previo acumulado)', format(forecast.drawdown*100,3) + '%',
+      'Mayor retroceso respecto de un máximo del histórico disponible. No representa el riesgo de toda la cartera.']));
+
+    if (index === 6) {
+      section.append(protocolCalculation(calculations[2][5]));
+      if (d.sd > 0) section.append(protocolCalculation(['Z-score del cierre', '(Cierre − media) ÷ desviación',
+        '(' + format(d.p, 6) + ' − ' + format(d.ma, 6) + ') ÷ ' + format(d.sd, 6)
+        + ' ≈ ' + format((d.p-d.ma)/d.sd),
+        'Distancia a la media en desviaciones estándar. Una desviación por sí sola no demuestra reversión.']));
+    }
+    if (index === 8) section.append(protocolCalculation(calculations[2][7]));
+    if (index === 11) {
+      const filter = newsFilter(d);
+      const line = document.createElement('p');
+      line.textContent = filter ? filter.relevant.length + ' titulares relevantes de ' + filter.total
+        + ' revisados. Ajuste aplicado: ' + filter.adjustment + ' puntos.' : 'Titulares aún sin verificar.';
+      section.append(line);
+    }
+    if (index === 17 && report.historicalTest.trades.length) {
+      const trades = protocolTrades(report.historicalTest.trades);
+      trades.open = expanded[index]?.trades ?? false;
+      section.append(trades);
+    }
+    if (index === 20) section.append(protocolCostScenario(
+      d.u[0] + '|' + d.interval, report.historicalTest.meanGrossReturn));
+    if (index === 28) {
+      const line = document.createElement('p');
+      const last = forecast?.lastClosed;
+      line.textContent = last
+        ? 'Última previsión resuelta: ' + last.direction + ' · emitida el '
+          + new Date(last.issuedAt).toLocaleString('es-ES') + ' · referencia '
+          + money(last.reference,d) + ' · cierre observado ' + money(last.close,d) + '.'
+        : 'Todavía no hay una previsión anterior resuelta para esta serie en el navegador.';
+      section.append(line);
+    }
+    if (index === 25) {
+      const opinion = opinionForAsset(d);
+      const line = document.createElement('p');
+      line.textContent = opinion.stance + '. ' + opinion.reason + ' ' + report.label + '.';
+      section.append(line);
+    }
+    if (groups.length) {
+      const reference = document.createElement('details');
+      reference.className = 'protocol-reference';
+      reference.open = expanded[index]?.reference ?? false;
+      const heading = document.createElement('summary');
+      heading.textContent = 'Fórmulas de referencia del protocolo';
+      reference.append(heading);
+      for (const [label, equations] of groups) {
+        const subtitle = document.createElement('strong');
+        subtitle.textContent = label;
+        reference.append(subtitle);
+        for (const equation of equations) {
+          const formula = document.createElement('pre');
+          formula.textContent = equation;
+          reference.append(formula);
+        }
+      }
+      section.append(reference);
+    }
+    item.append(section);
+    return item;
+  }));
+  const opinion = opinionForAsset(d);
+  $('protocolOutcome').textContent = 'Mi opinión: ' + opinion.stance + '.';
+  $('protocolVerdict').textContent = opinion.stance + '. ' + opinion.reason
+    + ' Decisión del protocolo: ' + report.label + ' · Asignación autorizada: ' + allocation(d).percent + '%.';
+  const forecast = report.forecast;
+  $('protocolForecast').textContent = forecast
+    ? 'Previsión experimental · ' + forecast.direction + ' al cierre de la próxima vela del plazo elegido. '
+      + 'Vela de referencia: ' + new Date(forecast.origin).toLocaleString('es-ES') + ' · cierre '
+      + money(forecast.reference,d) + ' · centro ' + money(forecast.center,d) + ' · rango indicativo '
+      + money(forecast.low,d) + ' a ' + money(forecast.high,d) + '. '
+      + (forecast.direction === 'Alcista' ? 'Escenario contrario: cierre por debajo del precio de referencia. '
+        : forecast.direction === 'Bajista' ? 'Escenario contrario: cierre por encima del precio de referencia. '
+        : 'Escenario contrario: cierre fuera del intervalo indicativo. ')
+      + (forecast.recorded ? 'Registro local disponible.' : 'El navegador no pudo guardar el registro.')
+    : 'Previsión sin emitir. ' + report.inputs.blockers.join(' ');
+  const history = report.historicalTest;
+  const evidence = [...calculations[0], ...calculations[2], ...calculations[3], ...calculations[4]]
+    .map(([name, , result]) => name + ' · ' + result);
+  if (matched) evidence.push('Momentum relativo de 10 velas frente a ' + reference[1] + ': '
+    + (matched.difference*100).toLocaleString('es-ES',{maximumFractionDigits:3}) + ' puntos porcentuales.');
+  if (forecast) evidence.push('Régimen técnico: ' + forecast.regime.trend
+    + (forecast.regime.elevated ? ' con volatilidad elevada' : '')
+    + (forecast.regime.complete ? '.' : ' · provisional.'));
+  if (forecast) evidence.push('Previsión ' + forecast.direction + ' · EWMA '
+    + (forecast.volatility*100).toFixed(3) + '% · caída máxima ' + (forecast.drawdown*100).toFixed(2)
+    + '% · ADX ' + (forecast.adx?.toFixed(2) ?? 'sin datos') + '.');
+  evidence.push('Puntuación técnica ' + d.score + '/100 · conjunta ' + joint(d) + '/100.');
+  if (history.meanGrossReturn !== null && history.benchmarkMean !== null) {
+    const difference = (history.meanGrossReturn - history.benchmarkMean) * 100;
+    evidence.push('La regla quedó ' + (difference > 0 ? 'por encima' : difference < 0 ? 'por debajo' : 'al nivel')
+      + ' de la referencia bruta (' + difference.toLocaleString('es-ES',{maximumFractionDigits:3}) + ' puntos porcentuales).');
+  }
+  evidence.push('Los indicadores técnicos se solapan y los resultados históricos son exploratorios. La decisión tiene en cuenta la señal, la referencia y los controles pendientes.');
+  $('protocolIndicatorSummary').replaceChildren(...evidence.map(text => {
+    const item = document.createElement('li');
+    item.textContent = text;
+    return item;
+  }));
+}
+
+$('openProtocol').onclick = () => {
+  const d = filtered().find(asset => asset.u[0] === selected);
+  if (!d) return;
+  loadMacro(d);
+  loadTrendReference(d);
+  $('protocolDialog').showModal();
+  $('protocolBody').scrollTop = 0;
+  showProtocol(d);
+};
+
 function showNews(d){let id=d.u[0];selectedNews=id;let n=newsData[id];$('newslist').replaceChildren();if(!n){$('newsstatus').textContent='Buscando noticias…';if(!newsPending[id])getNews(id);return}if(Date.now()/1000-n.asof>300&&!newsPending[id])getNews(id);$('newsstatus').textContent=(n.sources||[]).join(' · ')+' · '+(n.asof?new Date(n.asof*1000).toLocaleString('es-ES'):'')+' · '+(n.errors||[]).join(' · ')+' · Titulares, no artículos verificados.';for(let a of n.filter?.relevant||[]){let el=document.createElement('div');el.className='newsitem';let link=document.createElement('a');link.textContent=a.title;try{let url=new URL(a.url);if(['https:','http:'].includes(url.protocol)){link.href=url.href;link.target='_blank';link.rel='noopener noreferrer'}}catch{}let meta=document.createElement('p');meta.className='muted';meta.textContent=[a.category,a.source,a.date,a.reason,'Ajuste '+(a.impact>0?'+':'')+a.impact].filter(Boolean).join(' · ');el.append(link,meta);$('newslist').append(el)}let f=n.filter;if(f){$('newsstatus').textContent+=' · '+f.total+' revisadas / '+f.relevant.length+' relevantes / '+f.discarded.length+' descartadas · ajuste '+f.adjustment;let details=document.createElement('details');let title=document.createElement('summary');title.textContent='Ver noticias descartadas y motivos';details.append(title);for(let x of f.discarded){let p=document.createElement('p');p.textContent=x.title+' — '+x.reason;details.append(p)}$('newslist').append(details)}if(!f?.relevant.length){let p=document.createElement('p');p.textContent='Sin acontecimientos relevantes detectados. No significa que no existan.';$('newslist').append(p)}}
 async function getNews(id,force=false){if(newsPending[id])return newsPending[id];let promise=(async()=>{try{let r=await fetch('/api/news?symbol='+encodeURIComponent(id)+(force?'&force=1':''));let n=await r.json();if(n.error)throw Error(n.error);newsData[id]=n}catch(e){newsData[id]={items:[],errors:[e.message],asof:Date.now()/1000}}})();newsPending[id]=promise;await promise;delete newsPending[id];let d=data.find(x=>x.u[0]===id);if(d)render()}
-function context(d){return {asset:d.u[1],symbol:d.u[0],horizon:$('horizon').value,session:session(d),fresh: fresh(d),stale:!!d.stale,source:d.meta.source,quoteTime:d.meta.quote_time,score:d.score,risk:d.risk,rsi:d.rsi,momentum:d.mom,volatility:d.vol,displayCurrency:conversion(d),displayPrices:{current:money(d.p,d),average:money(d.ma,d),recentHigh:money(d.high,d),recentLow:money(d.low,d)},technicalDecision:decision(d)[1],virtualAllocation:allocation(d),combinedScore:joint(d),newsFilter:newsFilter(d),news:newsData[d.u[0]]||{items:[],errors:['Noticias no consultadas']}}}
+function context(d){return {asset:d.u[1],symbol:d.u[0],horizon:$('horizon').value,session:session(d),fresh: fresh(d),stale:!!d.stale,source:d.meta.source,quoteTime:d.meta.quote_time,score:d.score,risk:d.risk,rsi:d.rsi,momentum:d.mom,volatility:d.vol,displayCurrency:conversion(d),displayPrices:{current:money(d.p,d),average:money(d.ma,d),recentHigh:money(d.high,d),recentLow:money(d.low,d)},technicalDecision:preliminaryDecision(d)[1],protocol:protocolReport(d),strategyProfile,virtualAllocation:allocation(d),combinedScore:joint(d),newsFilter:newsFilter(d),news:newsData[d.u[0]]||{items:[],errors:['Noticias no consultadas']}}}
 function allocationTextFromSnapshot(s){let a=s.virtualAllocation,n=a.percent.toLocaleString('es-ES');return a.action==='buy'?'Compraría '+n+'% del valor total de la cartera virtual, como peso objetivo.':a.action==='sell'?'Vendería '+n+'% de la posición virtual existente, si la tuviera.':'0%: no realizaría ninguna operación.'}
 function deepKey(d){return d.u[0]+'|'+$('horizon').value+'|'+$('currency').value}
-function render(){let ds=filtered();$('count').textContent=ds.length;$('bull').textContent=ds.length?Math.round(ds.filter(x=>joint(x)>=65&&(!intra()||fresh(x))).length/ds.length*100)+'%':'—';$('top').textContent=ds.find(x=>!intra()||fresh(x))?.u[0].split(':')[0]||'—';$('rows').replaceChildren();for(let d of ds){let tr=document.createElement('tr');tr.dataset.id=d.u[0];let dec=decision(d);tr.className=dec[0]+(selected===d.u[0]?' selected':'');for(let [i,t] of [d.u[1]+' · '+d.u[2],money(d.meta.quote_price??d.p,d)+(d.stale?' (caché)':''), (d.change>=0?'+':'')+d.change.toFixed(2)+'%',(d.meta.source||'Proveedor')+' · '+quality(d)+' · '+quoteAge(d),intra()&&!fresh(d)?'—':joint(d)+'/100',d.risk,dec[1]].entries()){let td=document.createElement('td');td.textContent=t;if(i===2)td.className=d.change>=0?'up':'down';if(i===4&&(!intra()||fresh(d))){let bar=document.createElement('div');bar.className='bar';let k=document.createElement('i');k.style.width=joint(d)+'%';bar.append(k);td.append(bar)}tr.append(td)}tr.onclick=()=>{selected=d.u[0];render();if(innerWidth<=850)document.getElementById("allocationPane")?.scrollIntoView({behavior:"smooth",block:"center"})};$('rows').append(tr)}let d=ds.find(x=>x.u[0]===selected)||ds[0];if(d){selected=d.u[0];detail(d)}else{$('allocationPanel').textContent='Porcentaje virtual: —';$('name').textContent='Sin activos';$('price').textContent='—';$('signal').textContent='';$('analysis').textContent='No hay datos para estos filtros.';$('indicators').textContent='';$('source').textContent='';let c=$('chart');c.getContext('2d').clearRect(0,0,c.width,c.height)}}
-function detail(d){let a=allocation(d);$('allocationPanel').textContent='Porcentaje virtual: '+a.percent.toLocaleString('es-ES')+'% · '+(a.action==='buy'?'del total de la cartera':a.action==='sell'?'de la posición existente':decision(d)[1]);$('allocationPanel').style.background=a.action==='buy'?'#e5f5eb':a.action==='sell'?'#fce8e8':'#f1f3f5';$('name').textContent=d.u[1];$('price').textContent=money(d.p,d);if(d.meta.quote_price!=null&&d.meta.quote_time)$('price').textContent+=' · Última operación '+money(d.meta.quote_price,d);$('signal').textContent=intra()&&!fresh(d)?'Señal bloqueada':d.score>=65?'Tendencia a subir':d.score<=35?'Tendencia a bajar':'Sin dirección clara';$('indicators').textContent=`RSI ${d.rsi.toFixed(1)} · MA20 ${money(d.ma,d)} · Momentum ${d.mom.toFixed(2)}% · Vol. ${d.vol.toFixed(2)}% · MACD ${money(d.macd,d)} · ATR ${d.atr==null?"—":money(d.atr,d)} · Bollinger ${money(d.ma-2*d.sd,d)} / ${money(d.ma+2*d.sd,d)} · Volumen relativo ${d.volumeRatio==null?"—":d.volumeRatio.toFixed(2)+"×"}`;$('source').textContent='Última operación: '+quoteAge(d)+' · '+(d.meta.source||'Proveedor')+' · '+(d.stale?'CACHÉ ANTIGUA · ':'')+'última vela '+d.date+(d.meta.quote_time?' · última operación '+d.meta.quote_time:'')+' · '+(d.meta.exchange_timezone||d.meta.timezone||'zona no indicada');let blocked=d.stale||session(d)!=='open'||(intra()&&!fresh(d));let strong=d.score>=75&&d.mom>0&&d.p>d.ma&&d.rsi<75,weak=d.score<=35,extended=d.rsi>=75&&d.score>=65;let stance=blocked?'NO OPERARÍA. Los datos no son suficientemente fiables para decidir.':strong?'COMPRARÍA EN UNA CARTERA SIMULADA. La subida tiene fuerza y el precio se mantiene por encima de su media. No entraría con todo el capital.':weak?'EVITARÍA COMPRAR. Si ya tuviera una posición simulada, valoraría reducirla: el precio muestra debilidad.':extended?'NO COMPRARÍA A ESTE PRECIO. Ha subido mucho recientemente y prefiero esperar una bajada antes de entrar.':d.score>=65?'ESPERARÍA UNA CONFIRMACIÓN PARA COMPRAR. Hay señales positivas, pero todavía no me parecen suficientemente fuertes.':'NO HARÍA NINGUNA OPERACIÓN. No veo una ventaja clara frente al riesgo de perder dinero.';let trend=d.p>=d.ma?'Está por encima':'Está por debajo';let exit=d.atr>0?Math.max(0,d.p-2*d.atr):d.low;let trigger=d.high;let reward=d.atr>0?d.p+3*d.atr:null;$('analysis').textContent=`MI DECISIÓN\n${stance}\n\nPOR QUÉ\n${trend} de su precio medio reciente (${money(d.ma,d)}). En las últimas 10 velas ha cambiado un ${d.mom.toFixed(2)}%. ${d.rsi>=75?'La subida reciente es especialmente intensa; podría corregirse.':d.rsi<=30?'La caída reciente es intensa, pero eso no garantiza un rebote.':''}\n\nMI PLAN\n${strong?'Precio de referencia para una entrada simulada: '+money(d.p,d)+'. Cambiaría de opinión si cae por debajo de '+money(exit,d)+'. '+(reward!==null?'Vigilaría '+money(reward,d)+' como posible objetivo ilustrativo, no como predicción.':'No hay datos suficientes para estimar un objetivo.'):weak?'No plantearía una compra hasta que recupere su media reciente ('+money(d.ma,d)+') y mejore la tendencia.':'Reconsideraría una compra si supera '+money(trigger,d)+' y mantiene la subida. Si cae por debajo de '+money(d.low,d)+', descartaría la idea.'}\n\nRIESGO: ${d.risk.toUpperCase()}\n${d.risk==='Alto'?'El precio puede cambiar con fuerza en poco tiempo.':d.risk==='Medio'?'El precio puede fluctuar de forma apreciable.':'Los movimientos recientes son relativamente pequeños, pero también puede haber pérdidas.'}\n\nMi postura se basa solo en el comportamiento del precio, no en noticias ni en la situación financiera de la empresa. Es una estrategia sin validar; contrastaría los datos con el bróker y revisaría costes antes de invertir dinero real.`;if(blocked)$('analysis').textContent='MI DECISIÓN AHORA\nNo abriría una operación ahora: '+decision(d)[1]+' · '+quality(d)+'.\n\nMI OPINIÓN SOBRE EL PRECIO\n'+(strong?'Me gusta la dirección del precio. Buscaría una compra simulada si se confirma con una cotización reciente.':weak?'No me gusta la evolución del precio; evitaría comprar mientras siga débil.':extended?'No compraría tras una subida tan intensa; esperaría una corrección.':d.score>=65?'Veo señales positivas, pero exigiría una confirmación antes de comprar.':'No veo una oportunidad clara; buscaría otro activo.')+'\n\nQUÉ VIGILARÍA\n'+money(d.high,d)+' por arriba y '+money(d.low,d)+' por abajo, como referencias históricas, no órdenes de compra o venta.\n\nRiesgo: '+d.risk+'. Verificaría el precio con el bróker antes de operar.' ;let f=newsFilter(d),p=posture(d),actual=decision(d);let opinion=p[0]==='buy'?'Compraría una posición virtual pequeña. La evolución del precio y el contexto disponible respaldan la idea.':p[0]==='sell'?'Reduciría una posición virtual si ya la tuviera. No veo suficiente fortaleza para comprar.':'No haría ninguna operación virtual por ahora. '+(!f||newsData[d.u[0]]?.errors?.length?'Todavía falta información fiable.':'No encuentro una ventaja suficientemente clara.');let facts=f?.relevant.slice(0,4).map(a=>'• '+a.title+' ('+a.source+', '+a.date+'). '+(a.impact>0?'Favorece la idea de compra.':a.impact<0?'Aumenta la cautela.':'Solo contexto; efecto incierto.') ).join('\n')||'No hay noticias relevantes disponibles o todavía se están consultando.';$('analysis').textContent='MI DECISIÓN AHORA\n'+(actual[0]==='closed'?'No operaría ahora: mercado cerrado. ':actual[0]==='unknown'||d.stale||(intra()&&!fresh(d))?'No operaría ahora: horario o datos sin verificar. ':'')+opinion+'\n'+allocationText(d)+'\n\nPOR QUÉ\nEl precio '+(d.p>=d.ma?'está por encima':'está por debajo')+' de su media reciente. En 10 velas ha variado '+d.mom.toFixed(2)+'%. '+(d.rsi>=75?'La subida puede estar agotándose.':'')+'\n\nACONTECIMIENTOS CONSIDERADOS\n'+facts+'\n\nPUNTUACIÓN\nTécnica '+d.score+'/100 · ajuste noticias '+(f?.adjustment??'pendiente')+' · conjunta '+joint(d)+'/100. '+(f?f.total+' titulares revisados, '+f.discarded.length+' descartados.':'')+'\n\nGESTIÓN DE CAPITAL\nPorcentajes orientativos, sin conocer posiciones ni efectivo; no sumar entradas sin revisar exposición total.\n\nMI PLAN VIRTUAL\n'+(actual[0]==='buy'?'Entrada de referencia '+money(d.p,d)+'. Salida si pierde '+money(exit,d)+'. '+(reward?'Objetivo ilustrativo '+money(reward,d)+'.':''):actual[0]==='sell'?'No compraría hasta que recupere '+money(d.ma,d)+'.':'Vigilaría '+money(d.high,d)+' y '+money(d.low,d)+'.')+'\n\nRIESGO: '+d.risk+'. El filtro usa reglas de titulares, no verifica artículos completos. Contrastaría hechos y cotización con el bróker. Estrategia sin validar.';draw(d.a);showNews(d);$('deep').textContent=deepResults[deepKey(d)]||'';$('aihelp').textContent=ai?'IA por API: consulta bajo demanda, puede generar coste.':'Sin clave de OpenAI: puedes copiar el contexto y pegarlo en ChatGPT para un análisis completo.'}
+function render(){let ds=filtered();$('count').textContent=ds.length;$('bull').textContent=ds.length?Math.round(ds.filter(x=>joint(x)>=65&&(!intra()||fresh(x))).length/ds.length*100)+'%':'—';$('top').textContent=ds.find(x=>!intra()||fresh(x))?.u[0].split(':')[0]||'—';$('rows').replaceChildren();for(let d of ds){let tr=document.createElement('tr');tr.dataset.id=d.u[0];let dec=decision(d);tr.className=dec[0]+(selected===d.u[0]?' selected':'');for(let [i,t] of [d.u[1]+' · '+d.u[2],money(d.meta.quote_price??d.p,d)+(d.stale?' (caché)':''), (d.change>=0?'+':'')+d.change.toFixed(2)+'%',(d.meta.source||'Proveedor')+' · '+quality(d)+' · '+quoteAge(d),intra()&&!fresh(d)?'—':joint(d)+'/100',d.risk,dec[1]].entries()){let td=document.createElement('td');td.textContent=t;if(i===2)td.className=d.change>=0?'up':'down';if(i===4&&(!intra()||fresh(d))){let bar=document.createElement('div');bar.className='bar';let k=document.createElement('i');k.style.width=joint(d)+'%';bar.append(k);td.append(bar)}tr.append(td)}tr.onclick=()=>{selected=d.u[0];render();if(innerWidth<=850)document.getElementById("allocationPane")?.scrollIntoView({behavior:"smooth",block:"center"})};$('rows').append(tr)}let d=ds.find(x=>x.u[0]===selected)||ds[0];if(d){selected=d.u[0];detail(d)}else{showProtocol(null);$('allocationPanel').hidden=true;$('allocationPanel').textContent='Porcentaje virtual: —';$('name').textContent='Sin activos';$('price').textContent='—';$('signal').textContent='';$('analysis').textContent='No hay datos para estos filtros.';$('indicators').textContent='';$('source').textContent='';let c=$('chart');c.getContext('2d').clearRect(0,0,c.width,c.height)}}
+function detail(d){let a=allocation(d);$('allocationPanel').textContent='Porcentaje virtual: '+a.percent.toLocaleString('es-ES')+'% · '+(a.action==='buy'?'del total de la cartera':a.action==='sell'?'de la posición existente':decision(d)[1]);$('allocationPanel').style.background=a.action==='buy'?'#e5f5eb':a.action==='sell'?'#fce8e8':'#f1f3f5';$('name').textContent=d.u[1];$('price').textContent=money(d.p,d);if(d.meta.quote_price!=null&&d.meta.quote_time)$('price').textContent+=' · Última operación '+money(d.meta.quote_price,d);$('signal').textContent=intra()&&!fresh(d)?'Señal bloqueada':d.score>=65?'Tendencia a subir':d.score<=35?'Tendencia a bajar':'Sin dirección clara';$('indicators').textContent=`RSI ${d.rsi.toFixed(1)} · MA20 ${money(d.ma,d)} · Momentum ${d.mom.toFixed(2)}% · Vol. ${d.vol.toFixed(2)}% · MACD ${money(d.macd,d)} · ATR ${d.atr==null?"—":money(d.atr,d)} · Bollinger ${money(d.ma-2*d.sd,d)} / ${money(d.ma+2*d.sd,d)} · Volumen relativo ${d.volumeRatio==null?"—":d.volumeRatio.toFixed(2)+"×"}`;$('source').textContent='Última operación: '+quoteAge(d)+' · '+(d.meta.source||'Proveedor')+' · '+(d.stale?'CACHÉ ANTIGUA · ':'')+'última vela '+d.date+(d.meta.quote_time?' · última operación '+d.meta.quote_time:'')+' · '+(d.meta.exchange_timezone||d.meta.timezone||'zona no indicada');const f = newsFilter(d);
+const preliminary = preliminaryAllocation(d);
+const opinion = opinionForAsset(d);
+$('allocationPanel').hidden = false;
+$('analysis').textContent = 'MI OPINIÓN VIRTUAL\n' + opinion.stance + '. ' + opinion.reason + '\n\nDECISIÓN DEL PROTOCOLO\n' + decision(d)[1]
+  + '\n\nDIAGNÓSTICO PRELIMINAR\n'
+  + preliminaryDecision(d)[1] + ' · ' + preliminary.percent + '% (' + preliminary.basis + ').'
+  + '\nTécnica ' + d.score + '/100 · ajuste de titulares ' + (f?.adjustment ?? 'pendiente')
+  + ' · puntuación conjunta ' + joint(d) + '/100.'
+  + '\nReferencias históricas: ' + money(d.low,d) + ' a ' + money(d.high,d) + '.';
+showProtocol(d);draw(d.a);showNews(d);$('deep').textContent=deepResults[deepKey(d)]||'';$('aihelp').textContent=ai?'IA por API: consulta bajo demanda, puede generar coste.':'Sin clave de OpenAI: puedes copiar el contexto y pegarlo en ChatGPT para un análisis completo.'}
 function draw(a){let c=$('chart'),w=c.clientWidth||400,h=220;c.width=w*devicePixelRatio;c.height=h*devicePixelRatio;let ctx=c.getContext('2d');ctx.scale(devicePixelRatio,devicePixelRatio);let lo=Math.min(...a),hi=Math.max(...a),pad=12;let x=i=>pad+i*(w-pad*2)/(a.length-1),y=v=>h-pad-(v-lo)/(hi-lo||1)*(h-pad*2);ctx.strokeStyle='#e7edf2';for(let i=0;i<5;i++){ctx.beginPath();ctx.moveTo(0,i*h/5);ctx.lineTo(w,i*h/5);ctx.stroke()}ctx.beginPath();a.forEach((v,i)=>i?ctx.lineTo(x(i),y(v)):ctx.moveTo(x(i),y(v)));ctx.strokeStyle='#355e7d';ctx.lineWidth=2;ctx.stroke()}
 let newsBatch=false;async function queueNews(){if(newsBatch)return;newsBatch=true;try{let ids=filtered().map(d=>d.u[0]);for(let i=0;i<ids.length;i+=3){await Promise.all(ids.slice(i,i+3).filter(id=>!newsData[id]||Date.now()/1000-newsData[id].asof>=300).map(id=>getNews(id)))}}finally{newsBatch=false}}
-async function load(){if(busy)return;busy=true;$('refresh').disabled=true;$('refresh').textContent='Actualizando…';let errors=[];let alpacaConfigured=false;await loadFX();try{clock=await (await fetch('/api/clock')).json()}catch{clock={}}try{let r=await fetch('/api/status');let s=await r.json();connected=s.market;ai=s.ai;alpacaConfigured=s.alpaca}catch{connected=false;ai=false}let u=universe.filter(x=>($('view').value!=='live'||['Crypto','EE. UU.','ETF'].includes(x[2]))&&($('market').value==='all'||x[2]===$('market').value));let horizon=$('horizon').value;let results=await Promise.all(u.map(async a=>{try{if(!connected)throw Error('Abre la web desde el servidor local');let r=await fetch('/api/series?symbol='+encodeURIComponent(a[0])+'&interval='+horizon);let d=await r.json();if(d.error)throw Error(d.error);return compute(a,d)}catch(e){errors.push(a[0]+': '+e.message);return null}}));data=results.filter(Boolean);$('mode').textContent='DATOS REALES';$('notice').textContent='Alpaca: '+(data.some(d=>String(d.meta.quality).startsWith('alpaca_')&&!d.stale)?'conexión confirmada en esta consulta':alpacaConfigured?'claves detectadas; sin respuesta válida de Alpaca en esta selección':'claves no detectadas')+'. Kraken: API pública. Yahoo: latencia no garantizada. Actualizar no equivale a recibir una operación nueva.';$('stamp').textContent='Consulta: '+new Date().toLocaleString('es-ES');$('errors').textContent=errors.join(' · ');$('aiMode').textContent=ai?'IA disponible':'Motor cuantitativo';$('ask').disabled=false;render();queueNews();busy=false;$('refresh').disabled=false;$('refresh').textContent='Actualizar datos'}
+let reloadQueued=false;async function load(){if(busy){reloadQueued=true;return}busy=true;$('refresh').disabled=true;$('refresh').textContent='Actualizando…';let errors=[];let alpacaConfigured=false;await loadFX();try{clock=await (await fetch('/api/clock')).json()}catch{clock={}}try{let r=await fetch('/api/status');let s=await r.json();connected=s.market;ai=s.ai;alpacaConfigured=s.alpaca}catch{connected=false;ai=false}let u=universe.filter(x=>($('view').value!=='live'||['Crypto','EE. UU.','ETF'].includes(x[2]))&&($('market').value==='all'||x[2]===$('market').value));let horizon=$('horizon').value;let results=await Promise.all(u.map(async a=>{try{if(!connected)throw Error('Abre la web desde el servidor local');let r=await fetch('/api/series?symbol='+encodeURIComponent(a[0])+'&interval='+horizon);let d=await r.json();if(d.error)throw Error(d.error);return {...compute(a,d), interval:horizon}}catch(e){errors.push(a[0]+': '+e.message);return null}}));data=results.filter(Boolean);$('mode').textContent='DATOS REALES';$('notice').textContent='Alpaca: '+(data.some(d=>String(d.meta.quality).startsWith('alpaca_')&&!d.stale)?'conexión confirmada en esta consulta':alpacaConfigured?'claves detectadas; sin respuesta válida de Alpaca en esta selección':'claves no detectadas')+'. Kraken: API pública. Yahoo: latencia no garantizada. Actualizar no equivale a recibir una operación nueva.';$('stamp').textContent='Consulta: '+new Date().toLocaleString('es-ES');$('errors').textContent=errors.join(' · ');$('aiMode').textContent=ai?'IA disponible':'Motor cuantitativo';$('ask').disabled=false;render();queueNews();busy=false;$('refresh').disabled=false;$('refresh').textContent='Actualizar datos';if(reloadQueued){reloadQueued=false;load()}}
 $('currency').onchange=()=>{try{localStorage.setItem('qr_currency',$('currency').value)}catch{}fxNote();render()};$('refresh').onclick=load;$('view').onchange=()=>{if($('view').value==='live'){$('horizon').value='1min';$('market').value='all'}load()};for(let k of ['market','horizon'])$(k).onchange=load;for(let k of ['risk','search'])$(k).oninput=()=>{render();queueNews()};$('auto').onchange=()=>{clearInterval(timer);if(+$('auto').value)timer=setInterval(load,+$('auto').value)};$('reloadnews').onclick=()=>{if(selected)getNews(selected,true)};
-$('copy').onclick=async()=>{let d=data.find(x=>x.u[0]===selected);if(!d)return;await getNews(d.u[0]);let snapshot=context(d);let prompt='Analiza estos datos de Quant Radar en español sencillo. Evalúa noticias, situación empresarial, macro, riesgos, escenarios y qué harías en una cartera virtual. Contrasta fuentes y fechas; no inventes hechos. Distingue hipótesis de ejecución real. Contexto: '+JSON.stringify(snapshot);try{await navigator.clipboard.writeText(prompt);$('aihelp').textContent='Contexto copiado. Pégalo en ChatGPT.'}catch{$('deep').textContent=prompt}};
+$('copy').onclick=async()=>{let d=data.find(x=>x.u[0]===selected);if(!d)return;await getNews(d.u[0]);let snapshot=context(d);let prompt='Analiza estos datos de Quant Radar en español sencillo. Explica la decisión y la asignación virtual del protocolo. Trata el diagnóstico técnico como preliminar y señala qué comprobaciones faltan. Contrasta fuentes y fechas; no inventes hechos. Distingue hipótesis de ejecución real. Contexto: '+JSON.stringify(snapshot);try{await navigator.clipboard.writeText(prompt);$('aihelp').textContent='Contexto copiado. Pégalo en ChatGPT.'}catch{$('deep').textContent=prompt}};
 $('ask').onclick=async()=>{let d=data.find(x=>x.u[0]===selected);if(!d)return;let key=deepKey(d);if(!ai){$('deep').textContent='Para activar IA dentro de Quant Radar, añade OPENAI_API_KEY al archivo .env y reinicia. Alternativa: pulsa Copiar contexto para ChatGPT. El motor técnico y las noticias funcionan sin esa clave.';deepResults[key]=$('deep').textContent;return}if(!confirm('Esta consulta usa la API de OpenAI y puede generar coste. ¿Continuar?'))return;$('ask').disabled=true;deepResults[key]='Consultando noticias e IA…';$('deep').textContent=deepResults[key];try{await getNews(d.u[0]);let snapshot=context(d);let r=await fetch('/api/analysis',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(snapshot)});let j=await r.json();deepResults[key]=new Date().toLocaleString('es-ES')+' · Análisis bajo demanda\n\n'+(j.text?'MI ASIGNACIÓN VIRTUAL (motor cuantitativo, al solicitar el análisis)\n'+allocationTextFromSnapshot(snapshot)+'\n\n'+j.text:j.error)}catch(e){deepResults[key]=e.message}finally{$('ask').disabled=false;let current=data.find(x=>x.u[0]===selected);if(current)$('deep').textContent=deepResults[deepKey(current)]||''}};load();timer=setInterval(load,60000);setInterval(()=>{if(!busy&&intra())render()},10000);
 </script></html>
 
