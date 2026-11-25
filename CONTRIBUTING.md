@@ -1,5 +1,7 @@
 # Colaborar en Quant Radar
 
+Consulta las [instrucciones para IA](AGENTS.md) y la [guía de ramas](docs/branches.md).
+
 1. Crea una rama desde la versión actual de `main`. Usa un prefijo descriptivo como `ui/`, `motor/` o `entrenamiento/`.
 2. Trabaja desde tu propio clon. Mantén `.env`, datos privados, resultados locales y credenciales fuera de Git.
 3. Haz cambios pequeños. Si un cambio afecta al contrato, actualiza su documentación y los ejemplos en el mismo pull request.
