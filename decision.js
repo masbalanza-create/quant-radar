@@ -112,6 +112,10 @@ function backtestUncertainty(history) {
 function integratedVerdict(report, signal, cost, profile, sizing) {
   const wait = reason => ({action:'hold', percent:0, stance:'Esperar', reason});
   const pending = reason => ({action:'pending', percent:0, stance:'Datos insuficientes', reason});
+  if (!report.usable && report.dataReason === 'mercado cerrado') {
+    return {action:'pending', percent:0, stance:'Mercado cerrado',
+      reason:'El protocolo volverá a evaluar el activo cuando la sesión esté abierta y haya datos disponibles.'};
+  }
   if (!report.usable) return pending(report.dataReason);
   if (signal === 'sell' && report.exitSignal) {
     return {action:'sell', percent:0, stance:'Vender',

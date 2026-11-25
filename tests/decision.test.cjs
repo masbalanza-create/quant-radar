@@ -14,7 +14,8 @@ const cases = [
   ['Comprar', 'buy', report, 'buy', 1, 5],
   ['Vender', 'sell', { ...report, exitSignal: true }, 'sell', null, 0],
   ['Esperar', 'hold', report, 'buy', 3, 0],
-  ['Datos insuficientes', 'pending', report, 'buy', null, 0]
+  ['Datos insuficientes', 'pending', report, 'buy', null, 0],
+  ['Mercado cerrado', 'pending', { ...report, usable: false, dataReason: 'mercado cerrado' }, 'buy', 1, 0]
 ];
 for (const [stance, action, input, signal, cost, percent] of cases) {
   test(stance, () => {

@@ -24,10 +24,19 @@ body {
   font-variant-numeric: lining-nums tabular-nums;
 }
 .quick-header {
-  display: flex; justify-content: flex-end;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px;
   padding: 12px var(--page-gutter) 0;
 }
+.app-brand {
+  display: inline-flex; align-items: center; gap: 9px;
+  font-size: clamp(1rem, 1.7vw, 1.3rem); font-weight: 700; letter-spacing: -.02em;
+}
+.app-brand img { display: block; width: 36px; height: 36px; object-fit: contain; }
+@media (min-width: 651px) {
+  .app-brand { transform: scale(1.28); transform-origin: left center; }
+}
 .quick-capsule {
+  margin-inline-start: auto;
   display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 3px;
   padding: 4px; max-width: 100%; border: 1px solid var(--line);
   border-radius: 24px; background: var(--paper); box-shadow: var(--shadow);
@@ -204,32 +213,33 @@ button.asset-select:hover:not(:disabled) { background: transparent; color: var(-
   font-weight: 600;
 }
 .legend { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0; }
-small, .watch-label > span, .watch-verdict, .watch-leader, .watch-summary, .chart-details { margin-block: 14px 0; font-size: .75rem; color: #93a3b8; }
-.chart-details h3 { margin: 0 0 6px; font-size: inherit; font-weight: 600; color: inherit; }
-.chart-details dl {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 145px), 1fr));
-  gap: 8px 16px;
-  margin: 0;
-}
-.chart-details dl + h3 { margin-top: 14px; }
-.chart-details dd { margin: 0; font-weight: 500; overflow-wrap: anywhere; }
-.chart-details dt { color: #8293aa; }
+small, .watch-label > span, .watch-verdict, .watch-leader, .watch-summary { margin-block: 14px 0; font-size: .75rem; color: #93a3b8; }
 #chartReadout { letter-spacing: .015em; }
 #bull, #top { color: #10B981; }
 .chart-controls { display:flex; align-items:center; flex-wrap:wrap; gap:6px; margin-top:14px; }
 .chart-controls { justify-content: space-between; border-block: 1px solid var(--line); padding: 7px 0; }
-.chart-ranges { display: flex; align-items: center; gap: 3px; flex-wrap: wrap; }
-.chart-ranges button { min-width: 44px; min-height: 36px; padding: 5px 9px; border-color: transparent; font-size: .85rem; }
-.chart-ranges button[aria-pressed="true"] { color: var(--accent); background: var(--accent-soft); border-color: #00c2ff33; }
+.chart-ranges {
+  display: flex; flex: 1 1 16rem; min-width: 0;
+  align-items: center; justify-content: space-evenly; gap: 3px; flex-wrap: wrap;
+}
+.chart-ranges button {
+  min-width: 44px; min-height: 36px; padding: 5px 9px;
+  border: 0; border-radius: 18px; background: transparent;
+  color: var(--muted); font-size: .85rem;
+}
+.chart-ranges button:hover:not(:disabled) { background: transparent; color: var(--ink); }
+.chart-ranges button[aria-pressed="true"],
+.chart-ranges button[aria-pressed="true"]:hover:not(:disabled) {
+  color: var(--accent); background: var(--accent-soft);
+}
 .chart-ranges button:disabled { opacity: .65; }
-.chart-style { display: inline-flex; gap: 6px; align-items: center; color: var(--muted); font-size: .8rem; }
+.chart-style { margin-inline-start: auto; display: inline-flex; gap: 6px; align-items: center; color: var(--muted); font-size: .8rem; }
 .chart-style select { min-height: 36px; }
 @media (pointer: coarse) {
   .chart-ranges button, .chart-style select { min-height: 44px; }
 }
 .chart-plot { position: relative; margin: 15px 0 10px; }
-#chart { height: clamp(255px, 32vw, 380px); touch-action:pan-y; cursor:crosshair; margin: 0; }
+#chart { height: clamp(230px, 29vw, 340px); touch-action:pan-y; cursor:crosshair; margin: 0; }
 #chartPoint {
   position: absolute;
   pointer-events: none;
@@ -251,21 +261,26 @@ small, .watch-label > span, .watch-verdict, .watch-leader, .watch-summary, .char
   gap: 8px 16px;
   margin: 0;
 }
-.chart-details dl + h3 { margin-top: 14px; }
+.chart-indicators, .chart-indicators + .chart-details { margin-top: 6px; }
 .chart-details dd { margin: 0; font-weight: 500; overflow-wrap: anywhere; }
 .chart-details dt { color: #8293aa; }
-#chartReadout { min-height:3.2em; font-size:.83rem; font-variant-numeric:tabular-nums; }
+#chartReadout { min-height:1.5em; font-size:.83rem; font-variant-numeric:tabular-nums; }
 canvas { display: block; width: 100%; height: 220px; margin: 15px 0 10px; }
 #analysis, #deep { white-space: pre-wrap; line-height: 1.65; }
 .asset-actions { margin-top: 16px; }
-#allocationPanel {
-  margin: 16px 0;
-  padding: 14px;
-  border: 1px solid var(--line);
-  border-radius: 13px;
-  font-size: 1.03rem;
-  font-weight: 600;
+.decision-verdict {
+  margin-block: 16px;
+  padding: 12px 16px;
+  border-inline-start: 3px solid var(--verdict);
+  border-radius: 4px 12px 12px 4px;
+  background: var(--verdict-tint);
 }
+.decision-verdict h3 { margin: 0; color: var(--verdict); font-size: clamp(1.3rem, 2vw, 1.7rem); }
+.decision-verdict p, .decision-evidence p { margin: 6px 0 0; }
+.decision-evidence { font-size: .9rem; }
+.decision-evidence h3 { margin: 0; font-size: 1rem; }
+.decision-scores { display: flex; flex-wrap: wrap; gap: 8px 24px; margin: 10px 0; }
+.decision-scores dd { margin: 0; color: var(--ink); font-weight: 600; }
 #newslist { max-height: 480px; overflow: auto; }
 .newsitem { border-bottom: 1px solid var(--line); padding: 12px 0; }
 .newsitem a { font-weight: 620; text-decoration: none; }
@@ -367,14 +382,46 @@ footer { padding: 25px 0; color: var(--muted); font-size: .8rem; }
   .scroll :is(th, td) { padding: 6px 8px; }
   .scroll td { font-size: .8125rem; }
   .scroll button.asset-select:focus-visible { outline-offset: -2px; }
-  .chart-card #chart { height: clamp(320px, 43vh, 520px); }
+  .chart-card #chart { height: clamp(190px, calc(100svh - 526px), 390px); }
+  .asset-overview { min-height: calc(100svh - 76px); }
 
 }
 .workspace-content .asset-detail { grid-template-columns: minmax(0, 1fr); gap: 0; }
 .panel-section { min-width: 0; padding: clamp(14px, 2vw, 24px) 0; }
-.panel-section + .panel-section, .methodology { border-top: 1px solid var(--line); }
-.chart-card { padding-top: 0; }
-.panel-section #allocationPanel { padding: 0; border: 0; border-radius: 0; background: transparent; }
+.asset-tabs { min-width: 0; padding-bottom: 16px; }
+.asset-tabs [role="tablist"] { display: flex; flex-wrap: wrap; gap: 4px 8px; }
+.asset-tabs [role="tab"] {
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 44px; padding: 6px 14px; border: 0; border-radius: 22px;
+  color: var(--muted); background: transparent;
+  font-size: .95rem; font-weight: 650; letter-spacing: .01em;
+}
+.asset-tab-icon { width: 16px; height: 16px; flex: 0 0 16px; }
+.asset-tabs [role="tab"]:hover { color: var(--ink); background: transparent; }
+.asset-tabs [role="tab"][aria-selected="true"] { color: var(--accent); background: var(--accent-soft); }
+.asset-tabs [role="tabpanel"]:not([hidden]) {
+  margin-top: 16px;
+}
+.asset-tab-title, .decision-evidence .asset-tab-title {
+  margin: 0; font-size: clamp(1.2rem, 2vw, 1.55rem); font-weight: 700;
+}
+.asset-tabs .decision-scores { gap: 12px 30px; margin: 16px 0; }
+.asset-tabs .decision-scores dt { font-size: .8rem; }
+.asset-tabs .decision-scores dd { font-size: 1.3rem; }
+.asset-tabs #assetTechnicalSignal { color: var(--accent); font-weight: 600; }
+.asset-tab-note { max-width: 78ch; font-size: .875rem; }
+.asset-method-topics {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: 14px 24px; margin: 16px 0;
+}
+.asset-method-topics h3 { font-size: 1rem; margin: 0 0 4px; }
+.asset-method-topics p { margin: 0; color: var(--muted); font-size: .9rem; }
+#panel-news .newsitem a { font-size: 1.05rem; font-weight: 650; }
+.ai-review #deep:not(:empty) { border-inline-start: 2px solid var(--accent); padding-inline-start: 12px; }
+
+.chart-card { padding: 0 0 10px; }
+.asset-decision { padding-top: 10px; }
+.asset-decision .decision-verdict { margin-top: 8px; }
 
 .watchlist h2 { font-size: 1.125rem; }
 .watch-rows { list-style: none; margin: 12px 0 0; padding: 2px; }
@@ -397,12 +444,31 @@ footer { padding: 25px 0; color: var(--muted); font-size: .8rem; }
 .watch-quote strong { font-size: .85rem; line-height: 1.35; font-weight: 600; overflow-wrap: anywhere; }
 .watch-change { padding: 1px 5px; border: 1px solid var(--verdict); border-radius: 6px; color: var(--verdict); font-size: .75rem; line-height: 1.4; font-weight: 500; }
 canvas.watch-spark { width: 56px; height: 28px; margin: 0; }
-.chart-card #name { font-size: clamp(1.5rem, 3vw, 2.5rem); }
-.chart-card #price { font-size: clamp(1.3rem, 2.4vw, 2rem); }
+.asset-header {
+  display: flex; flex-wrap: wrap; justify-content: space-between;
+  align-items: flex-start; gap: 8px 18px;
+}
+.asset-identity { display: flex; align-items: center; gap: 10px; flex: 1 1 14rem; min-width: 0; }
+.asset-logo {
+  display: grid; place-items: center; flex: 0 0 38px;
+  width: 38px; height: 38px; border-radius: 10px;
+  background: var(--paper); color: var(--muted);
+  font-size: .7rem; font-weight: 700;
+}
+.asset-logo[data-brand] { background: #f8fafc; }
+.asset-logo[hidden] { display: none; }
+.asset-logo img { width: 26px; height: 26px; object-fit: contain; }
+.asset-identity h2 { font-size: clamp(1.4rem, 2.5vw, 2.2rem); }
+.asset-name { margin-inline-start: .4em; font-size: .55em; color: var(--muted); font-weight: 500; }
+.asset-market { margin: 4px 0 0; font-size: .8rem; }
+.asset-quote { margin-inline-start: auto; text-align: end; }
+.asset-quote #price { margin: 0; font-size: clamp(1.15rem, 2vw, 1.65rem); }
+.asset-last-trade { margin: 2px 0 0; font-size: .75rem; }
+.asset-quote .pill:not([hidden]) { margin-top: 4px; }
+.asset-quote .pill[hidden] { display: none; }
 .ai-review #deep { max-width: 80ch; overflow-wrap: anywhere; }
 .ai-review #deep:empty { display: none; }
 .workspace-content > .settings { margin-top: 18px; }
-.related-news { margin-top: 14px; }
 .app-sections { display: flex; flex-wrap: wrap; gap: 4px; }
 .app-sections a {
   padding: 9px 12px; color: var(--muted);
@@ -416,7 +482,9 @@ canvas.watch-spark { width: 56px; height: 28px; margin: 0; }
 .watch-rows .asset-select.is-leader { background: #302a23; }
 .watch-rows .asset-select.is-leader[aria-pressed="true"] { background: #3b3328; }
 .watch-leader { color: #dfc99f; font-size: .68rem; font-weight: 650; }
-</style><a class="skip-link" href="#mainContent">Saltar al contenido</a><header class="quick-header"><div class="quick-capsule">
+</style><a class="skip-link" href="#mainContent">Saltar al contenido</a><header class="quick-header">
+  <div class="app-brand"><img src="/icon-192.png" alt="" width="36" height="36"><span>Quant Radar</span></div>
+  <div class="quick-capsule">
 <nav class="app-sections" aria-label="Apartados de Quant Radar">
 <a id="radarLink" href="#workspace" aria-current="page">Radar</a>
 <a id="settingsLink" href="#settingsView">Configuración</a>
@@ -436,20 +504,72 @@ canvas.watch-spark { width: 56px; height: 28px; margin: 0; }
 <div class="filter-panel" id="filterPanel" hidden>
 <div class="toolbar filters"><label class="filter-field"><span>Vista</span><select id="view" aria-label="Vista"><option value="global">GLOBAL INVESTING</option><option value="live">LIVE TRADING · fuentes oficiales</option></select></label><label class="filter-field"><span>Mercado</span><select id="market" aria-label="Mercado"><option value="all">Todos los mercados</option><option>EE. UU.</option><option>Europa</option><option>Asia</option><option>Forex</option><option>ETF</option><option>Materias primas</option><option>Crypto</option></select></label><label class="filter-field"><span>Horizonte</span><select id="horizon" aria-label="Horizonte"><option value="1day">Corto plazo · diario</option><option value="1min">Intradiario · 1 min</option><option value="15min">Intradiario · 15 min</option><option value="30min">Intradiario · 30 min</option><option value="1h">Intradiario · 60 min</option><option value="5min">Intradiario · 5 min</option><option value="1week">Largo plazo · semanal</option></select></label><label class="filter-field"><span>Riesgo</span><select id="risk" aria-label="Riesgo"><option value="all">Todos los riesgos</option><option>Bajo</option><option>Medio</option><option>Alto</option></select></label><label class="filter-field"><span>Moneda</span><select id="currency" aria-label="Moneda de visualización"><option value="native">Moneda original</option><option value="EUR" selected>EUR · Euro</option><option value="USD">USD · Dólar estadounidense</option><option value="GBP">GBP · Libra esterlina</option><option value="JPY">JPY · Yen japonés</option><option value="CHF">CHF · Franco suizo</option><option value="CAD">CAD · Dólar canadiense</option><option value="AUD">AUD · Dólar australiano</option><option value="CNY">CNY · Yuan chino</option><option value="HKD">HKD · Dólar de Hong Kong</option><option value="SGD">SGD · Dólar de Singapur</option><option value="INR">INR · Rupia india</option><option value="KRW">KRW · Won surcoreano</option></select></label><label class="filter-field filter-search"><span>Buscar activo</span><input id="search" aria-label="Buscar activo" placeholder="Buscar activo"></label><label class="filter-field"><span>Actualización</span><select id="auto" aria-label="Frecuencia de actualización"><option value="0">Actualización manual</option><option value="30000">Cada 30 segundos</option><option value="60000" selected>Cada minuto</option><option value="300000">Cada 5 minutos</option><option value="900000">Cada 15 minutos</option></select></label></div>
 </div>
-<p class="watch-summary">Sesgo alcista <strong id="bull">—</strong> · Puntuación conjunta ≥ 65</p><ul id="rows" class="watch-rows" aria-labelledby="assetListTitle"></ul><p class="muted" id="errors" role="status"></p></section></aside><div class="workspace-content"><div class="asset-detail"><section class="chart-card panel-section" aria-labelledby="name"><div class="split"><h2 id="name" tabindex="-1">Selecciona un activo</h2><span id="signal" class="pill"></span></div><a class="asset-back" href="#assetListTitle">Volver a los activos</a><div class="metric" id="price">—</div><div class="chart-controls" aria-label="Controles del gráfico">
+<p class="watch-summary">Sesgo alcista <strong id="bull">—</strong> · Puntuación conjunta ≥ 65</p><ul id="rows" class="watch-rows" aria-labelledby="assetListTitle"></ul><p class="muted" id="errors" role="status"></p></section></aside><div class="workspace-content"><div class="asset-detail"><div class="asset-overview"><section class="chart-card panel-section" aria-labelledby="name"><div class="asset-header">
+  <div class="asset-identity">
+    <span class="asset-logo" id="assetLogo" aria-hidden="true" hidden></span>
+    <div>
+    <h2 id="name" tabindex="-1"><span id="assetTicker">Selecciona un activo</span><span class="asset-name" id="assetName"></span></h2>
+    <p class="asset-market muted" id="assetMarket" hidden></p>
+    </div>
+  </div>
+  <div class="asset-quote">
+    <div class="metric" id="price">—</div>
+    <p class="asset-last-trade muted" id="assetLastTrade" hidden></p>
+    <span id="signal" class="pill" hidden></span>
+  </div>
+</div>
+<a class="asset-back" href="#assetListTitle">Volver a los activos</a><div class="chart-controls" aria-label="Controles del gráfico">
 <div id="chartRanges" class="chart-ranges" role="group" aria-label="Rango temporal"></div>
 <label class="chart-style">Vista <select id="chartType"><option value="area" selected>Área</option><option value="candles">Velas</option></select></label>
-</div><div class="chart-plot"><canvas id="chart" tabindex="0" aria-label="Histórico de precios. Usa las flechas para inspeccionar y Mayús con las flechas para desplazar."></canvas><div id="chartPoint" hidden aria-hidden="true"><strong></strong><span></span><span></span></div></div><div id="chartReadout" class="muted"></div><span id="chartKeyboardStatus" class="sr-only" role="status"></span><div class="chart-details" id="chartDetails" hidden>
+</div><div class="chart-plot"><canvas id="chart" tabindex="0" aria-label="Histórico de precios. Usa las flechas para inspeccionar y Mayús con las flechas para desplazar."></canvas><div id="chartPoint" hidden aria-hidden="true"><strong></strong><span></span><span></span></div></div><div id="chartReadout" class="muted"></div><span id="chartKeyboardStatus" class="sr-only" role="status"></span>
+<div class="chart-details chart-indicators" id="chartIndicators" hidden>
   <h3>Indicadores técnicos</h3>
   <dl id="indicators"></dl>
+</div>
+<div class="chart-details" id="chartDetails" hidden>
   <h3>Datos de cotización</h3>
   <dl id="source"></dl>
-</div></section><section class="panel-section" aria-labelledby="assetDecisionTitle"><div class="split"><h2 id="assetDecisionTitle" tabindex="-1">Decisión del activo</h2><span class="pill">Motor cuantitativo</span></div><div id="allocationPanel" hidden>Porcentaje virtual: —</div><div id="analysis"></div><div class="asset-actions"><button id="openProtocol" type="button" aria-haspopup="dialog" disabled>Ver proceso cuantitativo</button></div><p class="muted">Hipótesis educativa. Simulación de operaciones.</p></section><section class="ai-review panel-section" aria-labelledby="aiReviewTitle">
-<div class="split"><h2 id="aiReviewTitle" tabindex="-1">Valoración de IA</h2><span class="pill" id="aiMode">IA bajo demanda</span></div>
+</div></section><section class="panel-section asset-decision" aria-labelledby="assetDecisionTitle"><div class="split"><h2 id="assetDecisionTitle" tabindex="-1">Decisión del activo</h2><span class="pill">Motor cuantitativo</span></div><div class="decision-verdict" id="allocationPanel" hidden>
+  <h3 id="assetVerdict"></h3>
+  <p id="assetVerdictReason"></p>
+  <p class="muted" id="assetVerdictAllocation"></p>
+</div>
+<p id="analysis" hidden></p>
+</section></div>
+<div class="asset-tabs" id="assetTabs">
+<div role="tablist" aria-label="Detalles del activo">
+  <button type="button" role="tab" id="tab-evidence" aria-controls="panel-evidence" aria-selected="true" tabindex="0"><svg class="asset-tab-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 2v12h12M5 10l3-3 2 1 4-4"/></svg>Evidencia técnica</button>
+  <button type="button" role="tab" id="tab-review" aria-controls="panel-review" aria-selected="false" tabindex="-1"><svg class="asset-tab-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 1.5 9.7 6.3 14.5 8 9.7 9.7 8 14.5 6.3 9.7 1.5 8 6.3 6.3Z"/></svg>Valoración de IA</button>
+  <button type="button" role="tab" id="tab-news" aria-controls="panel-news" aria-selected="false" tabindex="-1"><svg class="asset-tab-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 2h10v12H3zM5.5 5h5M5.5 8h5M5.5 11h3"/></svg>Noticias de contexto</button>
+  <button type="button" role="tab" id="tab-method" aria-controls="panel-method" aria-selected="false" tabindex="-1"><svg class="asset-tab-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 1.5 13 3.5v4c0 3-2 5.3-5 7-3-1.7-5-4-5-7v-4zM5.8 7.8l1.5 1.5 3-3"/></svg>Metodología y riesgo</button>
+</div>
+<section role="tabpanel" id="panel-evidence" tabindex="0" aria-labelledby="tab-evidence">
+<div class="decision-evidence" id="assetEvidence" hidden>
+  <h2 class="asset-tab-title">Evidencia técnica</h2>
+  <p id="assetTechnicalSignal"></p>
+  <dl class="decision-scores muted">
+    <div><dt>Puntuación conjunta</dt><dd id="assetJointScore"></dd></div>
+    <div><dt>Puntuación técnica</dt><dd id="assetTechnicalScore"></dd></div>
+    <div><dt>Ajuste de titulares</dt><dd id="assetNewsAdjustment"></dd></div>
+  </dl>
+  <p class="muted" id="assetHistoricalRange"></p>
+</div><div class="asset-actions"><button id="openProtocol" type="button" aria-haspopup="dialog" disabled>Ver proceso cuantitativo</button></div><p class="muted">Hipótesis educativa. Simulación de operaciones.</p>
+</section><section class="ai-review" role="tabpanel" id="panel-review" tabindex="0" aria-labelledby="tab-review" hidden>
+<div class="split"><h2 class="asset-tab-title" id="aiReviewTitle" tabindex="-1">Valoración de IA</h2><span class="pill" id="aiMode">IA bajo demanda</span></div>
 <div class="asset-actions"><button id="ask" class="primary">Generar valoración</button>
 <button id="copy" type="button">Copiar contexto para ChatGPT</button></div>
-<p id="aihelp" class="muted"></p><div id="deep" role="status"></div>
-<details class="related-news"><summary>Noticias utilizadas como contexto</summary><button id="reloadnews">Actualizar noticias</button><p id="newsstatus" class="muted"></p><div id="newslist"></div></details></section></div><p id="fxnote" class="muted" style="font-size:12px"></p><section class="panel-section methodology"><h2>Metodología y control de riesgo</h2><span class="pill" id="mode">Datos reales</span> <small id="stamp"></small><p class="muted" id="notice">Esperando datos de mercado.</p><p>Puntuación conjunta = técnica + ajuste de noticias (máximo ±12 puntos). Filtro de titulares de hasta 72 horas; impacto limitado a medios prioritarios y señales explícitas. No verifica artículos completos. Score técnico heurístico: momentum de 10 velas, relación con media de 20 velas y RSI de 14 periodos. Riesgo según volatilidad por vela y clase de activo; no equivale a una calificación regulatoria. Los horizontes cambian la frecuencia de las velas, no predicen el futuro. El universo es una lista inicial, no un escáner exhaustivo.</p><p class="muted">Datos: Alpaca (opcional), Kraken y Yahoo Finance (acceso no oficial). Sin conexión a bróker.</p></section></div></div><section id="settingsView" aria-labelledby="settingsTitle" hidden><h1 id="settingsTitle" tabindex="-1">Configuración</h1><section class="settings" aria-label="Configuración"><details id="strategyPanel">
+<p id="aihelp" class="muted asset-tab-note"></p><div id="deep" role="status"></div>
+</section>
+<section role="tabpanel" id="panel-news" tabindex="0" aria-labelledby="tab-news" hidden>
+<h2 class="asset-tab-title">Noticias utilizadas como contexto</h2>
+<div class="asset-actions"><button id="reloadnews">Actualizar noticias</button></div>
+<p id="newsstatus" class="muted"></p><div id="newslist"></div>
+</section>
+<section role="tabpanel" id="panel-method" tabindex="0" aria-labelledby="tab-method" hidden><h2 class="asset-tab-title">Metodología y control de riesgo</h2><span class="pill" id="mode">Datos reales</span> <small id="stamp"></small><p class="muted" id="notice">Esperando datos de mercado.</p><div class="asset-method-topics">
+  <div><h3>Puntuación técnica</h3><p>Combina el momentum de 10 velas, la relación con la media de 20 velas y el RSI de 14 periodos.</p></div>
+  <div><h3>Ajuste por noticias</h3><p>La puntuación conjunta suma a la técnica un ajuste de hasta ±12 puntos por señales explícitas en titulares de medios prioritarios publicados en las últimas 72 horas. El análisis se limita a los titulares.</p></div>
+  <div><h3>Riesgo y horizonte</h3><p>El riesgo se estima a partir de la volatilidad por vela y la clase de activo. Es una estimación interna. El horizonte define la frecuencia de las velas. El radar analiza una lista inicial de activos.</p></div>
+</div><p class="muted">Datos: Alpaca (opcional), Kraken y Yahoo Finance (acceso no oficial). Sin conexión a bróker.</p><p id="fxnote" class="muted" style="font-size:12px"></p></section></div></div></div></div><section id="settingsView" aria-labelledby="settingsTitle" hidden><h1 id="settingsTitle" tabindex="-1">Configuración</h1><section class="settings" aria-label="Configuración"><details id="strategyPanel">
 <summary>Mi estrategia virtual</summary>
 <form id="strategyForm" class="strategy-form">
 <label>Objetivo o idea que quieres probar
@@ -2726,12 +2846,19 @@ function render() {
   }
   showProtocol(null);
   $('allocationPanel').hidden = true;
-  $('allocationPanel').textContent = 'Porcentaje virtual: —';
-  $('name').textContent = 'Sin activos';
+  $('assetEvidence').hidden = true;
+  $('analysis').hidden = false;
+  $('assetTicker').textContent = 'Sin activos';
+  $('assetName').textContent = '';
+  $('assetMarket').hidden = true;
+  $('assetLogo').hidden = true;
+  $('assetLastTrade').hidden = true;
+  $('signal').hidden = true;
   $('price').textContent = '—';
   $('signal').textContent = '';
   $('analysis').textContent = 'No hay activos disponibles. Revisa los filtros o vuelve a actualizar.';
   $('chartDetails').hidden = true;
+  $('chartIndicators').hidden = true;
   setChartAsset(null);
 }
 
@@ -2788,24 +2915,112 @@ function showChartDetails(asset) {
     }));
   }
   $('chartDetails').hidden = false;
+  $('chartIndicators').hidden = false;
 }
 
-function detail(d){let a=allocation(d);$('allocationPanel').textContent=a.action==='pending'?'Datos insuficientes':a.action==='sell'?'Salida de la posición larga virtual':'Porcentaje virtual: '+a.percent.toLocaleString('es-ES')+'% · '+(a.action==='buy'?'adicional del capital virtual':decision(d)[1]);$('name').textContent=d.u[1];$('price').textContent=money(d.p,d);if(d.meta.quote_price!=null&&d.meta.quote_time)$('price').textContent+=' · Última operación '+money(d.meta.quote_price,d);$('signal').textContent=intra()&&!fresh(d)?'Señal bloqueada':d.score>=65?'Tendencia a subir':d.score<=35?'Tendencia a bajar':'Sin dirección clara';showChartDetails(d);
-const f = newsFilter(d);
+// Company site icons are bundled so switching assets works offline.
+const companyIcons = {
+  '7203': 'iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAAANlBMVEXWGCD////VExvUCBHVDRbTAwv3zc/++fnytbjfRUzjYGXslJfaLTX64uLqh4vvpqn87/Dmb3RvNCPTAAABlUlEQVRIie1U25bDIAgUEI3XmP//2R1M2tOTpLvb9/LQQyzDAA4697Wv/dv4af+L9l5EVPHj/V8YRIvLJbRIFFso2cmvGCTfGhGFdSFa1gC3baB5Gy4b0ehVlY2BVWsfRJvcQ9g7pMyKynVFbloV3WgGobtDsK9ImxQ1syeqiWi6CifWG4R3iCcnFpSoqBZKhhCH44i/zwQSaGkUGBVJBxCB3XwO1BYKcqZAVnKolwp6XqPC4oquC44ySJI/EyCL6mbNUouj9F5GbPNzUwX7iYI1WgVS53xeba1iNUY9A2zedtGS+vIIXnoSu2q7nxtAN1bD6CjWQxm6C4PBcAXEZ5msw+5M13EEWYOXknBG7A+/YYqY82OWnunS9Bxr2Q8NbAyPIJZyHetOkWYE+w5PEvUpCIZ3JcC5SaPuiETDubFnZam30jjEl6f4ZJ/q1JXJ9VZ8h7xDfcq7mLxreCdvQ2gGScisgr1p2KOM8Gisd/ETInnu5QKKdZnbmt/s24EAhF8fAf79ETgwHzwzD8wnD9nXvrbbD4GSDIprFzacAAAAAElFTkSuQmCC',
+  '9984': 'iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAflBMVEVHcEz///8uctMxcdL+/v/////////E2/Qvb9L///////9Ig9j///////9snuH///////////+3XdP///+3u74MXczP0dO1ubwAUMnL1/H3+Pjz9PWyt7kAWMve4OQoKChRUVHj6vSXl5d/f3+lpaWTr+S0ye1oaGimvelkj9uZf6hAAAAAEnRSTlMAjpvDPtgbCvfofl6pXiSkuK77fSU9AAACs0lEQVRYhe1X6dKiMBDk0i/ebg2JCVcOLnn/F9yAfBIuFdyf21VSqOlmpmdyYFnT+DkfHBfhBsh1DuefmYHT7IPmxvgJfRsj9/CpxtlBeBLIOX9Cd5tnxjimGFN9pTTG+kKbQNx3Ej/OI+Z7RasixkWcy0QizBi7tyk5LxM5tMHHeUGLAKOEFnekfwsRDqpWAR3m+c7TtYpRxlCeawGdDJYYy19jYuzM8V3DdsAsz4uK3kNWYBxIYLRz051O3/SeynuOmMS0yGsT9Y3MjbqiCSN6fEzvgGgoaZNCHT9lpkA8odCvfVzV5DzWVWCswvrCBj0xn3+rED8+hi39/wc+OHQxerXw2Ap4hsAGVmDT8fdr+AD7ZwXX8QF+a3k0fgvewhh8fPC3pii5+S9xI+bobSNgrxewGwd26wV2tQserBeAuhcu3whctMDuG4HdoAaLBXQdTgOB6A0GAqd+EQHCt+iPt60rfIXruonYYWN9xwf4LzAWSMgbJEOBQRlJdHuJYSduho20dC5ch628VMAeTaaFAqfvp/PXC8pwSVtWhctoUV3YB95oWV+GZlkfFnIJ7PHWtgzb8ea6CMd/tb1/fcDoHXGUSmVzE0a6YlGqVFd56Zt844hj9IKvdDM2dynJEgg5SP48UyTCFDAPWV0ShNc7h5+FCc8IJ6GmCAgzAoREEIgge6rtrR7+dAopZCrhIEjIg5Cn+nsaikCoSAUiy37H/bEG6GxQqpRQyjIEDnUEaZYoDipJFHA+ZUBby4eC0jGkaQI8aAQCzch8Hc5DoPTTlj91XG8UiEiFTESpEhEBzzKeljqFssyE7wsioLzN8U0f3mGU/8KG2s/xdT98sFdvvHn+J0G8eHzr5cu5efzk9Xdrz6xRO3v7Ab2JwruMNHYXb9ELvLU92dfW0s3VPs0++y8xTgcBoHO07wAAAABJRU5ErkJggg==',
+  'AAPL': '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',
+  'AMZN': 'iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAACWUlEQVRoge2aP24aQRSHvzeKpXTcwCnXckNukLV7Q0UVu4E7uHEkoHAK3wEnUoQbKkhqTG4Qp0ChC0fYjirjYnay62XBsPwZVtqvGfE0Gn6/9+bNIHaFBeg6ZYQamnPgFCgtmrsjAmCMMETTk3ue0iZJMqAbvENzC3zctcI16TLjRh6YxoMvDOgGF2i+sf9sr0qA5lK+8MMG/hsIxQ/c6FoTzYU1IQD6imOO+M3hZj5JwIyyPDBVABzxmfyIByjxllsA0XXKwC/HgrLyXiHUXKvIjFBT4TmfTzTnCnNJ5ZVTRb6aN0lJuVawKYUB1xQGXFMYcE3uDbxxLWAhng8nPngfYPLTxPqtuWnzBqrhpD8jmIx2I24Z1RZUmi9jnm/GFE2i6+i5RTphaNBOdb1T4gmEqAqen6onvQfuzsxYacL1Y7ToPui3IpGT0asJTK8AGMfXj9HnQTv6gl3i+VBtmvHuzJiwO6Ix9yfKkiaejMwC1oTdl5WmMbPNHok3rN3vg7ZZ31bfJjDB4grESWssy2QUnRLLTFlhEIlNxu16/Xa0Tkcv7cXVDECUiUVGtkFSqN1OtidTWN1AnGUVWRdbwYy9lc2AxVYlvndXwYreQh9tZiANa+TEj2L2TIetX47bN7Bncv9jrjDgmsKAawoDrlGYp4F5JVDA2LWKDRgrhKFrFZkRhgpNz7WOzGh6KnwC3nWtJQNduefJnELCDflq5oB/fILwGJUOU4Qrt5rWQHMpX/kLsXtAOnxHqHDYlQjiT+khcZGFJsocZk90mVGOi4eUt1UseXnd5hk+j8s+j9cPIQAAAABJRU5ErkJggg==',
+  'ASML': 'iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAAAe1BMVEUPI4z///8NIYsLH4rV2OuSm8vl5/MwQZzo6vRrd7j7+/33+PsWKY8dMJMhNJU0RZ4mOJdaaLCrstd6hb+EjsSkrNNNXKrEyePN0ee7wN7e4e85SqAXK5CdpdBGVqcqPJlmc7ZgbbNxfbtIWKdBUKRTYq2Iksa1u9vw8viLa3ETAAABgUlEQVRIie1S25aDIAwkAasgeENrvdVetOX/v3CDbne37r7tq3MOEBPnDBnC2I4dO/4L5JzjGqFftFGGs+VY6ohvhFRKeV6i0FbFIA2yo5RHxsaLvGSoc3k1b4wAAGpK4dxSBO7MzQngZPgNQOU8EXAIfxDQV8FNnCVNYW+2ie58JKbrWEUF+5twdiBisIhp3pcd7+eQd45+vRhBe4BbAi9BlQdoNGo2uaHT1OIcg4JgckpBwTYE7GuIJlopMt5FED1nzSW1oGoLIoK63xD45ChJfUufs3QXJ/mDrhJFNVQC2sxsFCyAKBuAQvtnuJMDIqlAyRMoJUm52xD0E1a045jSE5JWmzYQHytvnQ88IdVafwqkB4iLYYjI8Ws73B4H0hoFmeqVk2I1K66bphhXAvXXZsioMlzVIlWnIfUeHmNyaAAoF3dhccUT8iC4kdpMx2ifJ9HYDMdHUJrsEcyc0nlvA48yeXW9TpY/kBmj8fWB+D2OiJv5+/Ls7/SOHTt+4wMorBdtBNL1SQAAAABJRU5ErkJggg==',
+  'MSFT': 'iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAG1BMVEVHcEz/uQB/ugAApO/yUCLyUCIApO9/ugD/uQAiNQNqAAAABXRSTlMAf4CAgMY5tpAAAABASURBVFiF7cy5DQAhAMRAH3//FcM1sBESiaeAoUcNyowwMDAwMDAwuBy0jDNEvFcz+DJG9AcrMjAwMDAwMLgcbA4XXcky94g6AAAAAElFTkSuQmCC',
+  'NVDA': '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',
+  'SAN': 'iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAKlBMVEVHcEzuAADtAADuAADtAADvAADtAADuAADtAADtAADtAADtAADwAADsAABkbWImAAAADXRSTlMAPu5z3RaiJ1aGts0KzV9TUAAAAdVJREFUWIXtlouuwyAIhuv9yvu/7ukRXani1tbkJCcZyZJtyic/UOy2fe0fmFn1t4sAq9dCMBr8EkAAyCWAAlgLIewA6RYBsFKIXwkACyGIAojPAU4XwkIebQE8KiWeagoAwn1/I2kI+n4eFSgE6Yd5TJByJT0r5e6DIWwYQsVdtpI8/OrhSSkd6WHMIzwA1MfIIUDdI2D18HvALNybTbI4CQyh5FGKWwA8tU5E/0CDkNRJX+/nLIIMRwiAIeBjrYP42A0+taMyAmopE/6C9LYdjKJOijZQ7aaialoNodsxJdBce3gj8aASvhzZHlsEEV7zKAkBLJOKHOkGKhwbSFMAxIGQzxtqD8sDd14H3RPseT2e/jW9BBguC9Utt4dXvnD9hq4ve36bwxUsWkLHHRvNN7VAUxt7iUh9o+A1hyvaDSGeNTD8lkcMQTMb7AdALaXnlgYAI6E1tEncWi/BsTs80TCNsBp/TFkKE/906gNeaZjKg+GeYLeVMTqJYBiQrNQ4qxB32bIniS2z6WHnK6ciblwPzga8YWQIJrA4v6LE0LJqCGAyEZs5y7X94W0/v2gYHzjZu8ngr96vOyQmLStISp3idedm2Tmxm98/zt18v/naH9sPFUc7R6KlWD4AAAAASUVORK5CYII=',
+  'SAP': 'iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAADFBMVEUAcPJHcEwAZtsAcPLR0Y8hAAAABHRSTlP/AD1ipMIooQAAAIlJREFUWIXt1TECgDAIQ9GC97+zLmpbKU1gcSD7f2uaJNcKKKCAAnrgCO4GtMWmSUAlB6jkAJUcoJIDnj4IvH0M6PoQ0PcRYOgDwNjzwNTTwNyzwKcngW/PAUZPAVbPAGZPAHaPA4seBlY9Cix7EFj3GOD0EOD1COD2AOD3e2DT/+XeCyiggAKunTpyDB/fv3nBAAAAAElFTkSuQmCC',
+  'TSLA': 'iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAMFBMVEVHcEzJAADJAADJAADJAADJAADJAADJAADJAADJAADJAADJAADJAADJAADJAADJAAAesVzGAAAAD3RSTlMAbbPH6RQsB1Wfix/02EGXPixgAAACSklEQVRYhaVWWZaEIAxkh4Sl73/bCS4YwH5OY32pSUqsigEhJnjvXZGISjcoRFkcBebsvtRGJ0GZzxcYBdJFe0/jowv4vZazYChxJLktNg13JI5VS9CJhZNWAFLK0EA3AEqbLok+ZysPkFP3uBRnZ7m8t66U7lUmQ/CC0WYMm0LVA1DAOei2+rDpHDAzDgFntYyUGCWtJ+0vwase9+WllOFIOzlA2L3a1qeqUyrJs16mLqAqid056AoNFDIR9Sj1x4S9vuQppJGMLGCAwtaRiWpK2dI2md1Mva2DjHS2Jlg5v+FMogR7T/6pom/1In7NII18U/mOPx6NxNdosqo4b6Vs2RWZ95JuzdgYDLoYLcGfuqd24evzGB2aqZ6+U3dLIkzCqRY6PlnbrlMD8ebCWm8kYG212RrGVrfUD4xTjgTyilkwaMUMV/jNSBBZsLix9gYjwT9KevTt/zE/EwzdpZ4rBuBXDf+J0BOMrj3D9gRPO8IM343ivEDQNbP+naBXEZ/zJ3TN/LuG1K+c4D+9OyIyFU18zp8JmIp6hYAPU7j7e5/gmYpywcWumVdMIBvaH53Kc/YNrmmvV1zkG45aMYFUbM2MSxoyG36fJjvCoWJaM+E6F+Q1Ey4bFk0gEY79DdY0FG2mrEyTfQXH4WrVhH3Lvs5aC9htWDbhPHfolWFwYPsbft8WL+ArE8R+xk3rJpCKZINZ15BUJBvy2jA4UAne1NfTHrwikG8ameDL6kg/YVN60YcVJr2rF1q/JMB3JtBIeGUCwT0N1D+fRD3uNL6wmQAAAABJRU5ErkJggg==',
+};
+
+function showAssetLogo(ticker) {
+  const slot = $('assetLogo');
+  slot.hidden = false;
+  if (slot.dataset.ticker === ticker) return;
+  slot.dataset.ticker = ticker;
+  const label = ticker.split('/')[0];
+  slot.textContent = label;
+  const icon = companyIcons[ticker];
+  slot.toggleAttribute('data-brand', Boolean(icon));
+  if (!icon) return;
+  const image = document.createElement('img');
+  image.alt = '';
+  image.addEventListener('error', () => {
+    if (slot.firstChild !== image) return;
+    slot.removeAttribute('data-brand');
+    slot.textContent = label;
+  });
+  image.src = 'data:image/png;base64,' + icon;
+  slot.replaceChildren(image);
+}
+
+function detail(d){
+const [symbol, name, market] = d.u;
+$('assetTicker').textContent = symbol.split(':')[0];
+showAssetLogo($('assetTicker').textContent);
+$('assetName').textContent = name === $('assetTicker').textContent ? '' : ' ' + name;
+$('assetMarket').textContent = [market, d.meta.currency].filter(Boolean).join(' · ');
+$('assetMarket').hidden = !$('assetMarket').textContent;
+$('price').textContent = money(d.p,d);
+const lastTrade = $('assetLastTrade');
+lastTrade.hidden = d.meta.quote_price == null || !d.meta.quote_time;
+lastTrade.textContent = lastTrade.hidden ? '' : 'Última operación · ' + money(d.meta.quote_price,d);
+$('signal').textContent = intra() && !fresh(d) ? 'Señal bloqueada' : d.score >= 65 ? 'Tendencia a subir' : d.score <= 35 ? 'Tendencia a bajar' : 'Sin dirección clara';
+$('signal').hidden = false;
+showChartDetails(d);
 const opinion = protocolVerdictFor(d);
-$('allocationPanel').hidden = false;
-$('analysis').textContent = 'DECISIÓN DEL PROTOCOLO\n' + opinion.stance + '. ' + opinion.reason
-  + '\n\nEVIDENCIA TÉCNICA\n'
-  + preliminaryDecision(d)[1] + '.'
-  + '\nTécnica ' + d.score + '/100 · ajuste de titulares ' + (f?.adjustment ?? 'pendiente')
-  + ' · puntuación conjunta ' + joint(d) + '/100.'
-  + '\nReferencias históricas: ' + money(d.low,d) + ' a ' + money(d.high,d) + '.';
-showProtocol(d);setChartAsset(d, verdictColors[opinion.action]);showNews(d);$('deep').textContent=deepResults[deepKey(d)]||'';$('aihelp').textContent=ai?'IA por API: consulta bajo demanda, puede generar coste.':'Sin clave de OpenAI: puedes copiar el contexto y pegarlo en ChatGPT para un análisis completo.'}
+const color = verdictColors[opinion.action];
+const panel = $('allocationPanel');
+panel.style.setProperty('--verdict', color);
+panel.style.setProperty('--verdict-tint', color + '12');
+$('assetVerdict').textContent = opinion.stance;
+$('assetVerdictReason').textContent = opinion.reason;
+const allocation = $('assetVerdictAllocation');
+allocation.textContent = opinion.action === 'buy'
+  ? opinion.percent.toLocaleString('es-ES') + ' % adicional del capital virtual'
+  : opinion.action === 'sell' ? 'Salida de la posición larga virtual' : '';
+allocation.hidden = !allocation.textContent;
+panel.hidden = false;
+$('analysis').hidden = true;
+$('assetTechnicalSignal').textContent = preliminaryDecision(d)[1];
+$('assetJointScore').textContent = joint(d) + '/100';
+$('assetTechnicalScore').textContent = d.score + '/100';
+$('assetNewsAdjustment').textContent = newsFilter(d)?.adjustment ?? 'Pendiente';
+$('assetHistoricalRange').textContent = 'Referencias históricas · ' + money(d.low,d) + ' a ' + money(d.high,d);
+$('assetEvidence').hidden = false;
+showProtocol(d);setChartAsset(d, color);showNews(d);$('deep').textContent=deepResults[deepKey(d)]||'';$('aihelp').textContent=ai?'IA por API: consulta bajo demanda, puede generar coste.':'Sin clave de OpenAI: puedes copiar el contexto y pegarlo en ChatGPT para un análisis completo.'}
 $('filterToggle').addEventListener('click', () => {
   const panel = $('filterPanel');
   panel.hidden = !panel.hidden;
   $('filterToggle').setAttribute('aria-expanded', String(!panel.hidden));
 });
+const assetTabs = [...$('assetTabs').querySelectorAll('[role="tab"]')];
+
+function selectAssetTab(selectedTab) {
+  for (const tab of assetTabs) {
+    const active = tab === selectedTab;
+    tab.setAttribute('aria-selected', String(active));
+    tab.tabIndex = active ? 0 : -1;
+    $(tab.getAttribute('aria-controls')).hidden = !active;
+  }
+}
+
+assetTabs.forEach((tab, index) => {
+  tab.addEventListener('click', () => selectAssetTab(tab));
+  tab.addEventListener('keydown', event => {
+    const targets = {
+      ArrowLeft: (index + assetTabs.length - 1) % assetTabs.length,
+      ArrowRight: (index + 1) % assetTabs.length,
+      Home: 0,
+      End: assetTabs.length - 1
+    };
+    if (!Object.hasOwn(targets, event.key)) return;
+    event.preventDefault();
+    const target = assetTabs[targets[event.key]];
+    selectAssetTab(target);
+    target.focus({preventScroll: true});
+  });
+});
+
 function showWorkspaceSection() {
   const settings = location.hash === '#settingsView';
   $('workspace').hidden = settings;
