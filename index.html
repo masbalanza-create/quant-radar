@@ -170,6 +170,24 @@ button.asset-select:hover:not(:disabled) { background: transparent; color: var(-
 .legend { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0; }
 .metric, .scroll td:nth-child(n+3):nth-child(-n+4), .scroll td:nth-child(6), .protocol-math dd { font-family: var(--numbers); font-variant-numeric: tabular-nums; }
 #bull, #top { color: #10B981; }
+.chart-controls { display:flex; align-items:center; flex-wrap:wrap; gap:6px; margin-top:14px; }
+.chart-controls button { min-width:44px; }
+.chart-plot { position: relative; margin: 15px 0 10px; }
+#chart { height: clamp(255px, 32vw, 380px); touch-action:pan-y; cursor:crosshair; margin: 0; }
+#chartPoint {
+  position: absolute;
+  pointer-events: none;
+  max-width: calc(100% - 12px);
+  padding: 8px 11px;
+  border: 1px solid #00c2ff55;
+  border-radius: 10px;
+  background: #111827;
+  box-shadow: 0 4px 16px #0006;
+  font: .75rem/1.4 var(--numbers);
+}
+#chartPoint strong { display: block; color: var(--accent); font-size: .95rem; }
+#chartPoint span { display: block; color: var(--muted); }
+#chartReadout { min-height:3.2em; font-size:.83rem; font-variant-numeric:tabular-nums; }
 canvas { display: block; width: 100%; height: 220px; margin: 15px 0 10px; }
 #analysis, #deep { white-space: pre-wrap; line-height: 1.65; }
 .asset-actions { margin-top: 16px; }
@@ -299,7 +317,12 @@ footer { padding: 25px 0; color: var(--muted); font-size: .8rem; }
 <div class="strategy-wide"><button class="primary" type="submit">Guardar cartera</button>
 <p id="personalPortfolioStatus" class="muted" role="status">Los importes se guardan en este navegador.</p></div>
 </form>
-</details></section><p id="fxnote" class="muted" style="font-size:12px"></p><div class="cards"><div class="card"><small>Activos disponibles</small><div class="metric" id="count">—</div><small>Universo seleccionado</small></div><div class="card"><small>Sesgo alcista</small><div class="metric" id="bull">—</div><small>Puntuación conjunta ≥ 65</small></div><div class="card"><small>Mayor puntuación</small><div class="metric" id="top">—</div><small>Puntuación técnica + ajuste informativo, no probabilidad</small></div></div><div class="layout"><div class="card"><div class="split"><h2>Clasificación de activos</h2><small>Orden por puntuación conjunta</small></div><div class="legend"><span style="background:#10b98124">Compra virtual validada</span><span style="background:#f0839124">Venta virtual validada</span><span style="background:#e6bd7024">No operar</span><span style="background:#64748b33">Cerrado</span><span style="background:#202a3a">Horario sin verificar</span></div><div class="scroll"><table><thead><tr><th>Activo</th><th>Decisión / sesión</th><th>Precio</th><th>Variación / vela</th><th>Fuente y última operación</th><th>Score</th><th>Riesgo</th></tr></thead><tbody id="rows"></tbody></table></div><p class="muted" id="errors"></p></div><div class="asset-detail"><div class="card"><div class="split"><h2 id="name">Selecciona un activo</h2><span id="signal" class="pill"></span></div><div class="metric" id="price">—</div><canvas id="chart"></canvas><div id="indicators" class="muted"></div><p class="muted" id="source"></p></div><div class="card"><div class="split"><h2>¿Qué haría ante esta situación?</h2><span class="pill" id="aiMode">Motor cuantitativo</span></div><div id="allocationPanel" hidden>Porcentaje virtual: —</div><div id="analysis"></div><div class="asset-actions"><button id="openProtocol" type="button" aria-haspopup="dialog" disabled>Ver proceso cuantitativo</button><button id="ask" class="primary">Análisis avanzado con IA</button></div><p id="aihelp" class="muted"></p><button id="copy">Copiar contexto para ChatGPT</button><div id="deep" style="margin-top:14px"></div><p class="muted">Hipótesis educativa; no ejecuta operaciones ni garantiza resultados.</p></div><div class="card"><div class="split"><h2>Noticias y acontecimientos</h2><button id="reloadnews">Actualizar noticias</button></div><p id="newsstatus" class="muted"></p><div id="newslist"></div></div></div></div><div class="card" style="margin-top:16px"><h2>Metodología y control de riesgo</h2><p>Puntuación conjunta = técnica + ajuste de noticias (máximo ±12 puntos). Filtro de titulares de hasta 72 horas; impacto limitado a medios prioritarios y señales explícitas. No verifica artículos completos. Score técnico heurístico: momentum de 10 velas, relación con media de 20 velas y RSI de 14 periodos. Riesgo según volatilidad por vela y clase de activo; no equivale a una calificación regulatoria. Los horizontes cambian la frecuencia de las velas, no predicen el futuro. El universo es una lista inicial, no un escáner exhaustivo.</p></div><footer>QUANT RADAR · Datos: Alpaca (opcional), Kraken y Yahoo Finance (acceso no oficial). Sin conexión a bróker.</footer></main>
+</details></section><p id="fxnote" class="muted" style="font-size:12px"></p><div class="cards"><div class="card"><small>Activos disponibles</small><div class="metric" id="count">—</div><small>Universo seleccionado</small></div><div class="card"><small>Sesgo alcista</small><div class="metric" id="bull">—</div><small>Puntuación conjunta ≥ 65</small></div><div class="card"><small>Mayor puntuación</small><div class="metric" id="top">—</div><small>Puntuación técnica + ajuste informativo, no probabilidad</small></div></div><div class="layout"><div class="card"><div class="split"><h2>Clasificación de activos</h2><small>Orden por puntuación conjunta</small></div><div class="legend"><span style="background:#10b98124">Compra virtual validada</span><span style="background:#f0839124">Venta virtual validada</span><span style="background:#e6bd7024">No operar</span><span style="background:#64748b33">Cerrado</span><span style="background:#202a3a">Horario sin verificar</span></div><div class="scroll"><table><thead><tr><th>Activo</th><th>Decisión / sesión</th><th>Precio</th><th>Variación / vela</th><th>Fuente y última operación</th><th>Score</th><th>Riesgo</th></tr></thead><tbody id="rows"></tbody></table></div><p class="muted" id="errors"></p></div><div class="asset-detail"><div class="card"><div class="split"><h2 id="name">Selecciona un activo</h2><span id="signal" class="pill"></span></div><div class="metric" id="price">—</div><div class="chart-controls" aria-label="Controles del gráfico">
+<select id="chartType" aria-label="Tipo de gráfico"><option value="line">Línea</option><option value="candles">Velas</option><option value="area">Área</option></select>
+<button id="chartZoomIn" type="button" aria-label="Acercar">+</button>
+<button id="chartZoomOut" type="button" aria-label="Alejar">−</button>
+<button id="chartReset" type="button">Ver todo</button>
+</div><div class="chart-plot"><canvas id="chart" tabindex="0" aria-label="Histórico de precios. Usa las flechas para inspeccionar y Mayús con las flechas para desplazar."></canvas><div id="chartPoint" hidden aria-hidden="true"><strong></strong><span></span><span></span></div></div><div id="chartReadout" class="muted" aria-live="off"></div><div id="indicators" class="muted"></div><p class="muted" id="source"></p></div><div class="card"><div class="split"><h2>¿Qué haría ante esta situación?</h2><span class="pill" id="aiMode">Motor cuantitativo</span></div><div id="allocationPanel" hidden>Porcentaje virtual: —</div><div id="analysis"></div><div class="asset-actions"><button id="openProtocol" type="button" aria-haspopup="dialog" disabled>Ver proceso cuantitativo</button><button id="ask" class="primary">Análisis avanzado con IA</button></div><p id="aihelp" class="muted"></p><button id="copy">Copiar contexto para ChatGPT</button><div id="deep" style="margin-top:14px"></div><p class="muted">Hipótesis educativa; no ejecuta operaciones ni garantiza resultados.</p></div><div class="card"><div class="split"><h2>Noticias y acontecimientos</h2><button id="reloadnews">Actualizar noticias</button></div><p id="newsstatus" class="muted"></p><div id="newslist"></div></div></div></div><div class="card" style="margin-top:16px"><h2>Metodología y control de riesgo</h2><p>Puntuación conjunta = técnica + ajuste de noticias (máximo ±12 puntos). Filtro de titulares de hasta 72 horas; impacto limitado a medios prioritarios y señales explícitas. No verifica artículos completos. Score técnico heurístico: momentum de 10 velas, relación con media de 20 velas y RSI de 14 periodos. Riesgo según volatilidad por vela y clase de activo; no equivale a una calificación regulatoria. Los horizontes cambian la frecuencia de las velas, no predicen el futuro. El universo es una lista inicial, no un escáner exhaustivo.</p></div><footer>QUANT RADAR · Datos: Alpaca (opcional), Kraken y Yahoo Finance (acceso no oficial). Sin conexión a bróker.</footer></main>
 <dialog id="protocolDialog" aria-labelledby="protocolTitle">
 <div class="protocol-head"><div class="split"><h2 id="protocolTitle">Proceso cuantitativo</h2>
 <form method="dialog"><button autofocus>Cerrar</button></form></div>
@@ -2424,7 +2447,7 @@ async function getNews(id,force=false){if(newsPending[id])return newsPending[id]
 function context(d){return {asset:d.u[1],symbol:d.u[0],horizon:$('horizon').value,session:session(d),fresh: fresh(d),stale:!!d.stale,source:d.meta.source,quoteTime:d.meta.quote_time,score:d.score,risk:d.risk,rsi:d.rsi,momentum:d.mom,volatility:d.vol,displayCurrency:conversion(d),displayPrices:{current:money(d.p,d),average:money(d.ma,d),recentHigh:money(d.high,d),recentLow:money(d.low,d)},technicalSignal:preliminaryDecision(d)[1],protocolVerdict:protocolVerdictFor(d),protocol:protocolReport(d),strategyProfile,virtualAllocation:allocation(d),combinedScore:joint(d),newsFilter:newsFilter(d),news:newsData[d.u[0]]||{items:[],errors:['Noticias no consultadas']}}}
 function allocationTextFromSnapshot(s){let a=s.virtualAllocation,n=a.percent.toLocaleString('es-ES');return a.action==='pending'?'Asignación pendiente de evaluación.':a.action==='buy'?'Compraría '+n+'% adicional del capital virtual.':a.action==='sell'?'Salida técnica si hay una posición larga virtual.':'0%: no realizaría ninguna operación.'}
 function deepKey(d){return d.u[0]+'|'+$('horizon').value+'|'+$('currency').value}
-function render(){let ds=filtered();$('count').textContent=ds.length;$('bull').textContent=ds.length?Math.round(ds.filter(x=>joint(x)>=65&&(!intra()||fresh(x))).length/ds.length*100)+'%':'—';$('top').textContent=ds.find(x=>!intra()||fresh(x))?.u[0].split(':')[0]||'—';$('rows').replaceChildren();for(let d of ds){let tr=document.createElement('tr');tr.dataset.id=d.u[0];let dec=decision(d);tr.className=dec[0]+(selected===d.u[0]?' selected':'');for(let [i,t] of [d.u[1]+' · '+d.u[2],money(d.meta.quote_price??d.p,d)+(d.stale?' (caché)':''), (d.change>=0?'+':'')+d.change.toFixed(2)+'%',(d.meta.source||'Proveedor')+' · '+quality(d)+' · '+quoteAge(d),intra()&&!fresh(d)?'—':joint(d)+'/100',d.risk,dec[1]].entries()){let td=document.createElement('td');td.textContent=t;if(i===0){const button=document.createElement('button');button.type='button';button.className='asset-select';button.textContent=t;button.setAttribute('aria-pressed',String(selected===d.u[0]));td.replaceChildren(button)}if(i===2)td.className=d.change>=0?'up':'down';if(i===4&&(!intra()||fresh(d))){let bar=document.createElement('div');bar.className='bar';let k=document.createElement('i');k.style.width=joint(d)+'%';bar.append(k);td.append(bar)}tr.append(td)}tr.insertBefore(tr.lastElementChild,tr.children[1]);tr.onclick=event=>{selected=d.u[0];render();if(event.detail===0){$('rows').querySelector('.selected .asset-select')?.focus();return}if(innerWidth<=1000)document.getElementById("allocationPanel")?.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"center"})};$('rows').append(tr)}let d=ds.find(x=>x.u[0]===selected)||ds[0];if(d){selected=d.u[0];const row=[...$('rows').children].find(row=>row.dataset.id===selected);row?.classList.add('selected');row?.querySelector('.asset-select').setAttribute('aria-pressed','true');detail(d)}else{showProtocol(null);$('allocationPanel').hidden=true;$('allocationPanel').textContent='Porcentaje virtual: —';$('name').textContent='Sin activos';$('price').textContent='—';$('signal').textContent='';$('analysis').textContent='No hay datos para estos filtros.';$('indicators').textContent='';$('source').textContent='';let c=$('chart');c.getContext('2d').clearRect(0,0,c.width,c.height)}}
+function render(){let ds=filtered();$('count').textContent=ds.length;$('bull').textContent=ds.length?Math.round(ds.filter(x=>joint(x)>=65&&(!intra()||fresh(x))).length/ds.length*100)+'%':'—';$('top').textContent=ds.find(x=>!intra()||fresh(x))?.u[0].split(':')[0]||'—';$('rows').replaceChildren();for(let d of ds){let tr=document.createElement('tr');tr.dataset.id=d.u[0];let dec=decision(d);tr.className=dec[0]+(selected===d.u[0]?' selected':'');for(let [i,t] of [d.u[1]+' · '+d.u[2],money(d.meta.quote_price??d.p,d)+(d.stale?' (caché)':''), (d.change>=0?'+':'')+d.change.toFixed(2)+'%',(d.meta.source||'Proveedor')+' · '+quality(d)+' · '+quoteAge(d),intra()&&!fresh(d)?'—':joint(d)+'/100',d.risk,dec[1]].entries()){let td=document.createElement('td');td.textContent=t;if(i===0){const button=document.createElement('button');button.type='button';button.className='asset-select';button.textContent=t;button.setAttribute('aria-pressed',String(selected===d.u[0]));td.replaceChildren(button)}if(i===2)td.className=d.change>=0?'up':'down';if(i===4&&(!intra()||fresh(d))){let bar=document.createElement('div');bar.className='bar';let k=document.createElement('i');k.style.width=joint(d)+'%';bar.append(k);td.append(bar)}tr.append(td)}tr.insertBefore(tr.lastElementChild,tr.children[1]);tr.onclick=event=>{selected=d.u[0];render();if(event.detail===0){$('rows').querySelector('.selected .asset-select')?.focus();return}if(innerWidth<=1000)document.getElementById("allocationPanel")?.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"center"})};$('rows').append(tr)}let d=ds.find(x=>x.u[0]===selected)||ds[0];if(d){selected=d.u[0];const row=[...$('rows').children].find(row=>row.dataset.id===selected);row?.classList.add('selected');row?.querySelector('.asset-select').setAttribute('aria-pressed','true');detail(d)}else{showProtocol(null);$('allocationPanel').hidden=true;$('allocationPanel').textContent='Porcentaje virtual: —';$('name').textContent='Sin activos';$('price').textContent='—';$('signal').textContent='';$('analysis').textContent='No hay datos para estos filtros.';$('indicators').textContent='';$('source').textContent='';setChartAsset(null)}}
 function updateProtocolConclusion(d) {
   const verdict = protocolVerdictFor(d);
   $('protocolOutcome').textContent = verdict.stance;
@@ -2447,8 +2470,215 @@ $('analysis').textContent = 'DECISIÓN DEL PROTOCOLO\n' + opinion.stance + '. ' 
   + '\nTécnica ' + d.score + '/100 · ajuste de titulares ' + (f?.adjustment ?? 'pendiente')
   + ' · puntuación conjunta ' + joint(d) + '/100.'
   + '\nReferencias históricas: ' + money(d.low,d) + ' a ' + money(d.high,d) + '.';
-showProtocol(d);draw(d.a);showNews(d);$('deep').textContent=deepResults[deepKey(d)]||'';$('aihelp').textContent=ai?'IA por API: consulta bajo demanda, puede generar coste.':'Sin clave de OpenAI: puedes copiar el contexto y pegarlo en ChatGPT para un análisis completo.'}
-function draw(a){let c=$('chart'),w=c.clientWidth||400,h=220;c.width=w*devicePixelRatio;c.height=h*devicePixelRatio;let ctx=c.getContext('2d');ctx.scale(devicePixelRatio,devicePixelRatio);let lo=Math.min(...a),hi=Math.max(...a),pad=12;let x=i=>pad+i*(w-pad*2)/(a.length-1),y=v=>h-pad-(v-lo)/(hi-lo||1)*(h-pad*2);ctx.strokeStyle='#64748b40';for(let i=0;i<5;i++){ctx.beginPath();ctx.moveTo(0,i*h/5);ctx.lineTo(w,i*h/5);ctx.stroke()}ctx.beginPath();a.forEach((v,i)=>i?ctx.lineTo(x(i),y(v)):ctx.moveTo(x(i),y(v)));ctx.strokeStyle='#00C2FF';ctx.lineWidth=2;ctx.stroke()}
+showProtocol(d);setChartAsset(d);showNews(d);$('deep').textContent=deepResults[deepKey(d)]||'';$('aihelp').textContent=ai?'IA por API: consulta bajo demanda, puede generar coste.':'Sin clave de OpenAI: puedes copiar el contexto y pegarlo en ChatGPT para un análisis completo.'}
+const chart = $('chart');
+const chartPoint = $('chartPoint');
+const chartState = {asset:null, bars:[], start:0, count:0, cursor:null};
+let chartDrag = null;
+
+function setChartAsset(asset) {
+  const key = asset && [asset.u[0], asset.interval, asset.meta.source].join('|');
+  if (asset !== chartState.asset) {
+    const old = chartState.bars.length;
+    const atEnd = chartState.start + chartState.count >= old;
+    const all = chartState.count === old;
+    chartState.asset = asset;
+    chartState.bars = asset ? asset.values.map(row => ({
+      time:Date.parse(row.datetime), close:Number(row.close),
+      open:Number(row.open), high:Number(row.high), low:Number(row.low)
+    })).filter(bar => Number.isFinite(bar.time) && Number.isFinite(bar.close) && bar.close > 0)
+      .sort((a,b) => a.time - b.time) : [];
+    const length = chartState.bars.length;
+    const same = key === chartState.key;
+    chartState.count = same && !all ? Math.min(chartState.count,length) : length;
+    chartState.start = same && !atEnd ? Math.min(chartState.start,length-chartState.count) : length-chartState.count;
+    if (!same) chartState.cursor = null;
+    chartState.key = key;
+  }
+  paintChart();
+}
+
+function hasCandle(bar) {
+  return [bar.open,bar.high,bar.low].every(Number.isFinite) && bar.low > 0
+    && bar.low <= Math.min(bar.open,bar.close) && bar.high >= Math.max(bar.open,bar.close);
+}
+
+function paintChart() {
+  const {asset,bars,start,count,cursor} = chartState;
+  const width = chart.clientWidth;
+  const height = chart.clientHeight;
+  const ratio = window.devicePixelRatio || 1;
+  if (!width || !height) return;
+  chart.width = Math.round(width*ratio);
+  chart.height = Math.round(height*ratio);
+  const ctx = chart.getContext('2d');
+  ctx.scale(ratio,ratio);
+  $('chartZoomIn').disabled = count <= 8;
+  $('chartZoomOut').disabled = $('chartReset').disabled = count >= bars.length;
+  const visible = bars.slice(start,start+count);
+  chartPoint.hidden = true;
+  if (!visible.length) {
+    $('chartReadout').textContent = 'Sin histórico para mostrar.';
+    return;
+  }
+  const type = $('chartType').value;
+  const candles = type === 'candles';
+  const {left,right} = chartBounds(width);
+  const top = 17, bottom = height-31;
+  const step = (right-left)/visible.length;
+  const x = i => left+(i+.5)*step;
+  const extrema = visible.flatMap(bar => candles && hasCandle(bar) ? [bar.low,bar.high] : [bar.close]);
+  const min = Math.min(...extrema), max = Math.max(...extrema);
+  const prices = conversion(asset);
+  const padding = Math.max((max-min || min*.02)*.09, max*1e-12);
+  const low = min-padding, high = max+padding;
+  const y = v => top+(high-v)/(high-low)*(bottom-top);
+  const roughStep = (high-low)*prices.rate / Math.max(4, Math.floor((bottom-top)/34));
+  const magnitude = 10**Math.floor(Math.log10(roughStep));
+  const tick = ([1,2,2.5,5,10].find(value => value*magnitude >= roughStep) ?? 10)*magnitude;
+  const number = new Intl.NumberFormat('es-ES',{maximumSignificantDigits:9});
+  const axisNumber = new Intl.NumberFormat('es-ES',{maximumFractionDigits:
+    Math.min(16, Math.max(0, Math.ceil(-Math.log10(tick))+1))});
+  ctx.font = '11px ui-monospace, monospace';
+  ctx.textBaseline = 'middle';
+  const firstTick = Math.ceil(low*prices.rate/tick);
+  const lastTick = Math.floor(high*prices.rate/tick);
+  for (let i=firstTick;i<=lastTick;i++) {
+    const value = i*tick;
+    const level = y(value/prices.rate);
+    ctx.strokeStyle = '#64748b55';
+    ctx.beginPath(); ctx.moveTo(left,level); ctx.lineTo(right,level); ctx.stroke();
+    ctx.fillStyle = '#aab8cb';
+    ctx.fillText(axisNumber.format(value),right+7,level,width-right-9);
+  }
+  const intraday = !['1day','1week'].includes(asset.interval);
+  const shortSpan = visible.at(-1).time-visible[0].time < 86400000;
+  const date = new Intl.DateTimeFormat('es-ES',intraday && shortSpan
+    ? {hour:'2-digit',minute:'2-digit'} : {day:'numeric',month:'short'});
+  const marks = Math.min(visible.length,Math.max(2,Math.floor((right-left)/80)+1));
+  for (let i=0;i<marks;i++) {
+    const index = marks === 1 ? 0 : Math.round(i*(visible.length-1)/(marks-1));
+    const position = x(index);
+    ctx.strokeStyle = '#64748b40';
+    ctx.beginPath(); ctx.moveTo(position,top); ctx.lineTo(position,bottom); ctx.stroke();
+    ctx.textAlign = i === 0 ? 'left' : i === marks-1 ? 'right' : 'center';
+    ctx.fillStyle = '#aab8cb';
+    ctx.fillText(date.format(visible[index].time),position,height-13);
+  }
+  if (candles) {
+    visible.forEach((bar,i) => {
+      if (!hasCandle(bar)) {
+        ctx.fillStyle = '#aab8cb';
+        ctx.fillRect(x(i)-1,y(bar.close)-1,2,2);
+        return;
+      }
+      ctx.fillStyle = ctx.strokeStyle = bar.close >= bar.open ? '#10b981' : '#ff9aa7';
+      ctx.beginPath(); ctx.moveTo(x(i),y(bar.high)); ctx.lineTo(x(i),y(bar.low)); ctx.stroke();
+      const body = Math.min(14,Math.max(1,step*.65));
+      ctx.fillRect(x(i)-body/2,Math.min(y(bar.open),y(bar.close)),body,Math.max(1,Math.abs(y(bar.open)-y(bar.close))));
+    });
+  } else {
+    const trace = () => {
+      ctx.beginPath();
+      visible.forEach((bar,i) => i ? ctx.lineTo(x(i),y(bar.close)) : ctx.moveTo(x(i),y(bar.close)));
+    };
+    if (type === 'area') {
+      const gradient = ctx.createLinearGradient(0,top,0,bottom);
+      gradient.addColorStop(0,'#00c2ff55'); gradient.addColorStop(1,'#00c2ff05');
+      trace(); ctx.lineTo(x(visible.length-1),bottom); ctx.lineTo(x(0),bottom); ctx.closePath();
+      ctx.fillStyle = gradient; ctx.fill();
+    }
+    trace(); ctx.strokeStyle = '#00c2ff'; ctx.lineWidth = 2; ctx.stroke();
+  }
+  const index = cursor === null ? null : clamp(cursor-start,0,visible.length-1);
+  const bar = index === null ? visible.at(-1) : visible[index];
+  if (index !== null) {
+    ctx.strokeStyle = '#aab8cb'; ctx.lineWidth = 1; ctx.setLineDash([3,4]);
+    ctx.beginPath(); ctx.moveTo(x(index),top); ctx.lineTo(x(index),bottom);
+    ctx.moveTo(left,y(bar.close)); ctx.lineTo(right,y(bar.close)); ctx.stroke();
+  }
+  const timestamp = new Date(bar.time).toLocaleString('es-ES',{dateStyle:'medium',timeStyle:'short'});
+  if (index !== null) {
+    const pointX = x(index), pointY = y(bar.close);
+    ctx.setLineDash([]);
+    ctx.beginPath(); ctx.arc(pointX,pointY,5,0,2*Math.PI);
+    ctx.fillStyle = '#00c2ff'; ctx.fill();
+    ctx.strokeStyle = '#0b0f17'; ctx.lineWidth = 2; ctx.stroke();
+    const [price, dateLabel, extra] = chartPoint.children;
+    price.textContent = money(bar.close,asset);
+    dateLabel.textContent = timestamp;
+    extra.textContent = candles && hasCandle(bar)
+      ? 'Apertura ' + number.format(bar.open*prices.rate) + ' · Máx. ' + number.format(bar.high*prices.rate)
+        + ' · Mín. ' + number.format(bar.low*prices.rate) : '';
+    chartPoint.hidden = false;
+    const boxWidth = chartPoint.offsetWidth, boxHeight = chartPoint.offsetHeight;
+    const side = pointX + boxWidth + 14 <= width ? pointX + 12 : pointX - boxWidth - 12;
+    chartPoint.style.left = clamp(side,6,Math.max(6,width-boxWidth-6)) + 'px';
+    chartPoint.style.top = clamp(pointY-boxHeight-12,6,Math.max(6,height-boxHeight-6)) + 'px';
+  }
+
+  $('chartReadout').textContent = timestamp + ' · ' + (hasCandle(bar)
+    ? 'Apertura ' + money(bar.open,asset) + ' · Máximo ' + money(bar.high,asset) + ' · Mínimo ' + money(bar.low,asset) + ' · ' : '')
+    + 'Cierre ' + money(bar.close,asset) + (candles && !visible.some(hasCandle) ? ' · La fuente solo proporciona cierres en este tramo.' : '');
+}
+
+function changeChartZoom(factor, anchor = 1) {
+  const {bars,count,start} = chartState;
+  const next = clamp(Math.round(count*factor),Math.min(8,bars.length),bars.length);
+  chartState.start = clamp(Math.round(start+(count-next)*anchor),0,bars.length-next);
+  chartState.count = next;
+  chartState.cursor = null;
+  paintChart();
+}
+function chartBounds(width = chart.clientWidth) {
+  return {left:12,right:Math.max(24,width-(width < 330 ? 81 : 95))};
+}
+function chartFraction(x) {
+  const {left,right} = chartBounds();
+  return clamp((x-left)/(right-left),0,1);
+}
+function moveChart(start) {
+  chartState.start = clamp(start,0,chartState.bars.length-chartState.count);
+  chartState.cursor = null;
+  paintChart();
+}
+$('chartType').onchange = paintChart;
+$('chartZoomIn').onclick = () => changeChartZoom(.67);
+$('chartZoomOut').onclick = () => changeChartZoom(1.5);
+$('chartReset').onclick = () => changeChartZoom(Infinity);
+chart.addEventListener('wheel',event => {
+  if (!event.shiftKey) return;
+  event.preventDefault();
+  changeChartZoom(event.deltaY < 0 ? .8 : 1.25,chartFraction(event.offsetX));
+},{passive:false});
+chart.onpointerdown = event => {
+  chartDrag = {x:event.clientX,start:chartState.start};
+  chart.setPointerCapture(event.pointerId);
+  chart.onpointermove(event);
+};
+chart.onpointermove = event => {
+  if (chartDrag && Math.abs(event.clientX-chartDrag.x)>4) {
+    const {left,right} = chartBounds();
+    moveChart(chartDrag.start-Math.round((event.clientX-chartDrag.x)*chartState.count/(right-left)));
+  } else if (chartState.count) {
+    chartState.cursor = chartState.start+Math.min(chartState.count-1,Math.floor(chartFraction(event.offsetX)*chartState.count));
+    paintChart();
+  }
+};
+chart.onpointerup = chart.onpointercancel = chart.onlostpointercapture = () => {chartDrag = null;};
+chart.onpointerleave = event => { if (event.pointerType === 'mouse' && !chartDrag) {chartState.cursor=null;paintChart();} };
+chart.onkeydown = event => {
+  if (event.key === 'Escape' && chartState.cursor !== null) {chartState.cursor=null;paintChart();return;}
+  if (!chartState.count || !['ArrowLeft','ArrowRight'].includes(event.key)) return;
+  event.preventDefault();
+  const direction = event.key === 'ArrowLeft' ? -1 : 1;
+  if (event.shiftKey) {moveChart(chartState.start+direction);return;}
+  const end = chartState.start+chartState.count-1;
+  chartState.cursor = clamp((chartState.cursor ?? end)+direction,chartState.start,end);
+  paintChart();
+};
+new ResizeObserver(paintChart).observe(chart);
+
 let newsBatch=false;async function queueNews(){if(newsBatch)return;newsBatch=true;try{let ids=filtered().map(d=>d.u[0]);for(let i=0;i<ids.length;i+=3){await Promise.all(ids.slice(i,i+3).filter(id=>!newsData[id]||Date.now()/1000-newsData[id].asof>=300).map(id=>getNews(id)))}}finally{newsBatch=false}}
 let reloadQueued=false;async function load(){if(busy){reloadQueued=true;return}busy=true;$('refresh').disabled=true;$('refresh').textContent='Actualizando…';
   try {
