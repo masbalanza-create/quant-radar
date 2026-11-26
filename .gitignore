@@ -3,3 +3,7 @@
 !.env.example
 __pycache__/
 *.pyc
+
+training.sqlite3*
+
+valuation-inputs.json

@@ -1,8 +1,13 @@
-QUANT RADAR V11 — INSTALACIÓN EN NUBE (Render)
-1. Crear un repositorio privado en GitHub. Subir los archivos de esta carpeta, nunca .env ni claves. Incluir server.py, relevance.py, index.html, manifest.webmanifest, sw.js, los tres PNG y requirements.txt. .gitignore es recomendable.
-2. En dashboard.render.com: New > Web Service, conectar el repositorio privado. Runtime Python 3; Build Command: pip install -r requirements.txt; Start Command: python server.py. Elegir Free para pruebas o plan sin suspensión para mayor disponibilidad.
-3. En Environment configurar APCA_API_KEY_ID, APCA_API_SECRET_KEY, ALPACA_FEED=iex y QR_ACCESS_PASSWORD (contraseña nueva y larga, mínimo 16 caracteres, generada por tu gestor). No compartir secretos en chats ni subirlos al repositorio. Si ya tienes OpenAI API, puedes configurar OPENAI_API_KEY y OPENAI_MODEL opcionalmente. Render define PORT automáticamente. No introducir claves en HTML.
-4. Deploy. Abrir la URL HTTPS que Render proporciona. Usuario: radar; contraseña: la configurada en QR_ACCESS_PASSWORD. Comprobar cotizaciones, proveedor, antigüedad y opinión. Si la conexión falla, consultar logs sin exponer secretos.
-5. iPhone: abrir la URL HTTPS en Safari > Compartir > Añadir a pantalla de inicio > Abrir como app web (si aparece) > Añadir. Puede volver a pedir autenticación. No requiere App Store.
-6. El Mac puede estar apagado. El plan gratuito suspende el servidor por inactividad; puede tardar en arrancar. Las cotizaciones no funcionan sin Internet; no se almacenan en caché del móvil. Las notificaciones matinales de ChatGPT son independientes. Los precios y señales dependen de las fuentes originales y no son garantía de ejecución.
-7. Uso local en Mac: INICIAR.command como antes, con .env local. No se debe exponer el servidor local a Internet.
+QUANT RADAR · IPHONE Y DESPLIEGUE
+
+1. Conecta este repositorio a un servicio web Python que sirva la interfaz
+   y la API bajo la misma URL HTTPS. Usa pip install -r requirements.txt como
+   instalación y python server.py para arrancar.
+2. El proveedor define PORT. Configura QR_ACCESS_PASSWORD con al menos 16
+   caracteres. El usuario de acceso es radar. Las claves de Alpaca y OpenAI
+   son opcionales. Configúralas en las variables privadas del servicio.
+3. Para habilitar el DCF con datos revisados, configura QR_VALUATION_INPUTS
+   con la ruta de un archivo privado legible por el servidor. Consulta
+   docs/valuation.md para su formato. El análisis semanal funciona sin él.
+4. Abre la URL HTTPS en Safari en el iPhone, toca Compartir y añade la web a
+   la pantalla de inicio. Para obtener cotizaciones, abre la app con conexión.
