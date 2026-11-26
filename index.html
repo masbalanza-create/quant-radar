@@ -11,6 +11,11 @@
   --accent: #00C2FF;
   --accent-hover: #62dbff;
   --accent-soft: #00c2ff19;
+  --motion-press: 130ms;
+  --motion-ui: 150ms;
+  --motion-disclosure: 180ms;
+  --motion-spin: 850ms;
+  --ease-ui: cubic-bezier(.32, .72, 0, 1);
   --radius: 22px;
   --page-gutter: clamp(12px, 1.5vw, 24px);
   --shadow: 0 2px 4px #00000022, 0 10px 30px #00000033;
@@ -35,6 +40,15 @@ body {
 @media (min-width: 651px) {
   .app-brand { transform: scale(1.28); transform-origin: left center; }
 }
+.horizon-switch { display: flex; gap: 3px; margin-inline: auto; padding: 4px;
+  border: 1px solid var(--line); border-radius: 24px; background: var(--paper); }
+.horizon-switch[hidden] { display: none; }
+.horizon-switch button { border: 0; border-radius: 18px; background: transparent;
+  color: var(--muted); padding: 8px 14px; white-space: nowrap; }
+.horizon-switch button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
+@media (max-width: 850px) {
+  .horizon-switch { order: 3; justify-content: center; }
+}
 .quick-capsule {
   margin-inline-start: auto;
   display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 3px;
@@ -46,8 +60,9 @@ body {
   min-height: 38px; padding: 5px 10px; border: 1px solid transparent; border-radius: 18px;
   font-size: .85rem; line-height: 1.2;
 }
-.quick-capsule #refresh { color: var(--accent); background: var(--accent-soft); }
-.quick-capsule #refresh:hover:not(:disabled) { border-color: var(--accent); }
+.horizon-switch button:active:not(:disabled) { transform: none; background: var(--accent-soft); }
+.quick-capsule #refresh { color: var(--muted); background: transparent; }
+.quick-capsule #refresh:hover:not(:disabled) { color: var(--ink); border-color: var(--line); }
 .quick-capsule #refresh:disabled { color: var(--muted); }
 .quick-capsule #sidebarToggle { padding-inline: 9px; }
 .sidebar-glyph {
@@ -81,13 +96,13 @@ button, select, input, textarea {
   font: inherit;
   font-variant-numeric: inherit;
   color: var(--ink);
-  transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+  transition: background-color var(--motion-ui) var(--ease-ui), border-color var(--motion-ui) var(--ease-ui), box-shadow var(--motion-ui) var(--ease-ui), transform var(--motion-press) var(--ease-ui);
 }
 textarea { resize: vertical; }
 input::placeholder, textarea::placeholder { color: var(--muted); opacity: 1; }
 button { font-weight: 620; cursor: pointer; }
 button:hover:not(:disabled) { background: #1c293e; border-color: #00c2ff88; }
-button:active:not(:disabled) { transform: translateY(1px); }
+button:active:not(:disabled) { transform: scale(.98); }
 button.primary { background: var(--accent); border-color: var(--accent); color: var(--canvas); }
 button.primary:hover:not(:disabled) { background: var(--accent-hover); border-color: var(--accent-hover); }
 button:disabled { background: #202a3a; border-color: var(--line); color: var(--muted); cursor: default; }
@@ -100,7 +115,7 @@ button:disabled { background: #202a3a; border-color: var(--line); color: var(--m
   border: 2px solid currentColor;
   border-right-color: transparent;
   border-radius: 50%;
-  animation: spin 850ms linear infinite;
+  animation: spin var(--motion-spin) linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 :where(button, select, input, textarea, summary, a, [tabindex]):focus-visible {
@@ -128,7 +143,15 @@ button:disabled { background: #202a3a; border-color: var(--line); color: var(--m
 .filter-toggle:hover, .filter-toggle[aria-expanded="true"] {
   background: var(--line); color: var(--accent);
 }
-.filter-panel { margin-top: 8px; }
+.filter-panel { margin-top: 8px; transform-origin: top right; }
+@media (prefers-reduced-motion: no-preference) {
+  .filter-panel:not([hidden]) { animation: reveal-filters var(--motion-disclosure) var(--ease-ui) both; }
+  @keyframes reveal-filters {
+    from { opacity: 0; transform: translateY(-3px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+.filter-toggle[aria-expanded="true"] { background: var(--accent-soft); color: var(--accent); }
 .filter-field { display: grid; gap: 4px; min-width: 0; }
 .filter-field > span { font-size: .875rem; color: var(--muted); }
 .filters {
@@ -190,7 +213,7 @@ td, th { padding: 11px 12px; border-bottom: 1px solid var(--line); text-align: l
 tbody tr:last-child td { border-bottom: 0; }
 th { color: var(--muted); background: #111827; font-size: .72rem; text-transform: uppercase; letter-spacing: .055em; }
 tr[data-id] { cursor: pointer; }
-tr[data-id] td { transition: background-color 160ms ease; }
+tr[data-id] td { transition: background-color var(--motion-ui) var(--ease-ui); }
 tr[data-id] td:first-child { box-shadow: inset 3px 0 var(--row-mark, transparent); font-weight: 620; }
 tr.buy { --row-mark: #10B981; }
 tr.sell { --row-mark: #f08391; }
@@ -201,6 +224,7 @@ tr.selected td { background: var(--accent-soft); }
 tr.selected td:first-child { box-shadow: inset 3px 0 var(--accent); }
 button.asset-select { min-height: 36px; padding: 5px 2px; border: 0; background: transparent; text-align: left; }
 button.asset-select:hover:not(:disabled) { background: transparent; color: var(--accent); }
+button.asset-select:active:not(:disabled) { transform: none; }
 .up { color: #37d5a0; }
 .down { color: #ff9aa7; }
 .pill, .legend span {
@@ -217,6 +241,7 @@ button.asset-select:hover:not(:disabled) { background: transparent; color: var(-
 #bull, #top { color: #10B981; }
 .chart-controls { display:flex; align-items:center; flex-wrap:wrap; gap:6px; margin-top:14px; }
 .chart-controls { justify-content: space-between; border-block: 1px solid var(--line); padding: 7px 0; }
+.chart-range-label { flex: 0 0 auto; color: var(--muted); font-size: .78rem; font-weight: 650; }
 .chart-ranges {
   display: flex; flex: 1 1 16rem; min-width: 0;
   align-items: center; justify-content: space-evenly; gap: 3px; flex-wrap: wrap;
@@ -233,7 +258,7 @@ button.asset-select:hover:not(:disabled) { background: transparent; color: var(-
 }
 .chart-ranges button:disabled { opacity: .65; }
 .chart-style { margin-inline-start: auto; display: inline-flex; gap: 6px; align-items: center; color: var(--muted); font-size: .8rem; }
-.chart-style select { min-height: 36px; }
+.chart-style select { min-height: 36px; background-color: transparent; border-color: var(--line); color: var(--muted); }
 @media (pointer: coarse) {
   .chart-ranges button, .chart-style select { min-height: 44px; }
 }
@@ -263,6 +288,12 @@ button.asset-select:hover:not(:disabled) { background: transparent; color: var(-
 .chart-indicators, .chart-indicators + .chart-details { margin-top: 6px; }
 .chart-details dd { margin: 0; font-weight: 500; overflow-wrap: anywhere; }
 .chart-details dt { color: #8293aa; }
+.chart-details > summary { display: flex; align-items: center; gap: 8px; min-height: 40px; color: var(--muted); }
+.chart-details[open] > summary { margin-bottom: 10px; color: var(--ink); }
+.chart-details > summary::marker { color: var(--accent); }
+.chart-details > dl { padding-inline: 2px; }
+#previousDataNotice { margin: 12px 0 0; padding: 9px 12px; border: 1px solid #e6bd7055; border-radius: 10px; background: #e6bd7010; color: #e8c98f; font-size: .82rem; }
+#previousDataNotice[hidden] { display: none; }
 #chartReadout { min-height:1.5em; font-size:.83rem; font-variant-numeric:tabular-nums; }
 canvas { display: block; width: 100%; height: 220px; margin: 15px 0 10px; }
 #deep { white-space: pre-wrap; line-height: 1.65; }
@@ -300,7 +331,12 @@ footer { padding: 25px 0; color: var(--muted); font-size: .8rem; }
 @media (prefers-contrast: more) {
   :root { --muted: #dbe7f7; --line: #8291aa; --control: #afc0d8; }
 }
-@media (prefers-reduced-transparency: reduce) {
+@media (prefers-reduced-transparency: no-preference) {
+  .quick-capsule, .horizon-switch {
+    background: rgb(22 30 46 / 82%);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
@@ -338,14 +374,24 @@ footer { padding: 25px 0; color: var(--muted); font-size: .8rem; }
 .asset-decision-card[data-state="closed"], .asset-decision-card[data-state="unavailable"] {
   border-color: var(--muted); background: var(--line);
 }
-.asset-decision-card[data-state="buy"] { border-color: #14b88b; }
-.asset-decision-card[data-state="sell"] { border-color: #fb879a; }
+.asset-decision-card[data-state="buy"] { border-color: #35d9a4; background: #35d9a410; }
+.asset-decision-card[data-state="sell"] { border-color: #ff9aa7; background: #ff9aa710; }
+.asset-decision-card[data-state="wait"] { border-color: #ebbf75; background: #ebbf7510; }
 #assetDecisionMethod { margin: 4px 0 8px; }
 #fundamentalDecisionDetails { margin-top: 10px; }
 #fundamentalDecisionMetrics { display: flex; flex-wrap: wrap; gap: 8px 24px; margin: 0 0 10px; }
 #fundamentalDecisionMetrics dt { color: var(--muted); }
 #fundamentalDecisionMetrics dd { margin: 2px 0 0; font-weight: 700; }
 #fundamentalDecisionDetails a { margin-inline-start: 12px; }
+.asset-decision-summary { display: inline-flex; align-items: center; gap: .45em;
+  margin-top: 6px; padding: 3px 10px; border-radius: 999px; text-decoration: none;
+  background: var(--paper); color: var(--muted); font-size: .8rem; font-weight: 650; }
+.asset-decision-preview { max-width: 34ch; margin: 4px 0 0 auto; font-size: .76rem; line-height: 1.35; }
+.asset-decision-summary[hidden] { display: none; }
+.asset-decision-summary:hover { text-decoration: underline; }
+.asset-decision-summary[data-state="buy"] { color: #35d9a4; }
+.asset-decision-summary[data-state="sell"] { color: #ff9aa7; }
+.asset-decision-summary[data-state="wait"] { color: #ebbf75; }
 .asset-decision-card strong { display: block; font-size: 1.3rem; }
 .asset-decision-card p { margin: 4px 0 0; }
 .asset-tabs { min-width: 0; padding-bottom: 16px; }
@@ -371,8 +417,6 @@ footer { padding: 25px 0; color: var(--muted); font-size: .8rem; }
   margin: 0; font-size: clamp(1.2rem, 2vw, 1.55rem); font-weight: 700;
 }
 .asset-tab-note { max-width: 78ch; font-size: .875rem; }
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
-  gap: 14px 24px; margin: 16px 0;
 }
 #panel-news .newsitem a { font-size: 1.05rem; font-weight: 650; }
 .ai-review #deep:not(:empty) { border-inline-start: 2px solid var(--accent); padding-inline-start: 12px; }
@@ -389,6 +433,7 @@ footer { padding: 25px 0; color: var(--muted); font-size: .8rem; }
   border: 1px solid transparent; border-radius: 10px;
 }
 .watch-rows .asset-select:hover:not(:disabled) { background: #1b263a; color: var(--ink); }
+.watch-rows .asset-select:active:not(:disabled) { transform: none; background: #202c41; }
 .watch-rows .asset-select[aria-pressed="true"] {
   border-color: var(--muted); background: #202c41;
 }
@@ -396,9 +441,15 @@ footer { padding: 25px 0; color: var(--muted); font-size: .8rem; }
 .watch-label, .watch-quote { display: grid; min-width: 0; }
 .watch-label strong, .watch-label > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .watch-label > span { font-size: .72rem; color: var(--muted); font-weight: 500; }
-.watch-quote { justify-items: end; text-align: right; }
+.watch-quote { justify-items: end; text-align: right; gap: 2px; }
+.watch-trend { display: grid; justify-items: center; gap: 2px; }
 .watch-quote strong { font-size: .85rem; line-height: 1.35; font-weight: 600; overflow-wrap: anywhere; }
-.watch-change { padding: 1px 5px; border: 1px solid var(--muted); border-radius: 6px; color: var(--muted); font-size: .75rem; line-height: 1.4; font-weight: 500; }
+.watch-decision { max-width: 100%; color: var(--row-mark, var(--muted)); font-size: .7rem; font-weight: 700; line-height: 1.25; }
+.watch-rows .asset-select[data-state="pending"] { --row-mark: #aab8cb; }
+.watch-rows .asset-select[data-state="buy"] { --row-mark: #35d9a4; }
+.watch-rows .asset-select[data-state="sell"] { --row-mark: #ff9aa7; }
+.watch-rows .asset-select[data-state="wait"] { --row-mark: #ebbf75; }
+.watch-change { color: var(--muted); font-size: .75rem; line-height: 1.4; font-weight: 500; }
 canvas.watch-spark { width: 56px; height: 28px; margin: 0; }
 .asset-header {
   display: flex; flex-wrap: wrap; justify-content: space-between;
@@ -430,7 +481,7 @@ canvas.watch-spark { width: 56px; height: 28px; margin: 0; }
   padding: 9px 12px; color: var(--muted);
   text-decoration: none; font-weight: 650;
 }
-.app-sections a[aria-current] { background: var(--accent-soft); color: var(--accent); }
+.app-sections a[aria-current] { background: #ffffff09; color: var(--ink); }
 #settingsView, #trainingView { max-width: 64rem; margin-inline: auto; }
 #settingsView h1, #trainingView h1 { margin-bottom: 18px; font-size: clamp(1.6rem, 3vw, 2.25rem); }
 #workspace[hidden], #sidebarToggle[hidden] { display: none; }
@@ -438,13 +489,17 @@ canvas.watch-spark { width: 56px; height: 28px; margin: 0; }
 .watch-rows .asset-select.is-leader[aria-pressed="true"] { background: #3b3328; }
 </style><a class="skip-link" href="#mainContent">Saltar al contenido</a><header class="quick-header">
   <div class="app-brand"><img src="/icon-192.png" alt="" width="36" height="36"><span>Quant Radar</span></div>
+  <nav class="horizon-switch" id="radarHorizons" aria-label="Horizonte de decisión">
+    <button type="button" id="shortRadar" aria-pressed="true" aria-controls="workspace">Corto plazo</button>
+    <button type="button" id="longRadar" aria-pressed="false" aria-controls="workspace">Largo plazo</button>
+  </nav>
   <div class="quick-capsule">
 <nav class="app-sections" aria-label="Apartados de Quant Radar">
 <a id="radarLink" href="#workspace" aria-current="page">Radar</a>
 <a id="settingsLink" href="#settingsView">Configuración</a>
 <a id="trainingLink" href="#trainingView">Entrenamiento de IA</a>
 </nav><button id="sidebarToggle" type="button" aria-controls="workspaceSidebar" aria-expanded="true" aria-label="Ocultar barra lateral" title="Ocultar barra lateral"><span class="sidebar-glyph" aria-hidden="true"></span></button>
-<button id="refresh" type="button" aria-label="Actualizar datos">Actualizar</button>
+<button id="refresh" type="button" aria-label="Actualizar datos" aria-describedby="refreshStatus">Actualizar</button><span id="refreshStatus" class="sr-only" role="status" aria-live="polite"></span>
 </div></header><main id="mainContent" tabindex="-1" aria-label="Quant Radar"><div class="workspace" id="workspace"><aside class="workspace-sidebar" id="workspaceSidebar" aria-label="Navegación y filtros">
 <section class="card watchlist">
 <div class="split watchlist-heading">
@@ -470,28 +525,32 @@ canvas.watch-spark { width: 56px; height: 28px; margin: 0; }
   <div class="asset-quote">
     <div class="metric" id="price">—</div>
     <p class="asset-last-trade muted" id="assetLastTrade" hidden></p>
+    <a class="asset-decision-summary" id="assetDecisionSummary" href="#assetDecisionHeading" hidden></a>
+    <p class="asset-decision-preview muted" id="assetDecisionPreview" hidden></p>
 
   </div>
 </div>
 <a class="asset-back" href="#assetListTitle">Volver a los activos</a><div class="chart-controls" aria-label="Controles del gráfico">
+<span class="chart-range-label">Rango del gráfico</span>
 <div id="chartRanges" class="chart-ranges" role="group" aria-label="Rango temporal"></div>
-<label class="chart-style">Vista <select id="chartType"><option value="area" selected>Área</option><option value="candles">Velas</option></select></label>
+<label class="chart-style">Tipo <select id="chartType"><option value="area" selected>Área</option><option value="candles">Velas</option></select></label>
 </div><div class="chart-plot"><canvas id="chart" tabindex="0" aria-label="Histórico de precios. Usa las flechas para inspeccionar y Mayús con las flechas para desplazar."></canvas><div id="chartPoint" hidden aria-hidden="true"><strong></strong><span></span><span></span></div></div><div id="chartReadout" class="muted"></div><span id="chartKeyboardStatus" class="sr-only" role="status"></span>
-<div class="chart-details chart-indicators" id="chartIndicators" hidden>
-  <h3>Indicadores técnicos</h3>
+<p id="previousDataNotice" role="status" hidden></p>
+<details class="chart-details chart-indicators" id="chartIndicators" hidden>
+  <summary>Indicadores técnicos</summary>
   <dl id="indicators"></dl>
-</div>
-<div class="chart-details" id="chartDetails" hidden>
-  <h3>Datos de cotización</h3>
+ </details>
+<details class="chart-details" id="chartDetails" hidden>
+  <summary>Datos de cotización</summary>
   <dl id="source"></dl>
-</div></section></div>
+</details></section></div>
 <section class="asset-decision" aria-labelledby="assetDecisionHeading">
-  <div class="split"><h2 class="asset-tab-title" id="assetDecisionHeading">Decisión del activo</h2>
-    <button type="button" id="toggleDecisionHorizon">Ver largo plazo</button></div>
+  <h2 class="asset-tab-title" id="assetDecisionHeading" tabindex="-1">Decisión del activo</h2>
   <p class="muted" id="assetDecisionMethod">Señal técnica</p>
   <div class="asset-decision-card" id="assetDecisionCard" role="status">
     <strong id="assetDecisionTitle">Selecciona un activo</strong>
     <p class="muted" id="assetDecisionReason" hidden></p>
+    <details id="assetDecisionDetail" hidden><summary>Ver motivo completo</summary><p id="assetDecisionFullReason"></p></details>
   </div>
   <div id="fundamentalDecisionDetails" hidden>
     <dl id="fundamentalDecisionMetrics"></dl>
@@ -535,7 +594,7 @@ canvas.watch-spark { width: 56px; height: 28px; margin: 0; }
   <h1 id="trainingTitle" tabindex="-1">Entrenamiento de IA</h1>
 </section></main>
 <script src="/market-data.js"></script><script>
-const $=id=>document.getElementById(id), universe=[['AAPL','Apple','EE. UU.',190],['NVDA','Nvidia','EE. UU.',145],['MSFT','Microsoft','EE. UU.',420],['TSLA','Tesla','EE. UU.',250],['AMZN','Amazon','EE. UU.',200],['ASML:Euronext Amsterdam','ASML','Europa',780],['SAP:XETR','SAP','Europa',210],['SAN:BME','Santander','Europa',5],['7203:JPX','Toyota','Asia',2700],['9984:JPX','SoftBank','Asia',8000],['EUR/USD','Euro / dólar','Forex',1.08],['USD/JPY','Dólar / yen','Forex',150],['SPY','S&P 500 ETF','ETF',550],['QQQ','Nasdaq 100 ETF','ETF',480],['XAU/USD','Oro · futuro','Materias primas',2700],['XAG/USD','Plata · futuro','Materias primas',30],['BTC/USD','Bitcoin','Crypto',65000],['ETH/USD','Ethereum','Crypto',3200]];let clock={},newsData={},newsPending={},deepResults={},selectedNews=null;let data=[],selected=null,connected=false,ai=false,timer,busy=false;const fmt=n=>Number(n).toLocaleString('es-ES',{maximumFractionDigits:4}),avg=a=>a.reduce((s,x)=>s+x,0)/a.length,clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const $=id=>document.getElementById(id), universe=[['AAPL','Apple','EE. UU.',190],['NVDA','Nvidia','EE. UU.',145],['MSFT','Microsoft','EE. UU.',420],['TSLA','Tesla','EE. UU.',250],['AMZN','Amazon','EE. UU.',200],['ASML:Euronext Amsterdam','ASML','Europa',780],['SAP:XETR','SAP','Europa',210],['SAN:BME','Santander','Europa',5],['7203:JPX','Toyota','Asia',2700],['9984:JPX','SoftBank','Asia',8000],['EUR/USD','Euro / dólar','Forex',1.08],['USD/JPY','Dólar / yen','Forex',150],['SPY','S&P 500 ETF','ETF',550],['QQQ','Nasdaq 100 ETF','ETF',480],['XAU/USD','Oro · futuro','Materias primas',2700],['XAG/USD','Plata · futuro','Materias primas',30],['BTC/USD','Bitcoin','Crypto',65000],['ETH/USD','Ethereum','Crypto',3200]];let clock={},newsData={},newsPending={},deepResults={},selectedNews=null;let data=[],selected=null,connected=false,ai=false,timer,busy=false,pendingHorizon=null;const fmt=n=>Number(n).toLocaleString('es-ES',{maximumFractionDigits:4}),avg=a=>a.reduce((s,x)=>s+x,0)/a.length,clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 let fx={rates:{}};try{let saved=localStorage.getItem('qr_currency');if(saved&&[...$('currency').options].some(o=>o.value===saved))$('currency').value=saved}catch{}
 function conversion(d){let from=d.meta.currency,to=$('currency').value,unit=1;if(d.u[2]==='Forex'||to==='native'||from===to)return {rate:1,currency:from||'',converted:false};if(from==='GBp'||from==='GBX'){from='GBP';unit=.01}if(!fx.rates[from]||!fx.rates[to])return {rate:1,currency:d.meta.currency||'',converted:false,missing:true};return {rate:unit*fx.rates[to]/fx.rates[from],currency:to,converted:true}}
 function money(n,d){let c=conversion(d);return (c.converted?'≈ ':'')+fmt(n*c.rate)+' '+c.currency+(c.missing?' (original)':'')}
@@ -543,7 +602,7 @@ function fxNote(){let date=fx.asof?new Date(fx.asof*1000).toLocaleString('es-ES'
 async function loadFX(){try{let r=await fetch('/api/fx');fx=await r.json()}catch{}fxNote()}
 function compute(u,d){let a=d.values.map(v=>Number(v.close)).filter(x=>Number.isFinite(x)&&x>0);if(a.length<21)throw Error('Histórico insuficiente');let p=a.at(-1),ma=avg(a.slice(-20)),mom=(p/a.at(-11)-1)*100,delta=a.slice(1).map((v,i)=>v-a[i]).slice(-14),g=avg(delta.map(v=>Math.max(0,v))),l=avg(delta.map(v=>Math.max(0,-v))),rsi=l===0?(g===0?50:100):100-100/(1+g/l),ret=a.slice(1).map((v,i)=>v/a[i]-1).slice(-20),m=avg(ret),vol=Math.sqrt(avg(ret.map(x=>(x-m)**2)))*100,risk=u[2]==='Crypto'||vol>2?'Alto':vol>.65?'Medio':'Bajo';let ema=(arr,n)=>arr.reduce((v,x,i)=>i===0?x:x*2/(n+1)+v*(1-2/(n+1)),0),macd=ema(a,12)-ema(a,26),sd=Math.sqrt(avg(a.slice(-20).map(x=>(x-ma)**2))),rows=d.values.filter(v=>v.high!=null&&v.low!=null&&v.close!=null),tr=rows.slice(1).map((v,i)=>Math.max(+v.high-+v.low,Math.abs(+v.high-+rows[i].close),Math.abs(+v.low-+rows[i].close))),atr=tr.length>=14?avg(tr.slice(-14)):null,vr=rows.slice(-21,-1).map(v=>+v.volume),volumeRatio=vr.length&&avg(vr)>0?+rows.at(-1).volume/avg(vr):null;return {u,a,values:d.values,p,ma,mom,g,l,returnMean:m,macd,sd,atr,volumeRatio,rsi,vol,risk,change:(p/a.at(-2)-1)*100,meta:d.meta||{},stale:d.stale,fetched:d.fetched_at,date:d.values.at(-1).datetime,low:Math.min(...a.slice(-20)),high:Math.max(...a.slice(-20))}}
 function quoteAge(d){let t=typeof d.meta.quote_time==='number'?d.meta.quote_time*1000:Date.parse(d.meta.quote_time);if(!Number.isFinite(t))return 'hora no disponible';let age=Math.max(0,Math.floor((Date.now()-t)/1000));return new Date(t).toLocaleTimeString('es-ES')+' · hace '+(age<120?age+' s':Math.floor(age/60)+' min');}
-const intra=()=>['1min','5min','15min','30min','1h'].includes($('horizon').value);function fresh(d){return hasFreshIntradayData(d,$('horizon').value)}function filtered(){return data.filter(d=>d.interval===$('horizon').value&&($('view').value!=='live'||fresh(d))&&($('market').value==='all'||d.u[2]===$('market').value)&&($('risk').value==='all'||d.risk===$('risk').value)&&d.u.slice(0,3).join(' ').toLowerCase().includes($('search').value.toLowerCase()))}
+const intra=()=>['1min','5min','15min','30min','1h'].includes($('horizon').value);function fresh(d){return hasFreshIntradayData(d,$('horizon').value)}function filtered(){const eligible=d=>($('view').value!=='live'||d.interval!==$('horizon').value||fresh(d))&&($('market').value==='all'||d.u[2]===$('market').value)&&($('risk').value==='all'||d.risk===$('risk').value)&&d.u.slice(0,3).join(' ').toLowerCase().includes($('search').value.toLowerCase());const horizonData=data.filter(d=>d.interval===$('horizon').value);const fallback=!horizonData.length&&(pendingHorizon===$('horizon').value||busy);return (fallback?data.filter(eligible):horizonData.filter(eligible))}
 function session(d){if(d.u[2]==='Crypto')return 'open';if(['EE. UU.','ETF'].includes(d.u[2])&&clock.state&&Date.now()/1000-clock.asof<120)return clock.state;let s=d.meta.session,z=d.meta.exchange_timezone;if(s&&s.start&&s.end&&z){let now=Date.now()/1000;try{let f=new Intl.DateTimeFormat('en-CA',{timeZone:z,year:'numeric',month:'2-digit',day:'2-digit'});if(f.format(new Date(s.start*1000))===f.format(new Date()))return now>=s.start&&now<s.end?'open':'closed'}catch{}}return 'unknown'}
 const personalPortfolioKey = 'qr_personal_portfolio_v1';
 let personalHoldings = {};
@@ -653,11 +712,23 @@ function render() {
     quote.className = 'watch-quote';
     const price = document.createElement('strong');
     price.textContent = money(asset.meta.quote_price ?? asset.p,asset);
+    const decision = decisionFor(asset, valuationCache.get(asset.u[0])?.report);
+    const color = decisionColor(asset, decision);
+    button.dataset.state = decision.state;
+    button.style.setProperty('--row-mark', color);
+    button.setAttribute('aria-label', `${asset.u[0]} · ${asset.u[1]} · ${decision.title} · ${price.textContent}`);
+    const action = document.createElement('span');
+    action.className = 'watch-decision';
+    action.textContent = decision.title;
+    action.title = decision.reason;
     const change = document.createElement('span');
     change.className = 'watch-change';
     change.textContent = (asset.change>=0?'+':'')+asset.change.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+'%';
-    quote.append(price,change);
-    button.append(caption,watchSparkline(asset.a,'#aab8cb'),quote);
+    const trend = document.createElement('span');
+    trend.className = 'watch-trend';
+    trend.append(decisionSparkline(asset), action);
+    quote.append(price, change);
+    button.append(caption, trend, quote);
     if (asset.stale) button.title = 'Cotización en caché';
     button.onclick = event => {
       selected = asset.u[0];
@@ -682,6 +753,7 @@ function render() {
   $('price').textContent = '—';
   $('chartDetails').hidden = true;
   $('chartIndicators').hidden = true;
+  $('previousDataNotice').hidden = true;
   setChartAsset(null);
   showValuation(null);
 }
@@ -853,31 +925,87 @@ function renderValuation(report) {
   }
   valuationNode('p', 'Corte UTC · '+report.as_of+' · Modelo '+report.model_version, details).className = 'muted';
 }
+function decisionFor(asset, report) {
+  const fundamental = $('horizon').value === '1week';
+  const hasPosition = Number(personalHoldings?.[asset?.u[0]]) > 0;
+  return asset && asset.interval === $('horizon').value
+    ? assetDecision(report, session(asset), asset, {fundamental, hasPosition})
+    : {state:'pending', title:'Esperar', reason:selected ? 'Cargando datos del plazo seleccionado.' : 'Selecciona un activo.'};
+}
+function decisionColor(asset, decision) {
+  return (asset.interval === '1week' || session(asset) === 'open')
+    ? chartDecisionColors[decision.state] : chartDecisionColors.pending;
+}
+function briefDecisionReason(decision, asset, report) {
+  if (!asset || decision.state === 'pending' || decision.state === 'wait') return decision.reason;
+  if (decision.state === 'wait') return decision.reason;
+  if (decision.method === 'fundamental' && report?.quote?.value != null) {
+    const prudent = report.scenarios?.prudente?.value_per_share;
+    return `Precio de referencia ${valuationFormat(report.quote.value, usd)}${prudent == null ? '' : ` · valor prudente ${valuationFormat(prudent, usd)}`}.`;
+  }
+  if (decision.metrics?.average != null) {
+    return `Cierre semanal ${money(decision.metrics.close,asset)} · media de 40 semanas ${money(decision.metrics.average,asset)}.`;
+  }
+  const relation = asset.p >= asset.ma ? 'sobre' : 'bajo';
+  return `Precio ${money(asset.p,asset)} · ${relation} la media de 20 velas (${money(asset.ma,asset)}).`;
+}
+function decisionSparkline(asset) {
+  const decision = decisionFor(asset, valuationCache.get(asset.u[0])?.report);
+  const color = decisionColor(asset, decision);
+  const sparkline = watchSparkline(asset.a, color);
+  sparkline.dataset.color = color;
+  return sparkline;
+}
 function renderAssetDecision(asset, report) {
   const fundamental = $('horizon').value === '1week';
   const hasPosition = Number(personalHoldings?.[asset?.u[0]]) > 0;
-  const decision = asset && (fundamental || asset.interval === $('horizon').value)
-    ? assetDecision(report, session(asset), asset, {fundamental, hasPosition})
-    : {state:'wait', title:'Esperar', reason:selected ? 'Cargando datos del plazo seleccionado.' : 'Selecciona un activo.'};
+  const decision = decisionFor(asset, report);
   $('assetDecisionCard').dataset.state = decision.state;
+  const summary = $('assetDecisionSummary');
+  summary.hidden = !asset || decision.state === 'pending';
+  summary.dataset.state = decision.state;
+  if (!summary.hidden) {
+    const label = decision.title + ' · ' + (fundamental
+      ? decision.method === 'fundamental' ? 'Fundamental' : 'Semanal'
+      : 'Técnica');
+    if (summary.textContent !== label) summary.textContent = label;
+  }
   if (asset && chartState.asset === asset) {
-    const awaitingSession = !fundamental && session(asset) !== 'open';
-    const color = awaitingSession ? chartDecisionColors.pending : chartDecisionColors[decision.state];
-    if (color && color !== chartState.areaColor) {
+    const color = decisionColor(asset, decision);
+    if (color !== chartState.areaColor) {
       chartState.areaColor = color;
       paintChart();
     }
+    const row = [...$('rows').children].find(item => item.dataset.id === asset.u[0]);
+    const rowButton = row?.querySelector('.asset-select');
+    const rowAction = row?.querySelector('.watch-decision');
+    if (rowButton) {
+      rowButton.dataset.state = decision.state;
+      rowButton.style.setProperty('--row-mark', color);
+      rowButton.setAttribute('aria-label', `${asset.u[0]} · ${asset.u[1]} · ${decision.title} · ${money(asset.meta.quote_price ?? asset.p,asset)}`);
+    }
+    if (rowAction) {
+      rowAction.textContent = decision.title;
+      rowAction.title = decision.reason || '';
+    }
+    const sparkline = row?.querySelector('.watch-spark');
+    if (sparkline && sparkline.dataset.color !== color) sparkline.replaceWith(decisionSparkline(asset));
   }
   if ($('assetDecisionTitle').textContent !== decision.title) $('assetDecisionTitle').textContent = decision.title;
-  if ($('assetDecisionReason').textContent !== decision.reason) $('assetDecisionReason').textContent = decision.reason;
-  $('assetDecisionReason').hidden = !decision.reason;
+  const shortReason = briefDecisionReason(decision, asset, report);
+  const preview = $('assetDecisionPreview');
+  const firstSentence = shortReason?.split(/(?<=\.)\s+(?=[A-ZÁÉÍÓÚÑ])/u, 1)[0] || '';
+  preview.hidden = summary.hidden || !firstSentence;
+  if (preview.textContent !== firstSentence) preview.textContent = firstSentence;
+  if ($('assetDecisionReason').textContent !== shortReason) $('assetDecisionReason').textContent = shortReason;
+  $('assetDecisionReason').hidden = !shortReason;
+  $('assetDecisionDetail').hidden = !decision.reason || decision.reason === shortReason;
+  $('assetDecisionFullReason').textContent = decision.reason || '';
   const closed = fundamental && asset && session(asset) === 'closed';
   $('assetDecisionMethod').textContent = fundamental
     ? ('Largo plazo · ' + (decision.method === 'fundamental' ? 'Valoración fundamental' : 'Tendencia semanal') +
        (closed ? ' · Mercado cerrado' : ''))
-    : 'Señal técnica · Horizonte seleccionado';
-  $('toggleDecisionHorizon').textContent = fundamental ? 'Ver corto plazo' : 'Ver largo plazo';
-  $('toggleDecisionHorizon').disabled = $('view').value === 'live';
+    : `Decisión de corto plazo · Señal técnica · ${$('horizon').selectedOptions[0]?.textContent || 'diario'}`;
   $('fundamentalDecisionDetails').hidden = !fundamental || !asset;
   const metrics = $('fundamentalDecisionMetrics');
   $('openFundamentalDecision').hidden = !asset || ['Crypto','Forex','ETF','Materias primas'].includes(asset.u[2]);
@@ -936,13 +1064,25 @@ async function showValuation(symbol, force = false) {
     if (!$('panel-valuation').hidden) renderValuation(report);
   }
 }
-$('toggleDecisionHorizon').onclick = () => {
-  const horizon = $('horizon');
-  horizon.value = horizon.value === '1week' ? '1day' : '1week';
-  if (horizon.value === '1week') showValuation(selected);
-  else renderAssetDecision(null);
+let shortInterval = '1day';
+function syncRadarHorizons() {
+  const interval = $('horizon').value;
+  const long = interval === '1week';
+  if (!long) shortInterval = interval;
+  $('shortRadar').setAttribute('aria-pressed', String(!long));
+  $('longRadar').setAttribute('aria-pressed', String(long));
+  $('longRadar').disabled = $('view').value === 'live';
+}
+function selectRadarHorizon(interval) {
+  if ($('horizon').value === interval) return;
+  $('horizon').value = interval;
+  pendingHorizon = interval;
+  syncRadarHorizons();
+  render();
   load();
-};
+}
+$('shortRadar').onclick = () => selectRadarHorizon(shortInterval);
+$('longRadar').onclick = () => selectRadarHorizon('1week');
 $('openFundamentalDecision').onclick = () => {
   const tab = $('tab-valuation');
   selectAssetTab(tab);
@@ -958,6 +1098,9 @@ $('assetName').textContent = name === $('assetTicker').textContent ? '' : ' ' + 
 $('assetMarket').textContent = [market, d.meta.currency].filter(Boolean).join(' · ');
 $('assetMarket').hidden = !$('assetMarket').textContent;
 $('price').textContent = money(d.p,d);
+$('previousDataNotice').hidden = d.interval === $('horizon').value;
+$('previousDataNotice').textContent = $('previousDataNotice').hidden ? '' :
+  `Mostrando datos anteriores (${d.interval === '1week' ? 'semanales' : 'diarios/intradiarios'}) mientras se carga el plazo seleccionado. La decisión anterior queda suspendida.`;
 const lastTrade = $('assetLastTrade');
 lastTrade.hidden = d.meta.quote_price == null || !d.meta.quote_time;
 lastTrade.textContent = lastTrade.hidden ? '' : 'Última operación · ' + money(d.meta.quote_price,d);
@@ -972,6 +1115,12 @@ $('filterToggle').addEventListener('click', () => {
   const panel = $('filterPanel');
   panel.hidden = !panel.hidden;
   $('filterToggle').setAttribute('aria-expanded', String(!panel.hidden));
+});
+$('filterPanel').addEventListener('keydown', event => {
+  if (event.key !== 'Escape' || event.defaultPrevented) return;
+  event.preventDefault();
+  $('filterToggle').click();
+  $('filterToggle').focus();
 });
 const assetTabs = [...$('assetTabs').querySelectorAll('[role="tab"]')];
 
@@ -1011,6 +1160,7 @@ function showWorkspaceSection() {
     if (view === current) $(link).setAttribute('aria-current', 'page');
   }
   $('sidebarToggle').hidden = current !== 'workspace';
+  $('radarHorizons').hidden = current !== 'workspace';
   if (current !== 'workspace') $(current === 'settingsView' ? 'settingsTitle' : 'trainingTitle').focus();
 }
 
@@ -1316,23 +1466,26 @@ chart.onkeydown = event => {
 new ResizeObserver(paintChart).observe(chart);
 
 let newsBatch=false;async function queueNews(){if(newsBatch)return;newsBatch=true;try{let ids=filtered().map(d=>d.u[0]);for(let i=0;i<ids.length;i+=3){await Promise.all(ids.slice(i,i+3).filter(id=>!newsData[id]||Date.now()/1000-newsData[id].asof>=300).map(id=>getNews(id)))}}finally{newsBatch=false}}
-let reloadQueued=false;async function load(){if(busy){reloadQueued=true;return}busy=true;$('refresh').disabled=true;$('refresh').textContent='Actualizando…';
+let reloadQueued=false;async function load(announce=false){syncRadarHorizons();pendingHorizon=data.some(d=>d.interval!==$('horizon').value)?$('horizon').value:null;if(busy){reloadQueued=true;return}busy=true;$('refresh').disabled=true;$('refresh').setAttribute('aria-busy','true');$('refresh').setAttribute('aria-label','Actualizando datos');$('refresh').textContent='Actualizando…';if(announce)$('refreshStatus').textContent='Actualizando datos.';
   try {
-    let errors=[];let alpacaConfigured=false;await loadFX();try{clock=await (await fetch('/api/clock')).json()}catch{clock={}}try{let r=await fetch('/api/status');let s=await r.json();connected=s.market;ai=s.ai;alpacaConfigured=s.alpaca}catch{connected=false;ai=false}let u=universe.filter(x=>($('view').value!=='live'||['Crypto','EE. UU.','ETF'].includes(x[2]))&&($('market').value==='all'||x[2]===$('market').value));let horizon=$('horizon').value;let results=await Promise.all(u.map(async a=>{try{if(!connected)throw Error('Abre la web desde el servidor local');let r=await fetch('/api/series?symbol='+encodeURIComponent(a[0])+'&interval='+horizon);let d=await r.json();if(d.error)throw Error(d.error);return {...compute(a,d), interval:horizon}}catch(e){errors.push(a[0]+': '+e.message);return null}}));data=results.filter(Boolean);$('mode').textContent='DATOS REALES';$('notice').textContent='Alpaca: '+(data.some(d=>String(d.meta.quality).startsWith('alpaca_')&&!d.stale)?'conexión confirmada en esta consulta':alpacaConfigured?'claves detectadas; sin respuesta válida de Alpaca en esta selección':'claves no detectadas')+'. Kraken: API pública. Yahoo: latencia no garantizada. Actualizar no equivale a recibir una operación nueva.';$('stamp').textContent='Consulta: '+new Date().toLocaleString('es-ES');$('errors').textContent=errors.join(' · ');$('aiMode').textContent=ai?'IA disponible':'IA sin configurar';$('ask').disabled=false;render();queueNews();
+    let errors=[];let alpacaConfigured=false;await loadFX();try{clock=await (await fetch('/api/clock')).json()}catch{clock={}}try{let r=await fetch('/api/status');let s=await r.json();connected=s.market;ai=s.ai;alpacaConfigured=s.alpaca}catch{connected=false;ai=false}let u=universe.filter(x=>($('view').value!=='live'||['Crypto','EE. UU.','ETF'].includes(x[2]))&&($('market').value==='all'||x[2]===$('market').value));let horizon=$('horizon').value;let results=await Promise.all(u.map(async a=>{try{if(!connected)throw Error('Abre la web desde el servidor local');let r=await fetch('/api/series?symbol='+encodeURIComponent(a[0])+'&interval='+horizon);let d=await r.json();if(d.error)throw Error(d.error);return {...compute(a,d), interval:horizon}}catch(e){errors.push(a[0]+': '+e.message);return null}}));data=results.filter(Boolean);pendingHorizon=null;$('mode').textContent='DATOS REALES';$('notice').textContent='Alpaca: '+(data.some(d=>String(d.meta.quality).startsWith('alpaca_')&&!d.stale)?'conexión confirmada en esta consulta':alpacaConfigured?'claves detectadas; sin respuesta válida de Alpaca en esta selección':'claves no detectadas')+'. Kraken: API pública. Yahoo: latencia no garantizada. Actualizar no equivale a recibir una operación nueva.';$('stamp').textContent='Consulta: '+new Date().toLocaleString('es-ES');$('errors').textContent=errors.join(' · ');$('aiMode').textContent=ai?'IA disponible':'IA sin configurar';$('ask').disabled=false;render();queueNews();if(announce)$('refreshStatus').textContent=errors.length?'Actualización completa con algunos errores.':'Datos actualizados.';
   } catch (error) {
     console.error('Error al actualizar Quant Radar', error);
     $('errors').textContent = 'No se pudo completar la actualización. Pulsa Actualizar datos para reintentar.';
+    if (announce) $('refreshStatus').textContent = 'No se pudo completar la actualización.';
   } finally {
     busy = false;
     $('refresh').disabled = false;
     $('refresh').textContent = 'Actualizar';
+    $('refresh').removeAttribute('aria-busy');
+    $('refresh').setAttribute('aria-label','Actualizar datos');
     if (reloadQueued) {
       reloadQueued = false;
       load();
     }
   }
 }
-$('currency').onchange=()=>{try{localStorage.setItem('qr_currency',$('currency').value)}catch{}fxNote();render()};$('refresh').onclick=load;$('view').onchange=()=>{if($('view').value==='live'){$('horizon').value='1min';$('market').value='all'}load()};for(let k of ['market','horizon'])$(k).onchange=load;for(let k of ['risk','search'])$(k).oninput=()=>{render();queueNews()};$('auto').onchange=()=>{clearInterval(timer);if(+$('auto').value)timer=setInterval(load,+$('auto').value)};$('reloadnews').onclick=()=>{if(selected)getNews(selected,true)};
+$('currency').onchange=()=>{try{localStorage.setItem('qr_currency',$('currency').value)}catch{}fxNote();render()};$('refresh').onclick=()=>load(true);$('view').onchange=()=>{if($('view').value==='live'){$('horizon').value='1min';$('market').value='all'}load()};for(let k of ['market','horizon'])$(k).onchange=load;for(let k of ['risk','search'])$(k).oninput=()=>{render();queueNews()};$('auto').onchange=()=>{clearInterval(timer);if(+$('auto').value)timer=setInterval(load,+$('auto').value)};$('reloadnews').onclick=()=>{if(selected)getNews(selected,true)};
 $('copy').onclick=async()=>{let d=data.find(x=>x.u[0]===selected);if(!d)return;await getNews(d.u[0]);let snapshot=context(d);let prompt='Analiza estos datos de Quant Radar en español sencillo. Describe la cotización, los indicadores y las noticias disponibles. Señala qué datos faltan. Contrasta fuentes y fechas; no inventes hechos. Distingue hipótesis de ejecución real. Contexto: '+JSON.stringify(snapshot);try{await navigator.clipboard.writeText(prompt);$('aihelp').textContent='Contexto copiado. Pégalo en ChatGPT.'}catch{$('deep').textContent=prompt}};
 $('ask').onclick=async()=>{let d=data.find(x=>x.u[0]===selected);if(!d)return;let key=deepKey(d);if(!ai){$('deep').textContent='Para activar IA dentro de Quant Radar, añade OPENAI_API_KEY al archivo .env y reinicia. Alternativa: pulsa Copiar contexto para ChatGPT. La gráfica y las noticias funcionan sin esa clave.';deepResults[key]=$('deep').textContent;return}if(!confirm('Esta consulta usa la API de OpenAI y puede generar coste. ¿Continuar?'))return;$('ask').disabled=true;deepResults[key]='Consultando noticias e IA…';$('deep').textContent=deepResults[key];try{await getNews(d.u[0]);let snapshot=context(d);let r=await fetch('/api/analysis',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(snapshot)});let j=await r.json();deepResults[key]=new Date().toLocaleString('es-ES')+' · Análisis bajo demanda\n\n'+(j.text?j.text:j.error)}catch(e){deepResults[key]=e.message}finally{$('ask').disabled=false;let current=data.find(x=>x.u[0]===selected);if(current)$('deep').textContent=deepResults[deepKey(current)]||''}};load();timer=setInterval(load,60000);setInterval(()=>{if(!busy&&intra())render()},10000);
 </script></html>

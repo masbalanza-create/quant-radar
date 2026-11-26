@@ -18,7 +18,7 @@ Copia `.env.example` a `.env` si necesitas habilitar Alpaca u OpenAI. Cada colab
 
 ## Decisiones por plazo
 
-La ficha muestra **Comprar**, **Vender** o **Esperar**, con el motivo. **Ver largo plazo**
+La ficha muestra **Comprar**, **Vender** o **Esperar**, con el motivo. **Largo plazo**, en la cabecera,
 usa el DCF cuando hay una valoración válida y la tendencia semanal en los demás casos.
 El modelo DCF admite las acciones estadounidenses cubiertas que publican en USD y
 requiere un perfil financiero revisado. Consulta el [registro de cambios](CHANGELOG.md)
