@@ -475,8 +475,8 @@ canvas.watch-spark { width: 56px; height: 28px; margin: 0; }
   text-decoration: none; font-weight: 650;
 }
 .app-sections a[aria-current] { background: var(--accent-soft); color: var(--accent); }
-#settingsView { max-width: 64rem; margin-inline: auto; }
-#settingsView h1 { margin-bottom: 18px; font-size: clamp(1.6rem, 3vw, 2.25rem); }
+#settingsView, #trainingView { max-width: 64rem; margin-inline: auto; }
+#settingsView h1, #trainingView h1 { margin-bottom: 18px; font-size: clamp(1.6rem, 3vw, 2.25rem); }
 #workspace[hidden], #sidebarToggle[hidden] { display: none; }
 .watch-summary { margin: 5px 0 0; color: var(--muted); font-size: .8rem; }
 .watch-rows .asset-select.is-leader { background: #302a23; }
@@ -488,6 +488,7 @@ canvas.watch-spark { width: 56px; height: 28px; margin: 0; }
 <nav class="app-sections" aria-label="Apartados de Quant Radar">
 <a id="radarLink" href="#workspace" aria-current="page">Radar</a>
 <a id="settingsLink" href="#settingsView">Configuración</a>
+<a id="trainingLink" href="#trainingView">Entrenamiento de IA</a>
 </nav><button id="sidebarToggle" type="button" aria-controls="workspaceSidebar" aria-expanded="true" aria-label="Ocultar barra lateral" title="Ocultar barra lateral"><span class="sidebar-glyph" aria-hidden="true"></span></button>
 <button id="refresh" type="button" aria-label="Actualizar datos">Actualizar</button>
 </div></header><main id="mainContent" tabindex="-1" aria-label="Quant Radar"><div class="workspace" id="workspace"><aside class="workspace-sidebar" id="workspaceSidebar" aria-label="Navegación y filtros">
@@ -618,7 +619,10 @@ canvas.watch-spark { width: 56px; height: 28px; margin: 0; }
 <div class="strategy-wide"><button class="primary" type="submit">Guardar cartera</button>
 <p id="personalPortfolioStatus" class="muted" role="status">Los importes se guardan en este navegador.</p></div>
 </form>
-</details></section></section></main>
+</details></section></section>
+<section id="trainingView" aria-labelledby="trainingTitle" hidden>
+  <h1 id="trainingTitle" tabindex="-1">Entrenamiento de IA</h1>
+</section></main>
 <dialog id="protocolDialog" aria-labelledby="protocolTitle">
 <div class="protocol-head"><div class="split"><h2 id="protocolTitle">Proceso cuantitativo</h2>
 <form method="dialog"><button autofocus>Cerrar</button></form></div>
@@ -3022,14 +3026,15 @@ assetTabs.forEach((tab, index) => {
 });
 
 function showWorkspaceSection() {
-  const settings = location.hash === '#settingsView';
-  $('workspace').hidden = settings;
-  $('settingsView').hidden = !settings;
-  $('sidebarToggle').hidden = settings;
-  $('radarLink').removeAttribute('aria-current');
-  $('settingsLink').removeAttribute('aria-current');
-  $(settings ? 'settingsLink' : 'radarLink').setAttribute('aria-current','page');
-  if (settings) $('settingsTitle').focus();
+  const current = ['#settingsView', '#trainingView'].includes(location.hash)
+    ? location.hash.slice(1) : 'workspace';
+  for (const [view, link] of [['workspace', 'radarLink'], ['settingsView', 'settingsLink'], ['trainingView', 'trainingLink']]) {
+    $(view).hidden = view !== current;
+    $(link).removeAttribute('aria-current');
+    if (view === current) $(link).setAttribute('aria-current', 'page');
+  }
+  $('sidebarToggle').hidden = current !== 'workspace';
+  if (current !== 'workspace') $(current === 'settingsView' ? 'settingsTitle' : 'trainingTitle').focus();
 }
 
 window.addEventListener('hashchange', showWorkspaceSection);
