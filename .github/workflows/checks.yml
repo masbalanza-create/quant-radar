@@ -17,5 +17,5 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: node --test tests/decision.test.cjs
-      - run: python3 tests/check_app.py
+      - run: node --test tests/market-data.test.cjs
+      - run: python3 -m unittest discover -s tests -p 'check*.py'

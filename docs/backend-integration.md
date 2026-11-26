@@ -10,14 +10,14 @@
 |---|---|
 | `index.html` | Rutas que llama la web, parámetros que envía, campos que lee y estados que muestra. |
 | `server.py` | Respuestas actuales de la API, proveedores, autenticación y manejo de errores. |
-| `decision.js` | Cálculo del protocolo que se ejecuta en el navegador. |
+| `market-data.js` | Cálculo del protocolo que se ejecuta en el navegador. |
 | `relevance.py` | Estructura del filtro de noticias y reglas del ajuste de titulares. |
 | `macro.py` | Estructura del informe macroeconómico. |
-| `tests/decision.test.cjs` y `tests/check_app.py` | Pruebas de referencia para comprobar regresiones. |
+| `tests/market-data.test.cjs` y `tests/check_app.py` | Pruebas de referencia para comprobar regresiones. |
 
 Verifica el contrato comparando lo que devuelve el servidor con lo que lee el navegador. Para campos anidados y casos opcionales, usa los archivos de referencia y genera respuestas de prueba a partir de ellos.
 
-Mantén `index.html`, `decision.js`, `manifest.webmanifest`, `sw.js` y los iconos tal como están. Los cambios de integración van en el backend nuevo, en el proxy y en las pruebas del backend.
+Mantén `index.html`, `market-data.js`, `manifest.webmanifest`, `sw.js` y los iconos tal como están. Los cambios de integración van en el backend nuevo, en el proxy y en las pruebas del backend.
 
 ## 2. Arquitectura
 
@@ -47,6 +47,7 @@ Conserva las rutas, los campos, los tipos y las unidades actuales, aunque el bac
 | `GET /api/market-quote` | `symbol` | Cotización `bid` y `ask`, con tamaños y marcas de tiempo cuando estén disponibles, o una respuesta con `reason`. |
 | `GET /api/options` | `symbol` | Datos del subyacente y `pair` con `expiration`, `strike`, `call` y `put`, o `reason` cuando falte cobertura. Conserva el caso `pair: null`. |
 | `GET /api/fundamentals` | `symbol` | Ejercicio anual con `end`, `filed`, `currency`, `revenue`, `income`, `eps`, `metrics` y `filingUrl`, o `reason` cuando falte cobertura. |
+| `GET /api/valuation` | `symbol`, `as_of` UTC opcional | Contrato versionado con `status`, `reasons`, `quote`, `scenarios`, `ratios`, `sensitivity` y `run_id`. Consulta [valoración](valuation.md). |
 | `GET /api/macro` | `symbol` | `{economies, difference}`. Para un activo sin cobertura, `{"economies":[],"difference":null}`. |
 | `POST /api/analysis` | JSON generado por `context(d)` en `index.html` | `{text, status}` en éxito. Ante fallo, devuelve un JSON con `error`. `text` se muestra en **Valoración de IA**. |
 
@@ -63,7 +64,7 @@ Conserva las rutas, los campos, los tipos y las unidades actuales, aunque el bac
 
 Cada noticia conserva `title`, `date`, `source`, `url`, `group` y `summary` si existe. El filtro conserva `relevant`, `discarded`, `adjustment`, `total` y `method`. `adjustment` utiliza la escala de **−12 a +12 puntos**.
 
-Una consulta válida sin titulares puede devolver `items: []` y `errors: []`, con el filtro correspondiente. Si una fuente falla, refléjalo en `errors` o devuelve `error` según la ruta. El protocolo actual puede bloquear la decisión cuando el contexto informativo está incompleto.
+Una consulta válida sin titulares puede devolver `items: []` y `errors: []`, con el filtro correspondiente. Si una fuente falla, refléjalo en `errors` o devuelve `error` según la ruta. Los titulares aportan contexto al informe bajo demanda.
 
 Devuelve `Content-Type: application/json` para las respuestas de la API, incluidos los errores que va a leer la web. Usa tiempos de espera definidos para los proveedores y permite que las demás rutas sigan entregando sus datos válidos cuando falle un proveedor.
 
@@ -81,8 +82,8 @@ Implementa el orden de decisión del jefe con reglas comprobables. Evalúa prime
 
 ### Qué puede verse en la web actual
 
-- **Decisión del activo** sigue mostrando lo que calcula el `decision.js` original. Una ruta nueva o un campo `chief` en el JSON carece de consumidor en ese recuadro.
-- **Valoración de IA** puede mostrar el informe de los tres bots a través de `POST /api/analysis`. Devuelve en `text` la decisión del jefe, su motivo y un resumen de ambos informes. El frontend antepone su propia asignación virtual y muestra una confirmación que menciona OpenAI. Si el backend usa otro proveedor, esos textos seguirán apareciendo como en la versión de referencia.
+- **Decisión del activo** aplica en el navegador las reglas técnicas o la política de largo plazo. Consume la serie y, si procede, el resultado de `GET /api/valuation` como dato para la decisión. El campo `chief` de un backend externo carece de consumidor en ese recuadro.
+- **Valoración de IA** puede mostrar el informe de los tres bots a través de `POST /api/analysis`. Devuelve en `text` la decisión del jefe y la evidencia de ambos informes. El flujo de la versión de referencia sigue indicando OpenAI.
 - **Entrenamiento de IA** muestra únicamente su título. La pestaña actual carece de controles y llamadas al servidor.
 
 Trata la respuesta interna del jefe como un resultado distinto de la decisión del navegador. Si difieren, explícalo en el informe. Mantén precios, noticias y estados de mercado fieles a las fuentes. Sustituir el recuadro principal por la decisión del jefe requeriría un cambio explícito de alcance.
@@ -102,9 +103,9 @@ Trata la respuesta interna del jefe como un resultado distinto de la decisión d
 - Los archivos entregados al navegador coinciden con los de la versión de referencia.
 - Al abrir el origen público, el Radar carga activos y dibuja la gráfica. Cambiar de activo u horizonte muestra la serie correcta.
 - Los símbolos con `:` o `/` llegan intactos al backend. Los rangos, la moneda y los estados de sesión se muestran correctamente.
-- Una sesión cerrada muestra **Mercado cerrado**. Una sesión sin verificar, una serie antigua y una consulta fallida tienen estados distinguibles.
+- La decisión técnica muestra **Esperar** con el motivo **Mercado cerrado**. La decisión de largo plazo identifica el cierre de sesión cuando se conoce. Una sesión sin verificar, una serie antigua y una consulta fallida tienen estados distinguibles.
 - La caída de noticias conserva la información técnica disponible. Una consulta correcta sin titulares se reconoce como tal.
-- Las pestañas y el proceso cuantitativo siguen siendo accesibles. Las rutas de cotización, opciones, fundamentales y macro devuelven datos o su estado de falta de cobertura.
+- Las pestañas y el cambio de método por horizonte siguen siendo accesibles. Las rutas de cotización, opciones, fundamentales y macro devuelven datos o su estado de falta de cobertura.
 - Con `ai: true`, **Generar valoración** muestra un informe que identifica la decisión del jefe y la evidencia de los dos especialistas. La decisión principal conserva el comportamiento de la versión de referencia.
 - La pestaña **Entrenamiento de IA** sigue disponible con su título.
-- Pasan `node --test tests/decision.test.cjs`, `python3 tests/check_app.py` y las pruebas de contrato del backend nuevo. Se prueba la web a través del proxy y se indica qué escenarios usaron datos reales y cuáles usaron datos simulados.
+- Pasan `node --test tests/market-data.test.cjs`, `python3 -m unittest discover -s tests -p 'check*.py'` y las pruebas de contrato del backend nuevo. Se prueba la web a través del proxy y se indica qué escenarios usaron datos reales y cuáles usaron datos simulados.
