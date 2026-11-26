@@ -1,5 +1,9 @@
 # Cambios de Quant Radar
 
+## Registro horario de señales
+
+- Captura señales técnicas de BTC/USD, ETH/USD, EUR/USD y USD/JPY en velas horarias cerradas. GitHub Actions las guarda en Neon y conserva una sola captura por par y hora.
+
 ## v11.3.0 · Decisión por plazo y valoración fundamental
 
 ### Navegación y gráficos

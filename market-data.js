@@ -112,4 +112,9 @@ function assetDecision(report, marketSession, asset, {fundamental = false, hasPo
       'La media de 20 velas, el rendimiento de 10 velas y el MACD no coinciden en una dirección.'};
 }
 
-if (typeof module !== "undefined") module.exports = { hasFreshIntradayData, assetDecision };
+function compute(u,d) {
+  const avg = values => values.reduce((sum, value) => sum + value, 0) / values.length;
+  let a=d.values.map(v=>Number(v.close)).filter(x=>Number.isFinite(x)&&x>0);if(a.length<21)throw Error('Histórico insuficiente');let p=a.at(-1),ma=avg(a.slice(-20)),mom=(p/a.at(-11)-1)*100,delta=a.slice(1).map((v,i)=>v-a[i]).slice(-14),g=avg(delta.map(v=>Math.max(0,v))),l=avg(delta.map(v=>Math.max(0,-v))),rsi=l===0?(g===0?50:100):100-100/(1+g/l),ret=a.slice(1).map((v,i)=>v/a[i]-1).slice(-20),m=avg(ret),vol=Math.sqrt(avg(ret.map(x=>(x-m)**2)))*100,risk=u[2]==='Crypto'||vol>2?'Alto':vol>.65?'Medio':'Bajo';let ema=(arr,n)=>arr.reduce((v,x,i)=>i===0?x:x*2/(n+1)+v*(1-2/(n+1)),0),macd=ema(a,12)-ema(a,26),sd=Math.sqrt(avg(a.slice(-20).map(x=>(x-ma)**2))),rows=d.values.filter(v=>v.high!=null&&v.low!=null&&v.close!=null),tr=rows.slice(1).map((v,i)=>Math.max(+v.high-+v.low,Math.abs(+v.high-+rows[i].close),Math.abs(+v.low-+rows[i].close))),atr=tr.length>=14?avg(tr.slice(-14)):null,vr=rows.slice(-21,-1).map(v=>+v.volume),volumeRatio=vr.length&&avg(vr)>0?+rows.at(-1).volume/avg(vr):null;return {u,a,values:d.values,p,ma,mom,g,l,returnMean:m,macd,sd,atr,volumeRatio,rsi,vol,risk,change:(p/a.at(-2)-1)*100,meta:d.meta||{},stale:d.stale,fetched:d.fetched_at,date:d.values.at(-1).datetime,low:Math.min(...a.slice(-20)),high:Math.max(...a.slice(-20))}
+}
+
+if (typeof module !== "undefined") module.exports = { hasFreshIntradayData, assetDecision, compute };
