@@ -1,6 +1,14 @@
 # Cambios de Quant Radar
 
-## Decisión por plazo y valoración fundamental
+## v11.3.0 · Decisión por plazo y valoración fundamental
+
+### Navegación y gráficos
+
+- La barra lateral permite buscar por nombre o símbolo y desplazar el listado de activos.
+- El resaltado se desliza entre opciones en el selector de plazo y en la navegación principal. Al pasar el cursor por la lista, las filas cercanas se amplían con un efecto inspirado en el Dock.
+- El gráfico principal y la minigráfica del activo seleccionado usan tonos vivos según la señal. Las demás minigráficas usan tonos suaves de la misma familia. La fila seleccionada se distingue con un sombreado más intenso y sin borde.
+
+### Motor y valoración
 
 - **Corto plazo e intradía.** La ficha muestra Comprar, Vender o Esperar y explica la relación entre cierre, media de 20 velas, rendimiento de 10 velas y MACD.
 - **Largo plazo.** Usa el valor del negocio y los datos de solvencia y rentabilidad cuando el DCF está disponible. Para otros activos o si faltan datos fundamentales, aplica un criterio semanal con media de 40 semanas y rendimiento a 26 semanas. Una salida a largo plazo requiere una posición registrada.
