@@ -9,6 +9,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import server
+from signal_evaluator import evaluate_pending
 
 ROOT = Path(__file__).resolve().parent
 PAIRS = {
@@ -110,6 +111,8 @@ def record_hour(database, now, series_for, *, postgres=False):
                             json.dumps(row, allow_nan=False)) for row in series['values']])
             summary['inserted'] += inserted
             summary['existing'] += 1 - inserted
+        with db.transaction() if postgres else db:
+            summary['outcomes'] = evaluate_pending(db, mark, now, PUBLICATION_DELAY)
     return summary
 
 
