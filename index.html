@@ -860,6 +860,14 @@ function renderAssetDecision(asset, report) {
     ? assetDecision(report, session(asset), asset, {fundamental, hasPosition})
     : {state:'wait', title:'Esperar', reason:selected ? 'Cargando datos del plazo seleccionado.' : 'Selecciona un activo.'};
   $('assetDecisionCard').dataset.state = decision.state;
+  if (asset && chartState.asset === asset) {
+    const awaitingSession = !fundamental && session(asset) !== 'open';
+    const color = awaitingSession ? chartDecisionColors.pending : chartDecisionColors[decision.state];
+    if (color && color !== chartState.areaColor) {
+      chartState.areaColor = color;
+      paintChart();
+    }
+  }
   if ($('assetDecisionTitle').textContent !== decision.title) $('assetDecisionTitle').textContent = decision.title;
   if ($('assetDecisionReason').textContent !== decision.reason) $('assetDecisionReason').textContent = decision.reason;
   $('assetDecisionReason').hidden = !decision.reason;
@@ -1081,11 +1089,14 @@ function syncChartRanges() {
   }
 }
 
-const chartState = {asset:null, areaColor:'#00c2ff', bars:[], start:0, count:0, cursor:null, range:'Todo', ranges:new Map()};
+const chartDecisionColors = {buy:'#35d9a4', sell:'#ff9aa7', wait:'#ebbf75', pending:'#aab8cb'};
+const chartState = {asset:null, areaColor:chartDecisionColors.pending, bars:[], start:0, count:0, cursor:null, range:'Todo', ranges:new Map()};
 let chartDrag = null;
 
-function setChartAsset(asset, areaColor = '#00c2ff') {
-  chartState.areaColor = areaColor;
+function setChartAsset(asset) {
+  if (asset?.u[0] !== chartState.asset?.u[0] || asset?.interval !== chartState.asset?.interval) {
+    chartState.areaColor = chartDecisionColors.pending;
+  }
   const key = asset && [asset.u[0], asset.interval, asset.meta.source].join('|');
   if (asset !== chartState.asset) {
     const old = chartState.bars.length;
