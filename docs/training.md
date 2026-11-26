@@ -32,3 +32,13 @@ Actions. Las velas se guardan una sola vez por par, proveedor y hora, y la
 primera captura válida importa también las velas anteriores de su ventana.
 Las velas históricas recuperadas quedan en su propia tabla, sin generar
 señales retrospectivas.
+
+### Evaluación de las señales
+
+Cada ejecución evalúa las señales vencidas. La entrada simulada usa la apertura
+de la primera hora UTC que empieza después de registrar la señal. La salida
+usa el cierre de la cuarta vela consecutiva. Si falta alguna vela, la
+evaluación queda pendiente. La comparación inicial usa un coste ilustrativo
+de ida y vuelta del 0,20 % para una compra y su salida. En una venta mide la
+diferencia bruta entre cerrar una posición existente y mantenerla. Los
+resultados se guardan una sola vez por señal y versión de la evaluación.
