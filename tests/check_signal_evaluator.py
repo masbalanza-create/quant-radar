@@ -4,7 +4,8 @@ import unittest
 from contextlib import closing
 from datetime import datetime, timedelta
 
-from signal_evaluator import evaluate_pending
+from signal_evaluator import POLICY, evaluate_pending, evaluation_window
+from signal_report import build_report
 
 
 class SignalEvaluatorChecks(unittest.TestCase):
@@ -15,7 +16,8 @@ class SignalEvaluatorChecks(unittest.TestCase):
             db.execute('CREATE TABLE hourly_candles (symbol, provider, bar_start, candle)')
             db.execute('INSERT INTO hourly_signals VALUES (?, ?, ?, ?)', (
                 'BTC/USD', '2026-11-26T09:00:00+00:00', '2026-11-26T10:12:00+00:00',
-                json.dumps({'decision': {'state': 'wait'}, 'market_data': {'source': 'Kraken'}})))
+                json.dumps({'decision': {'state': 'wait'}, 'market_data': {'source': 'Kraken'},
+                            'features': {'close': 105, 'sma20': 100}})))
             for hour in (10, 11, 12, 14):
                 db.execute('INSERT INTO hourly_candles VALUES (?, ?, ?, ?)', (
                     'BTC/USD', 'Kraken', f'2026-11-26T{hour}:00:00+00:00',
@@ -31,3 +33,7 @@ class SignalEvaluatorChecks(unittest.TestCase):
             outcome = json.loads(db.execute('SELECT outcome FROM hourly_signal_outcomes').fetchone()[0])
             self.assertEqual(outcome['entry_price'], 100)
             self.assertAlmostEqual(outcome['missed_long_gain'], 0.048)
+            report = build_report(db, '?', POLICY, ('BTC/USD',), ready,
+                                  lambda value: evaluation_window(value)[1] + delay)
+            self.assertIn('| BTC/USD | 1 | 1 | 0 | 0 |', report)
+            self.assertIn('| BTC/USD | — | 1/1 | — | +0.00% | +4.80% |', report)

@@ -9,7 +9,8 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import server
-from signal_evaluator import evaluate_pending
+from signal_evaluator import POLICY, evaluate_pending, evaluation_window
+from signal_report import build_report
 
 ROOT = Path(__file__).resolve().parent
 PAIRS = {
@@ -113,6 +114,11 @@ def record_hour(database, now, series_for, *, postgres=False):
             summary['existing'] += 1 - inserted
         with db.transaction() if postgres else db:
             summary['outcomes'] = evaluate_pending(db, mark, now, PUBLICATION_DELAY)
+            if summary_path := os.getenv('GITHUB_STEP_SUMMARY'):
+                report = build_report(db, mark, POLICY, PAIRS, now,
+                                      lambda recorded: evaluation_window(recorded)[1] + PUBLICATION_DELAY)
+                with Path(summary_path).open('a', encoding='utf-8') as output:
+                    output.write(report)
     return summary
 
 
