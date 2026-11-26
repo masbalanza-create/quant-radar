@@ -10,6 +10,14 @@ ROUND_TRIP_COST = 0.002
 POLICY = 'four-hour-long-v1'
 
 
+def evaluation_window(recorded_at):
+    recorded = datetime.fromisoformat(recorded_at)
+    entry = recorded.replace(minute=0, second=0, microsecond=0)
+    if entry < recorded:
+        entry += HOUR
+    return entry, entry + HOUR * HORIZON
+
+
 def evaluate_pending(db, mark, now, publication_delay):
     db.execute("""
         CREATE TABLE IF NOT EXISTS hourly_signal_outcomes (
@@ -30,11 +38,7 @@ def evaluate_pending(db, mark, now, publication_delay):
     summary = {'evaluated': 0, 'missing_candles': 0}
     with closing(db.cursor()) as cursor:
         for symbol, session, recorded_at, raw in signals:
-            recorded = datetime.fromisoformat(recorded_at)
-            entry = recorded.replace(minute=0, second=0, microsecond=0)
-            if entry < recorded:
-                entry += HOUR
-            end = entry + HOUR * HORIZON
+            entry, end = evaluation_window(recorded_at)
             if end + publication_delay > now:
                 continue
             snapshot = json.loads(raw)
