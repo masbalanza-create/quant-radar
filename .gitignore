@@ -7,3 +7,5 @@ __pycache__/
 training.sqlite3*
 
 valuation-inputs.json
+
+hourly-signals.sqlite3*
