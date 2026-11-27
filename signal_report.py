@@ -4,7 +4,7 @@ from collections import defaultdict
 from statistics import mean
 
 
-def build_report(db, mark, policy, pairs, now, deadline):
+def summarize_signals(db, mark, policy, pairs, now, deadline):
     rows = db.execute(f"""
         SELECT s.symbol, s.recorded_at, s.snapshot, o.outcome
         FROM hourly_signals s
@@ -13,7 +13,9 @@ def build_report(db, mark, policy, pairs, now, deadline):
     """, (policy,))
     counts = defaultdict(lambda: [0, 0, 0, 0])
     returns = defaultdict(list)
+    latest = {}
     for symbol, recorded_at, raw_snapshot, raw_outcome in rows:
+        latest[symbol] = max(recorded_at, latest.get(symbol, ''))
         counts[symbol][0] += 1
         if raw_outcome is None:
             counts[symbol][2 if deadline(recorded_at) > now else 3] += 1
@@ -28,6 +30,26 @@ def build_report(db, mark, policy, pairs, now, deadline):
             features['close'] > features['sma20'],
         ))
 
+    report = []
+    for pair in pairs:
+        results = returns[pair]
+        buys = [net for signal, net, _, _ in results if signal == 'buy']
+        waits = [net for signal, net, _, _ in results if signal == 'wait']
+        sells = [edge for signal, _, edge, _ in results if signal == 'sell']
+        report.append({
+            'pair': pair, 'latest': latest.get(pair),
+            **dict(zip(('signals', 'evaluated', 'pending', 'overdue'), counts[pair])),
+            'buys': len(buys), 'buy_mean': mean(buys) if buys else None,
+            'waits': len(waits), 'missed': sum(net > 0 for net in waits),
+            'sells': len(sells), 'favorable_exits': sum(edge > 0 for edge in sells),
+            'motor': mean(net if signal == 'buy' else 0 for signal, net, _, _ in results) if results else None,
+            'baseline': mean(net if above else 0 for _, net, _, above in results) if results else None,
+        })
+    return report
+
+
+def build_report(db, mark, policy, pairs, now, deadline):
+    report = summarize_signals(db, mark, policy, pairs, now, deadline)
     lines = [
         '## Evaluación de señales',
         '',
@@ -36,24 +58,21 @@ def build_report(db, mark, policy, pairs, now, deadline):
         '| Par | Señales | Evaluadas | En plazo | Vencidas sin resultado |',
         '|---|---:|---:|---:|---:|',
     ]
-    for pair in pairs:
-        lines.append('| ' + ' | '.join([pair, *map(str, counts[pair])]) + ' |')
+    for row in report:
+        cells = (row['pair'], row['signals'], row['evaluated'], row['pending'], row['overdue'])
+        lines.append('| ' + ' | '.join(map(str, cells)) + ' |')
     lines.extend([
         '',
         '| Par | Comprar: media neta y n | Esperar: compras rentables omitidas | Vender: salidas favorables | Motor: media por caso | Media 20: media por caso |',
         '|---|---:|---:|---:|---:|---:|',
     ])
-    for pair in pairs:
-        results = returns[pair]
-        buys = [net for signal, net, _, _ in results if signal == 'buy']
-        waits = [net for signal, net, _, _ in results if signal == 'wait']
-        sells = [edge for signal, _, edge, _ in results if signal == 'sell']
-        buy_mean = f'{mean(buys):+.2%} ({len(buys)})' if buys else '—'
-        missed = f'{sum(net > 0 for net in waits)}/{len(waits)}' if waits else '—'
-        exits = f'{sum(edge > 0 for edge in sells)}/{len(sells)}' if sells else '—'
-        motor = f'{mean(net if signal == "buy" else 0 for signal, net, _, _ in results):+.2%}' if results else '—'
-        baseline = f'{mean(net if above else 0 for _, net, _, above in results):+.2%}' if results else '—'
-        lines.append(f'| {pair} | {buy_mean} | {missed} | {exits} | {motor} | {baseline} |')
+    for row in report:
+        buy_mean = f"{row['buy_mean']:+.2%} ({row['buys']})" if row['buys'] else '—'
+        missed = f"{row['missed']}/{row['waits']}" if row['waits'] else '—'
+        exits = f"{row['favorable_exits']}/{row['sells']}" if row['sells'] else '—'
+        motor = f"{row['motor']:+.2%}" if row['evaluated'] else '—'
+        baseline = f"{row['baseline']:+.2%}" if row['evaluated'] else '—'
+        lines.append(f"| {row['pair']} | {buy_mean} | {missed} | {exits} | {motor} | {baseline} |")
     lines.extend([
         '',
         'La comparación puntúa entradas largas sobre los mismos casos evaluados. Sin entrada, el resultado es cero.',
