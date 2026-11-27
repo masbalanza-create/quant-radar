@@ -11,3 +11,13 @@ QUANT RADAR · ARRANQUE LOCAL
 
 Consulta README.md, Quant_Radar_Manual_Operativo.pdf y docs/valuation.md.
 Alpaca y OpenAI son opcionales. Mantén .env y valuation-inputs.json en local.
+
+Para mostrar los datos de Entrenamiento de IA en el Mac, prepara el entorno
+local desde la carpeta del proyecto:
+
+  python3 -m venv .venv
+  .venv/bin/python -m pip install -r requirements.txt
+
+Añade QR_TRAINING_DATABASE_URL en .env con el rol de Neon de solo lectura
+y abre INICIAR.command. Mantén abierta la ventana de Terminal mientras uses
+la copia local.

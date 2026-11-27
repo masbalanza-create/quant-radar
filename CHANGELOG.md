@@ -1,5 +1,11 @@
 # Cambios de Quant Radar
 
+## Panel de entrenamiento y arranque local
+
+- La pestaña Entrenamiento de IA muestra señales registradas, evaluaciones y la comparación con la media de 20 velas.
+- El evaluador guarda en Neon el resultado de las señales tras cuatro velas horarias consecutivas.
+- El iniciador de macOS usa el entorno Python local cuando está disponible, para que el panel pueda consultar Neon con su conexión de solo lectura.
+
 ## Registro horario de señales
 
 - Captura señales técnicas de BTC/USD, ETH/USD, EUR/USD y USD/JPY en velas horarias cerradas. GitHub Actions las guarda en Neon y conserva una sola captura por par y hora.

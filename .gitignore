@@ -9,3 +9,5 @@ training.sqlite3*
 valuation-inputs.json
 
 hourly-signals.sqlite3*
+
+.venv/
