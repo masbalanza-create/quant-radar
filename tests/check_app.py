@@ -42,6 +42,17 @@ class AppChecks(unittest.TestCase):
         handler.do_GET()
         self.assertEqual(handler.reply.call_args.args[1], 400)
 
+    def test_training_summary_http_dispatch(self):
+        from unittest.mock import patch
+
+        handler = server.Handler.__new__(server.Handler)
+        handler.authorized = Mock(return_value=True)
+        handler.reply = Mock()
+        handler.path = '/api/training-summary'
+        with patch.dict(server.os.environ, {'QR_TRAINING_DATABASE_URL': ''}):
+            handler.do_GET()
+        handler.reply.assert_called_once_with({'status': 'unconfigured'}, 200)
+
     def test_browser_scripts_and_control_ids(self):
         html = (ROOT / "index.html").read_text()
         scripts = re.findall(r"<script>(.*?)</script>", html, re.S)

@@ -8,7 +8,6 @@ from contextlib import closing
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-import server
 from signal_evaluator import POLICY, evaluate_pending, evaluation_window
 from signal_report import build_report
 
@@ -123,6 +122,8 @@ def record_hour(database, now, series_for, *, postgres=False):
 
 
 def main():
+    import server
+
     database = os.getenv('QR_SIGNAL_DATABASE', str(ROOT / 'hourly-signals.sqlite3'))
     database_url = os.getenv('DATABASE_URL')
     if os.getenv('GITHUB_ACTIONS') == 'true' and not database_url:

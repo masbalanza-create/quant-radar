@@ -297,6 +297,28 @@ def valuation_source(url, headers=None):
  cache[key]=(now,result)
  return result
 
+def training_summary():
+    from signal_evaluator import POLICY, evaluation_window
+    from signal_registry import PAIRS, PUBLICATION_DELAY
+    from signal_report import summarize_signals
+
+    database = os.getenv('QR_TRAINING_DATABASE_URL')
+    if not database:
+        return {'status': 'unconfigured'}, 200
+    now = datetime.now(timezone.utc)
+    try:
+        import psycopg
+        with psycopg.connect(database, connect_timeout=5) as db:
+            db.execute('SET TRANSACTION READ ONLY')
+            db.execute('SET LOCAL statement_timeout = 5000')
+            rows = summarize_signals(db, '%s', POLICY, PAIRS, now,
+                                     lambda recorded: evaluation_window(recorded)[1] + PUBLICATION_DELAY)
+    except Exception as exc:
+        print(f'Panel de entrenamiento: {type(exc).__name__}', flush=True)
+        return {'status': 'unavailable'}, 503
+    return {'status': 'ok', 'pairs': rows}, 200
+
+
 class Handler(SimpleHTTPRequestHandler):
  def authorized(self):
   if not os.getenv('PORT'):return True
@@ -317,6 +339,7 @@ class Handler(SimpleHTTPRequestHandler):
  def do_GET(self):
   if not self.authorized():return
   u=urllib.parse.urlsplit(self.path);q=urllib.parse.parse_qs(u.query)
+  if u.path=='/api/training-summary':return self.reply(*training_summary())
   if u.path=='/api/market-quote':return self.reply(market_quote(q.get('symbol',[''])[0]))
   if u.path=='/api/options':return self.reply(option_snapshot(q.get('symbol',[''])[0]))
   if u.path=='/api/valuation':

@@ -587,6 +587,13 @@ canvas.watch-spark { width: 56px; height: 28px; margin: 0; }
 }
 .app-sections a[aria-current] { background: #ffffff09; color: var(--ink); }
 #settingsView, #trainingView { max-width: 64rem; margin-inline: auto; }
+.training-header { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.training-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 21rem), 1fr)); gap: 16px; }
+.training-pair { padding: 18px; border: 1px solid var(--line); border-radius: 16px; background: var(--paper); }
+.training-pair h2 { margin: 0; font-size: 1.25rem; }
+.training-pair dl { display: grid; grid-template-columns: 1fr auto; gap: 8px 16px; }
+.training-pair dt { color: var(--muted); }
+.training-pair dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
 #settingsView h1, #trainingView h1 { margin-bottom: 18px; font-size: clamp(1.6rem, 3vw, 2.25rem); }
 #workspace[hidden], #sidebarToggle[hidden] { display: none; }
 .watch-rows .asset-select.is-leader { background: #302a23; }
@@ -700,7 +707,13 @@ canvas.watch-spark { width: 56px; height: 28px; margin: 0; }
 </form>
 </details></section></section>
 <section id="trainingView" aria-labelledby="trainingTitle" hidden>
-  <h1 id="trainingTitle" tabindex="-1">Entrenamiento de IA</h1>
+  <div class="training-header">
+    <h1 id="trainingTitle" tabindex="-1">Entrenamiento de IA</h1>
+    <button id="trainingRefresh" type="button">Actualizar informe</button>
+  </div>
+  <p id="trainingStatus" class="muted" role="status"></p>
+  <div id="trainingResults" class="training-grid"></div>
+  <p id="trainingNotes" class="muted" hidden>Comparación de entradas largas sobre los mismos casos, con cuatro velas por operación y un coste simulado del 0,20 %. La media de 20 velas compra cuando el cierre supera esa media. Los resultados se expresan por caso y las operaciones simuladas pueden solaparse.</p>
 </section></main>
 <script src="/market-data.js"></script><script>
 const $=id=>document.getElementById(id), universe=[['AAPL','Apple','EE. UU.',190],['NVDA','Nvidia','EE. UU.',145],['MSFT','Microsoft','EE. UU.',420],['TSLA','Tesla','EE. UU.',250],['AMZN','Amazon','EE. UU.',200],['ASML:Euronext Amsterdam','ASML','Europa',780],['SAP:XETR','SAP','Europa',210],['SAN:BME','Santander','Europa',5],['7203:JPX','Toyota','Asia',2700],['9984:JPX','SoftBank','Asia',8000],['EUR/USD','Euro / dólar','Forex',1.08],['USD/JPY','Dólar / yen','Forex',150],['SPY','S&P 500 ETF','ETF',550],['QQQ','Nasdaq 100 ETF','ETF',480],['XAU/USD','Oro · futuro','Materias primas',2700],['XAG/USD','Plata · futuro','Materias primas',30],['BTC/USD','Bitcoin','Crypto',65000],['ETH/USD','Ethereum','Crypto',3200]];let clock={},newsData={},newsPending={},deepResults={},selectedNews=null;let data=[],selected=null,connected=false,ai=false,timer,busy=false,pendingHorizon=null;const fmt=n=>Number(n).toLocaleString('es-ES',{maximumFractionDigits:4}),avg=a=>a.reduce((s,x)=>s+x,0)/a.length,clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
@@ -1273,6 +1286,70 @@ function updateSectionIndicator() {
   nav.style.setProperty('--nav-radius', 1800 / active.offsetWidth + 'px');
   nav.dataset.indicator = '';
 }
+const trainingPercent = new Intl.NumberFormat('es-ES', {
+  style: 'percent', maximumFractionDigits: 2, signDisplay: 'exceptZero'
+});
+
+async function loadTrainingSummary() {
+  const button = $('trainingRefresh');
+  if (button.disabled) return;
+  const status = $('trainingStatus');
+  const results = $('trainingResults');
+  button.disabled = true;
+  results.setAttribute('aria-busy', 'true');
+  status.textContent = 'Consultando las señales…';
+  try {
+    const response = await fetch('/api/training-summary', {signal: AbortSignal.timeout(15000)});
+    if (!response.ok) throw new Error('Informe no disponible');
+    const report = await response.json();
+    results.replaceChildren();
+    $('trainingNotes').hidden = report.status !== 'ok';
+    if (report.status === 'unconfigured') {
+      status.textContent = 'El panel está pendiente de conectar al registro de señales.';
+      return;
+    }
+    if (report.status !== 'ok') throw new Error('Informe no disponible');
+    const percent = value => value == null ? '—' : trainingPercent.format(value);
+    const items = report.pairs.map(pair => {
+      const item = document.createElement('section');
+      item.className = 'training-pair';
+      const title = document.createElement('h2');
+      title.textContent = pair.pair;
+      const time = document.createElement('p');
+      time.className = 'muted';
+      time.textContent = pair.latest
+        ? 'Última señal · ' + new Date(pair.latest).toLocaleString('es-ES')
+        : 'Sin señales registradas';
+      const metrics = document.createElement('dl');
+      for (const [label, value] of [
+        ['Señales registradas', pair.signals],
+        ['Evaluadas', pair.evaluated],
+        ['En plazo', pair.pending],
+        ['Vencidas sin resultado', pair.overdue],
+        ['Motor · media por caso', percent(pair.motor)],
+        ['Media de 20 velas · media por caso', percent(pair.baseline)]
+      ]) {
+        const term = document.createElement('dt');
+        const detail = document.createElement('dd');
+        term.textContent = label;
+        detail.textContent = value;
+        metrics.append(term, detail);
+      }
+      item.append(title, time, metrics);
+      return item;
+    });
+    results.replaceChildren(...items);
+    const evaluated = report.pairs.reduce((total, pair) => total + pair.evaluated, 0);
+    status.textContent = evaluated ? evaluated + ' señales evaluadas' : 'Aún no hay resultados de evaluación.';
+  } catch {
+    status.textContent = 'No se pudo actualizar el informe. Vuelve a intentarlo.';
+  } finally {
+    button.disabled = false;
+    results.removeAttribute('aria-busy');
+  }
+}
+$('trainingRefresh').addEventListener('click', loadTrainingSummary);
+
 function showWorkspaceSection() {
   const current = ['#settingsView', '#trainingView'].includes(location.hash)
     ? location.hash.slice(1) : 'workspace';
@@ -1284,6 +1361,7 @@ function showWorkspaceSection() {
   $('sidebarToggle').hidden = current !== 'workspace';
   $('radarHorizons').hidden = current !== 'workspace';
   updateSectionIndicator();
+  if (current === 'trainingView') loadTrainingSummary();
   if (current !== 'workspace') $(current === 'settingsView' ? 'settingsTitle' : 'trainingTitle').focus();
 }
 

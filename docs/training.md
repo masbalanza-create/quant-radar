@@ -42,3 +42,12 @@ evaluación queda pendiente. La comparación inicial usa un coste ilustrativo
 de ida y vuelta del 0,20 % para una compra y su salida. En una venta mide la
 diferencia bruta entre cerrar una posición existente y mantenerla. Los
 resultados se guardan una sola vez por señal y versión de la evaluación.
+
+### Panel de entrenamiento
+
+La pestaña **Entrenamiento de IA** consulta el registro mediante
+`GET /api/training-summary`. Para habilitarla en Render, añade
+`QR_TRAINING_DATABASE_URL` como variable secreta del servicio. Usa un rol de
+Neon con permiso de lectura sobre `hourly_signals` y
+`hourly_signal_outcomes`. GitHub Actions continúa usando su propio secreto
+para escribir los datos.
