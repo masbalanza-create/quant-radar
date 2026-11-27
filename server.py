@@ -298,6 +298,7 @@ def valuation_source(url, headers=None):
  return result
 
 def training_summary():
+    from portfolio_simulator import load_simulation
     from signal_evaluator import POLICY, evaluation_window
     from signal_registry import PAIRS, PUBLICATION_DELAY
     from signal_report import summarize_signals
@@ -313,10 +314,11 @@ def training_summary():
             db.execute('SET LOCAL statement_timeout = 5000')
             rows = summarize_signals(db, '%s', POLICY, PAIRS, now,
                                      lambda recorded: evaluation_window(recorded)[1] + PUBLICATION_DELAY)
+            simulation = load_simulation(db, '%s')
     except Exception as exc:
         print(f'Panel de entrenamiento: {type(exc).__name__}', flush=True)
         return {'status': 'unavailable'}, 503
-    return {'status': 'ok', 'pairs': rows}, 200
+    return {'status': 'ok', 'pairs': rows, 'simulation': simulation}, 200
 
 
 class Handler(SimpleHTTPRequestHandler):

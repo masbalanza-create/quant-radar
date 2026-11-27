@@ -712,6 +712,12 @@ canvas.watch-spark { width: 56px; height: 28px; margin: 0; }
     <button id="trainingRefresh" type="button">Actualizar informe</button>
   </div>
   <p id="trainingStatus" class="muted" role="status"></p>
+  <section id="trainingSimulation" aria-labelledby="simulationTitle" hidden>
+    <h2 id="simulationTitle">Cartera simulada · BTC/USD y ETH/USD</h2>
+    <p id="simulationPeriod" class="muted"></p>
+    <div id="simulationResults" class="training-grid"></div>
+    <p class="muted">Solo entradas largas. Una posición por par, cuatro velas por operación y un coste de ida y vuelta del 0,20 %. La caída máxima se calcula al cierre de las operaciones.</p>
+  </section>
   <div id="trainingResults" class="training-grid"></div>
   <p id="trainingNotes" class="muted" hidden>Comparación de entradas largas sobre los mismos casos, con cuatro velas por operación y un coste simulado del 0,20 %. La media de 20 velas compra cuando el cierre supera esa media. Los resultados se expresan por caso y las operaciones simuladas pueden solaparse.</p>
 </section></main>
@@ -1290,6 +1296,45 @@ const trainingPercent = new Intl.NumberFormat('es-ES', {
   style: 'percent', maximumFractionDigits: 2, signDisplay: 'exceptZero'
 });
 
+function renderTrainingSimulation(simulation) {
+  const panel = $('trainingSimulation');
+  panel.hidden = !simulation;
+  if (!simulation) return;
+  const formatCurrency = value => value.toLocaleString('es-ES', {
+    style: 'currency', currency: 'USD', maximumFractionDigits: 0
+  });
+  const date = value => new Date(value).toLocaleString('es-ES', {
+    dateStyle: 'short', timeStyle: 'short'
+  });
+  const capital = 'Capital inicial ' + formatCurrency(simulation.initial_cash) +
+    ' · ' + formatCurrency(simulation.stake) + ' por operación';
+  $('simulationPeriod').textContent = simulation.cases
+    ? capital + ' · ' + simulation.cases + ' casos evaluados · ' +
+      date(simulation.from) + ' a ' + date(simulation.through)
+    : capital + ' · Aún no hay casos evaluados.';
+  const cards = [['Motor actual', simulation.motor], ['Media de 20 velas', simulation.baseline]];
+  $('simulationResults').replaceChildren(...cards.map(([label, metrics]) => {
+    const card = document.createElement('section');
+    card.className = 'training-pair';
+    const title = document.createElement('h3');
+    title.textContent = label;
+    const list = document.createElement('dl');
+    for (const [name, value] of [
+      ['Rentabilidad neta', trainingPercent.format(metrics.net_return)],
+      ['Caída máxima al cierre', trainingPercent.format(-metrics.closed_drawdown)],
+      ['Operaciones cerradas', metrics.trades]
+    ]) {
+      const term = document.createElement('dt');
+      const detail = document.createElement('dd');
+      term.textContent = name;
+      detail.textContent = simulation.cases ? value : '—';
+      list.append(term, detail);
+    }
+    card.append(title, list);
+    return card;
+  }));
+}
+
 async function loadTrainingSummary() {
   const button = $('trainingRefresh');
   if (button.disabled) return;
@@ -1304,6 +1349,7 @@ async function loadTrainingSummary() {
     const report = await response.json();
     results.replaceChildren();
     $('trainingNotes').hidden = report.status !== 'ok';
+    renderTrainingSimulation(report.simulation);
     if (report.status === 'unconfigured') {
       status.textContent = 'El panel está pendiente de conectar al registro de señales.';
       return;

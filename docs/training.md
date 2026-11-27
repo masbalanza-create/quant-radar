@@ -51,3 +51,13 @@ La pestaña **Entrenamiento de IA** consulta el registro mediante
 Neon con permiso de lectura sobre `hourly_signals` y
 `hourly_signal_outcomes`. GitHub Actions continúa usando su propio secreto
 para escribir los datos.
+
+### Cartera simulada
+
+El panel compara entradas largas del motor y de la media de 20 velas usando
+las señales evaluadas de BTC/USD y ETH/USD. Cada estrategia empieza con
+2.000 USD y asigna 500 USD por entrada. Admite una posición abierta por par.
+Las salidas de una hora se contabilizan antes de las nuevas entradas de esa
+misma hora. Se reutiliza la rentabilidad neta con el coste simulado de 0,20 %.
+La caída máxima se calcula con el capital al cierre de las operaciones,
+valorando al coste las demás posiciones abiertas.
